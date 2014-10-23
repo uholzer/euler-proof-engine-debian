@@ -79,6 +79,7 @@
 :- dynamic(goal/0).
 :- dynamic(got_answer/9).
 :- dynamic(got_dq/0).
+:- dynamic(got_labelvars/2).
 :- dynamic(got_sq/0).
 :- dynamic(got_wi/5).
 :- dynamic(graph/2).
@@ -134,7 +135,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7474 2014-10-17 12:34:16Z josd $').
+version_info('$Id: euler.yap 7485 2014-10-23 18:44:53Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1105,6 +1106,7 @@ n3_n3p(Argument, Mode) :-
 					Rt \= ':-'(_, _)
 				->	(	\+pred(P),
 						P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
+						P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 						P \= query
 					->	assertz(pred(P)),
 						(	flag(n3p)
@@ -1622,6 +1624,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 		functor(Dn, P, N),
 		(	\+pred(P),
 			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
+			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 			N = 2
 		->	assertz(pred(P))
 		;	true
@@ -1664,6 +1667,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			functor(Cn, P, N),
 			(	\+pred(P),
 				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
+				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 				N = 2
 			->	assertz(pred(P))
 			;	true
@@ -3530,8 +3534,14 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#labelvars>'(A, B) :-
-	copy_term_nat(A, B),
-	labelvars(B, 0, _).
+	(	got_labelvars(A, B)
+	->	true
+	;	copy_term_nat(A, B),
+		nb_getval(wn, W),
+		labelvars(B, W, N),
+		nb_setval(wn, N),
+		assertz(got_labelvars(A, B))
+	).
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#length>'(A, B) :-
