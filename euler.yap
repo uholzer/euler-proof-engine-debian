@@ -135,7 +135,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7487 2014-10-26 19:13:49Z josd $').
+version_info('$Id: euler.yap 7490 2014-10-27 21:55:06Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -835,7 +835,19 @@ args(['--plugin', Argument|Args]) :-
 	->	true
 	;	(	Rt = ':-'(Rg)
 		->	call(Rg)
-		;	(	call(Rt)
+		;	(	predicate_property(Rt, dynamic)
+			->	true
+			;	(	File = '-'
+				->	true
+				;	close(In)
+				),
+				(	retract(tmpfile(File))
+				->	delete_file(File)
+				;	true
+				),
+				throw(builtin_redefinition(Rt))
+			),
+			(	call(Rt)
 			->	true
 			;	strelas(Rt),
 				(	Rt \= scope(_),
@@ -1102,11 +1114,10 @@ n3_n3p(Argument, Mode) :-
 			read(Rs, Rt),
 			(	Rt = end_of_file
 			->	true
-			;	(	functor(Rt, P, 2),
-					Rt \= ':-'(_, _)
+			;	(	predicate_property(Rt, dynamic),
+					functor(Rt, P, 2)
 				->	(	\+pred(P),
 						P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
-						P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 						P \= query
 					->	assertz(pred(P)),
 						(	flag(n3p)
@@ -1121,7 +1132,16 @@ n3_n3p(Argument, Mode) :-
 				),
 				(	ground(Rt),
 					Rt \= ':-'(_, _)
-				->	(	call(Rt)
+				->	(	predicate_property(Rt, dynamic)
+					->	true
+					;	close(Rs),
+						(	retract(tmpfile(Tmp_p))
+						->	delete_file(Tmp_p)
+						;	true
+						),
+						throw(builtin_redefinition(Rt))
+					),
+					(	call(Rt)
 					->	true
 					;	strelas(Rt),
 						cnt(sc),
@@ -1625,7 +1645,6 @@ astep(A, B, C, Cn, Cc, Rule) :-
 		functor(Dn, P, N),
 		(	\+pred(P),
 			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
-			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 			N = 2
 		->	assertz(pred(P))
 		;	true
@@ -1668,7 +1687,6 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			functor(Cn, P, N),
 			(	\+pred(P),
 				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
-				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#trace>',
 				N = 2
 			->	assertz(pred(P))
 			;	true
@@ -3912,14 +3930,18 @@ indentation(C) :-
 			),
 			flatten(H, I),
 			atomic_list_concat(I, J),
-			exec(J, _),
-			n3_n3p(Tmp2, semantics),
-			absolute_uri(Tmp2, Tmp),
-			atomic_list_concat(['<', Tmp, '>'], Res),
-			semantics(Res, B),
-			labelvars(B, 0, _),
-			delete_file(Tmp1),
-			delete_file(Tmp2)
+			(	catch(exec(J, _), _, fail)
+			->	n3_n3p(Tmp2, semantics),
+				absolute_uri(Tmp2, Tmp),
+				atomic_list_concat(['<', Tmp, '>'], Res),
+				semantics(Res, B),
+				labelvars(B, 0, _),
+				delete_file(Tmp1),
+				delete_file(Tmp2)
+			;	delete_file(Tmp1),
+				delete_file(Tmp2),
+				fail
+			)
 		)
 	).
 
