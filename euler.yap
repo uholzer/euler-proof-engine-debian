@@ -135,7 +135,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7490 2014-10-27 21:55:06Z josd $').
+version_info('$Id: euler.yap 7492 2014-10-31 19:52:42Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -153,6 +153,7 @@ eye
 <options>
 	--nope			no proof explanation
 	--no-qnames		no qnames in output
+	--no-numerals		no numerals in output
 	--no-distinct		no distinct answers in output
 	--single-answer		give only one answer
 	--step <count>		set maximimum step count
@@ -161,7 +162,6 @@ eye
 	--n3p			output N3 P-code
 	--image <file>		output PVM code
 	--strings		output log:outputString objects
-	--traditional		traditional mode
 	--warn			output warning info
 	--debug			output debug info
 	--debug-cnt		output debug info about counters
@@ -170,6 +170,7 @@ eye
 	--profile		output profile info
 	--statistics		output statistics info
 	--probe			output speedtest info
+	--traditional		traditional mode
 	--version		show version info
 	--license		show license info
 	--help			show help info
@@ -2818,7 +2819,12 @@ wt(rdiv(X, Y)) :-
 wt(X) :-
 	number(X),
 	!,
-	write(X).
+	(	flag('no-numerals')
+	->	dtlit([U, V], X),
+		dtlit([U, V], W),
+		wt(W)
+	;	write(X)
+	).
 wt(cn([X])) :-
 	!,
 	wt(X).
