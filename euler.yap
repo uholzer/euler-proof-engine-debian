@@ -135,7 +135,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7492 2014-10-31 19:52:42Z josd $').
+version_info('$Id: euler.yap 7502 2014-11-12 14:43:15Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9753,10 +9753,13 @@ symbol(Name) -->
 	}.
 symbol(Name) -->
 	[bnode(Label)],
-	{	atom_codes(Label, LabelCodes),
-		subst([[[0'-], [0'_, 0'M, 0'I, 0'N, 0'U, 0'S, 0'_]], [[0'.], [0'_, 0'D, 0'O, 0'T, 0'_]]], LabelCodes, LabelTidy),
-		atom_codes(N, LabelTidy),
-		nb_getval(fdepth, D),
+	{	nb_getval(fdepth, D),
+		(	D =:= 0
+		->	N = Label
+		;	atom_codes(Label, LabelCodes),
+			subst([[[0'-], [0'_, 0'M, 0'I, 0'N, 0'U, 0'S, 0'_]], [[0'.], [0'_, 0'D, 0'O, 0'T, 0'_]]], LabelCodes, LabelTidy),
+			atom_codes(N, LabelTidy)
+		),
 		(	(	D =:= 0
 			->	evar(N, S)
 			;	evar(N, S, D)
