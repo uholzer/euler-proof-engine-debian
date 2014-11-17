@@ -8,18 +8,22 @@
 % Via N3 [4] it is interoperable with Cwm [5].
 % The EYE test cases [6] and their results [7] support the development of EYE.
 %
+% See also README.Linux [8], README.Windows [9] and README.MacOSX [10].
+%
 %
 % References
 % ----------
 %
-% [1] http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt
-% [2] http://eulersharp.sourceforge.net/2006/02swap/rgb-note.txt
-% [3] http://mathworld.wolfram.com/KoenigsbergBridgeProblem.html
-% [4] http://www.w3.org/TeamSubmission/n3/
-% [5] http://www.w3.org/2000/10/swap/doc/cwm
-% [6] http://eulersharp.sourceforge.net/2006/02swap/etc.sh
-% [7] http://eulersharp.sourceforge.net/2006/02swap/etc.n3
-
+%  [1] http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt
+%  [2] http://eulersharp.sourceforge.net/2006/02swap/rgb-note.txt
+%  [3] http://mathworld.wolfram.com/KoenigsbergBridgeProblem.html
+%  [4] http://www.w3.org/TeamSubmission/n3/
+%  [5] http://www.w3.org/2000/10/swap/doc/cwm
+%  [6] http://eulersharp.sourceforge.net/2006/02swap/etc.sh
+%  [7] http://eulersharp.sourceforge.net/2006/02swap/etc.n3
+%  [8] http://eulersharp.sourceforge.net/README.Linux
+%  [9] http://eulersharp.sourceforge.net/README.Windows
+% [10] http://eulersharp.sourceforge.net/README.MacOSX
 
 
 % ----------
@@ -135,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7502 2014-11-12 14:43:15Z josd $').
+version_info('$Id: euler.yap 7514 2014-11-17 20:33:03Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2001,11 +2005,18 @@ qstep(A, B) :-
 % DEPRECATED
 qstep(A, true) :-
 	(	nonvar(A)
-	->	true
+	->	(	A =.. [P, [S1, S2|S3], O]
+		->	B =.. [P, S1, S2, S3, O]
+		;	(	A =.. [P, S, literal(O1, O2)]
+			->	B =.. [P, S, O1, O2]
+			;	B = A
+			)
+		)
 	;	pred(P),
-		A =.. [P, _, _]
+		A =.. [P, _, _],
+		B = A
 	),
-	catch(clause(A, true), _, fail),
+	catch(clause(B, true), _, fail),
 	\+prfstep(A, _, _, _, _, _, _, _).
 
 
