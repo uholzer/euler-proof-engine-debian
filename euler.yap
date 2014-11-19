@@ -139,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7514 2014-11-17 20:33:03Z josd $').
+version_info('$Id: euler.yap 7518 2014-11-19 19:51:17Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8644,6 +8644,7 @@ prolog_sym(get_mutable, get_mutable, rel).
 prolog_sym(get_time, get_time, rel).
 prolog_sym(get0, get0, rel).
 prolog_sym(getcwd, getcwd, rel).
+prolog_sym(getrand, getrand, rel).
 prolog_sym(ground, ground, rel).
 prolog_sym(halt, halt, rel).
 prolog_sym(if, soft_cut, rel).
@@ -8766,6 +8767,7 @@ prolog_sym(set_prolog_flag, set_prolog_flag, rel).
 prolog_sym(set_stream_position, set_stream_position, rel).
 prolog_sym(setarg, setarg, rel).
 prolog_sym(setof, setof, rel).
+prolog_sym(setrand, setrand, rel).
 prolog_sym(sign, sign, func).
 prolog_sym(simple, simple, rel).
 prolog_sym(sin, sin, func).
