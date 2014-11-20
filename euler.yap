@@ -125,13 +125,14 @@
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#reflexive>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/2).
 :- dynamic('<http://www.w3.org/2000/10/swap/list#in>'/2).
 :- dynamic('<http://www.w3.org/2000/10/swap/log#implies>'/2).
+:- dynamic('<http://www.w3.org/2000/10/swap/log#outputString>'/2).
 :- dynamic('<http://www.w3.org/2002/07/owl#sameAs>'/2).
-
 
 
 % -----
@@ -139,7 +140,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7518 2014-11-19 19:51:17Z josd $').
+version_info('$Id: euler.yap 7525 2014-11-20 22:42:08Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -526,6 +527,14 @@ n3socket(Argus) :-
 				atom_codes(ST, NT),
 				wt(ST)
 			)
+		),
+		(	(	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, CsvTuple)
+			;	answer(B1, B2, B3, B4, B5, B6, B7, B8),
+				strela(answer('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, CsvTuple)), answer(B1, B2, B3, B4, B5, B6, B7, B8))
+			),
+			wct(CsvTuple),
+			fail
+		;	true
 		)
 	;	TE is T1+T3+T5,
 		format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, TC, TP, BC, BP, PM, CM, FM, AM]),
@@ -1408,6 +1417,7 @@ strelaz([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
 strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2, P2, O2, exopred, delta, delta)) :-
 	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
 	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
+	P1 \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>',
 	O1 =.. [P2, S2, O2],
 	!.
 strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
@@ -3338,6 +3348,49 @@ ws(X) :-
 		;	write(' ')
 		)
 	).
+
+
+wct([]) :-
+	!,
+	nl.
+wct([A]) :-
+	!,
+	wcf(A),
+	nl.
+wct([A|B]) :-
+	wcf(A),
+	write(','),
+	wct(B).
+
+
+wcf(literal(A, _)) :-
+	!,
+	write('"'),
+	atom_codes(A, B),
+	escape_string(C, B),
+	subst([[[0'"], [0'", 0'"]]], C, D),
+	atom_codes(E, D),
+	write(E),
+	write('"').
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 22, _, '<http://localhost/var#'),
+	!,
+	sub_atom(A, 22, _, 1, B),
+	write('_:'),
+	write(B).
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 1, _, '<'),
+	!,
+	sub_atom(A, 1, _, 1, B),
+	write(B).
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 4, _, some),
+	!.
+wcf(A) :-
+	write(A).
 
 
 indent:-
@@ -7752,7 +7805,10 @@ relabel(A, B) :-
 
 partconc(_, [], []).
 partconc(A, [B|C], [B|D]) :-
-	B = answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _),
+	(	B = answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _)
+	;	B = answer('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>', _, _, _, _, _, _, _)
+	;	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, _)
+	),
 	!,
 	partconc(A, C, D).
 partconc(A, [B|C], [B|D]) :-
