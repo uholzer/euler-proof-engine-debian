@@ -139,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7541 2014-11-26 11:09:38Z josd $').
+version_info('$Id: euler.yap 7543 2014-11-26 11:31:53Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -445,6 +445,7 @@ n3socket(Argus) :-
 	nb_setval(fm, 0),
 	nb_setval(lemma_count, 0),
 	nb_setval(lemma_cursor, 0),
+	nb_setval(answers, 0),
 	catch(eam(0), Exc,
 		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
 			flush_output(user_error),
