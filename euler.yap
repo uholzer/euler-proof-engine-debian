@@ -139,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7531 2014-11-21 20:12:18Z josd $').
+version_info('$Id: euler.yap 7541 2014-11-26 11:09:38Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -507,7 +507,7 @@ n3socket(Argus) :-
 	flush_output(user_error),
 	statistics(runtime, [_, T4]),
 	statistics(walltime, [_, T5]),
-	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n~n', [T4, T5]),
+	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
 	flush_output(user_error),
 	(	flag(strings)
 	->	findall([Key, Str],
@@ -537,6 +537,16 @@ n3socket(Argus) :-
 		format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, TC, TP, BC, BP, PM, CM, FM, AM]),
 		nl
 	),
+	get_time(StampN),
+	datetime(StampN, StampC),
+	atom_codes(StampA, StampC),
+	nb_getval(answers, Ans),
+	(	statistics(inferences, Inf)
+	->	true
+	;	Inf = ''
+	),
+	format(user_error, '[~w] answers=~d inferences=~w seconds=~3d~n~n', [StampA, Ans, Inf, TE]),
+	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
 			(	table(ETP, tp, Rule),
@@ -2530,6 +2540,7 @@ w3(U) :-
 		ws(B),
 		write('.'),
 		nl,
+		cnt(answers),
 		fail
 	;	true
 	),
@@ -2551,6 +2562,7 @@ w3(U) :-
 		ws(C),
 		write('.'),
 		nl,
+		cnt(answers),
 		fail
 	;	(	U = branch
 		->	true
@@ -2619,6 +2631,7 @@ w3(U) :-
 			wt(C),
 			ws(C),
 			write('.'),
+			cnt(answers),
 			fail
 		;	true
 		),
