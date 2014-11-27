@@ -139,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7543 2014-11-26 11:31:53Z josd $').
+version_info('$Id: euler.yap 7545 2014-11-27 12:32:38Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -542,11 +542,13 @@ n3socket(Argus) :-
 	datetime(StampN, StampC),
 	atom_codes(StampA, StampC),
 	nb_getval(answers, Ans),
-	(	statistics(inferences, Inf)
+	(	statistics(inferences, Inf),
+		statistics(codes, Codes)
 	->	true
-	;	Inf = ''
+	;	Inf = '',
+		Codes =''
 	),
-	format(user_error, '[~w] answers=~d inferences=~w seconds=~3d~n~n', [StampA, Ans, Inf, TE]),
+	format(user_error, '[~w] answers=~d inferences=~w pvmcodes=~w seconds=~3d~n~n', [StampA, Ans, Inf, Codes, TE]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
@@ -869,13 +871,23 @@ args(['--plugin', Argument|Args]) :-
 				),
 				throw(builtin_redefinition(Rt))
 			),
+			(	Rt = scope(Scope)
+			->	nb_setval(current_scope, Scope)
+			;	true
+			),
 			(	call(Rt)
 			->	true
 			;	strelas(Rt),
 				(	Rt \= scope(_),
 					Rt \= pfx(_, _),
 					Rt \= pred(_)
-				->	cnt(sc)
+				->	(	flag(nope),
+						\+flag(ances)
+					->	true
+					;	nb_getval(current_scope, Src),
+						assertz(prfstep(Rt, _, true, _, Rt, _, forward, Src))
+					),
+					cnt(sc)
 				;	true
 				)
 			)
@@ -898,7 +910,8 @@ args(['--plugin', Argument|Args]) :-
 	flush_output(user_error),
 	args(Args).
 args(['--turtle', Arg|Args]) :-
-	atomic_list_concat(['<', Arg, '>'], R),
+	absolute_uri(Arg, A),
+	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
 	->	format('~q.~n', [scope(R)])
@@ -911,7 +924,8 @@ args(['--turtle', Arg|Args]) :-
 % DEPRECATED
 args(['--trules', Arg|Args]) :-
 	!,
-	atomic_list_concat(['<', Arg, '>'], R),
+	absolute_uri(Arg, A),
+	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
 	->	format('~q.~n', [scope(R)])
@@ -963,7 +977,8 @@ args(['--tquery', Arg|Args]) :-
 	assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 	args(Args).
 args([Arg|Args]) :-
-	atomic_list_concat(['<', Arg, '>'], R),
+	absolute_uri(Arg, A),
+	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
 	->	format('~q.~n', [scope(R)])
