@@ -139,7 +139,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7545 2014-11-27 12:32:38Z josd $').
+version_info('$Id: euler.yap 7548 2014-11-27 16:06:27Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -548,7 +548,8 @@ n3socket(Argus) :-
 	;	Inf = '',
 		Codes =''
 	),
-	format(user_error, '[~w] answers=~d inferences=~w pvmcodes=~w seconds=~3d~n~n', [StampA, Ans, Inf, Codes, TE]),
+	Elapsed is T1+T3+T5,
+	format(user_error, '[~w] answers=~d inferences=~w pvmcodes=~w seconds=~3d~n~n', [StampA, Ans, Inf, Codes, Elapsed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
