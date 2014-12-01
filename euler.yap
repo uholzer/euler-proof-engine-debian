@@ -33,6 +33,8 @@
 
 :- if(current_prolog_flag(dialect, swi)).
 :- style_check(-atom).
+:- initialization(catch(set_prolog_stack(local, limit(2^33)), _, true)).
+:- initialization(catch(set_prolog_stack(global, limit(2^35)), _, true)).
 :- endif.
 
 
@@ -139,7 +141,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7548 2014-11-27 16:06:27Z josd $').
+version_info('$Id: euler.yap 7566 2014-12-01 22:08:01Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
