@@ -141,7 +141,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7566 2014-12-01 22:08:01Z josd $').
+version_info('$Id: euler.yap 7576 2014-12-03 20:49:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -447,7 +447,7 @@ n3socket(Argus) :-
 	nb_setval(fm, 0),
 	nb_setval(lemma_count, 0),
 	nb_setval(lemma_cursor, 0),
-	nb_setval(answers, 0),
+	nb_setval(output_triples, 0),
 	catch(eam(0), Exc,
 		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
 			flush_output(user_error),
@@ -543,15 +543,14 @@ n3socket(Argus) :-
 	get_time(StampN),
 	datetime(StampN, StampC),
 	atom_codes(StampA, StampC),
-	nb_getval(answers, Ans),
-	(	statistics(inferences, Inf),
-		statistics(codes, Codes)
+	nb_getval(output_triples, OutT),
+	(	statistics(inferences, Inf)
 	->	true
-	;	Inf = '',
-		Codes =''
+	;	Inf = ''
 	),
-	Elapsed is T1+T3+T5,
-	format(user_error, '[~w] answers=~d inferences=~w pvmcodes=~w seconds=~3d~n~n', [StampA, Ans, Inf, Codes, Elapsed]),
+	Elaps is T1+T3+T5,
+	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
+	format(user_error, '[~w] outputTriples=~d inferences=~w seconds=~3d inferences/sec=~w~n~n', [StampA, OutT, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
@@ -2559,7 +2558,7 @@ w3(U) :-
 		ws(B),
 		write('.'),
 		nl,
-		cnt(answers),
+		cnt(output_triples),
 		fail
 	;	true
 	),
@@ -2581,7 +2580,7 @@ w3(U) :-
 		ws(C),
 		write('.'),
 		nl,
-		cnt(answers),
+		cnt(output_triples),
 		fail
 	;	(	U = branch
 		->	true
@@ -2650,7 +2649,7 @@ w3(U) :-
 			wt(C),
 			ws(C),
 			write('.'),
-			cnt(answers),
+			cnt(output_triples),
 			fail
 		;	true
 		),
