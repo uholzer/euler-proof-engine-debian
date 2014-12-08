@@ -141,7 +141,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7576 2014-12-03 20:49:50Z josd $').
+version_info('$Id: euler.yap 7585 2014-12-08 14:03:48Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1295,6 +1295,17 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		(	flag('no-distinct')
 		;	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
+	->	write(query(X, Y)),
+		writeln('.')
+	;	strela(answer(Y), V),
+		write(implies(X, V, Src)),
+		writeln('.')
+	),
+	tr_n3p(Z, Src, query).
+tr_n3p([':-'(Y, X)|Z], Src, query) :-
+	!,
+	(	flag(nope),
+		\+flag('single-answer')
 	->	write(query(X, Y)),
 		writeln('.')
 	;	strela(answer(Y), V),
