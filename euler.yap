@@ -141,7 +141,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7585 2014-12-08 14:03:48Z josd $').
+version_info('$Id: euler.yap 7589 2014-12-08 23:05:14Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2960,7 +2960,10 @@ wt0(X) :-
 	!,
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')
-	->	write('_:sk'),
+	->	(	nb_getval(fvar, uvar)
+		->	write('?U')
+		;	write('_:sk')
+		),
 		write(Y)
 	;	atomic_list_concat(['<http://localhost/var#sk', Y, '>'], Z),
 		wt(Z)
