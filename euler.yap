@@ -105,6 +105,8 @@
 :- dynamic(qevar/3).
 :- dynamic(query/2).
 :- dynamic(quvar/3).
+:- dynamic(rule_conc/0).
+:- dynamic(rule_uvar/1).
 :- dynamic(scope/1).
 :- dynamic(semantics/2).
 :- dynamic(span/1).
@@ -119,7 +121,6 @@
 :- dynamic(tuple/8).
 :- dynamic(wcache/2).
 :- dynamic(wpfx/1).
-:- dynamic(write_uvar/0).
 :- dynamic(wtcache/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#mu>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#pi>'/2).
@@ -142,7 +143,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7592 2014-12-09 10:05:22Z josd $').
+version_info('$Id: euler.yap 7595 2014-12-09 15:34:29Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2960,7 +2961,15 @@ wt0(X) :-
 	!,
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')
-	->	(	write_uvar
+	->	(	rule_uvar(L),
+			(	rule_conc
+			->	memberchk(Y, L)
+			;	(	memberchk(Y, L)
+				->	true
+				;	retract(rule_uvar(L)),
+					assertz(rule_uvar([Y|L]))
+				)
+			)
 		->	write('?U')
 		;	write('_:sk')
 		),
@@ -2995,7 +3004,15 @@ wt0(X) :-
 	!,
 	sub_atom(X, 22, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
-		write_uvar
+		rule_uvar(L),
+		(	rule_conc
+		->	memberchk(Y, L)
+		;	(	memberchk(Y, L)
+			->	true
+			;	retract(rule_uvar(L)),
+				assertz(rule_uvar([Y|L]))
+			)
+		)
 	->	write('?')
 	;	write('_:')
 	),
@@ -3118,23 +3135,25 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 		)
 	;	Z = U
 	),
-	assertz(write_uvar),
+	assertz(rule_uvar([])),
 	(	catch(clause(Y, Z), _, fail)
 	->	wg(Y),
 		write(' <= '),
 		wg(X)
 	;	wg(X),
 		write(' => '),
-		wg(Y)
+		assertz(rule_conc),
+		wg(Y),
+		retract(rule_conc)
 	),
-	retract(write_uvar),
+	retract(rule_uvar(_)),
 	!.
 wt2(':-'(X, Y)) :-
-	assertz(write_uvar),
+	assertz(rule_uvar([])),
 	wg(X),
 	write(' <= '),
 	wg(Y),
-	retract(write_uvar),
+	retract(rule_uvar(_)),
 	!.
 wt2(is(O, T)) :-
 	!,
