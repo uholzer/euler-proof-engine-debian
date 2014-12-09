@@ -119,6 +119,7 @@
 :- dynamic(tuple/8).
 :- dynamic(wcache/2).
 :- dynamic(wpfx/1).
+:- dynamic(write_uvar/0).
 :- dynamic(wtcache/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#mu>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#pi>'/2).
@@ -141,7 +142,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7589 2014-12-08 23:05:14Z josd $').
+version_info('$Id: euler.yap 7592 2014-12-09 10:05:22Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -299,7 +300,6 @@ n3socket(Argus) :-
 	nb_setval(table, -1),
 	nb_setval(tuple, -1),
 	nb_setval(fdepth, 0),
-	nb_setval(fvar, evar),
 	nb_setval(defcl, true),
 	opts(Argus, Args),
 	(	\+memberchk('--query', Args),
@@ -2960,7 +2960,7 @@ wt0(X) :-
 	!,
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')
-	->	(	nb_getval(fvar, uvar)
+	->	(	write_uvar
 		->	write('?U')
 		;	write('_:sk')
 		),
@@ -2994,8 +2994,8 @@ wt0(X) :-
 	sub_atom(X, 0, 22, _, '<http://localhost/var#'),
 	!,
 	sub_atom(X, 22, _, 1, Y),
-	(	nb_getval(fvar, uvar),
-		\+sub_atom(Y, 0, 2, _, 'qe')
+	(	\+sub_atom(Y, 0, 2, _, 'qe'),
+		write_uvar
 	->	write('?')
 	;	write('_:')
 	),
@@ -3100,7 +3100,6 @@ wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'([X|Y
 	wt(X),
 	write('}').
 wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
-	!,
 	(	flag(nope)
 	->	U = X
 	;	(	X = when(A, B)
@@ -3119,45 +3118,24 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 		)
 	;	Z = U
 	),
+	assertz(write_uvar),
 	(	catch(clause(Y, Z), _, fail)
-	->	(	atom(Y)
-		->	true
-		;	nb_setval(fvar, uvar)
-		),
-		wg(Y),
+	->	wg(Y),
 		write(' <= '),
-		(	atom(X)
-		->	true
-		;	nb_setval(fvar, uvar)
-		),
 		wg(X)
-	;	(	atom(X)
-		->	true
-		;	nb_setval(fvar, uvar)
-		),
-		wg(X),
+	;	wg(X),
 		write(' => '),
-		(	atom(Y)
-		->	true
-		;	nb_setval(fvar, uvar)
-		),
 		wg(Y)
 	),
-	nb_setval(fvar, evar).
+	retract(write_uvar),
+	!.
 wt2(':-'(X, Y)) :-
-	!,
-	(	atom(X)
-	->	true
-	;	nb_setval(fvar, uvar)
-	),
+	assertz(write_uvar),
 	wg(X),
 	write(' <= '),
-	(	atom(Y)
-	->	true
-	;	nb_setval(fvar, uvar)
-	),
 	wg(Y),
-	nb_setval(fvar, evar).
+	retract(write_uvar),
+	!.
 wt2(is(O, T)) :-
 	!,
 	(	number(T),
@@ -3200,11 +3178,8 @@ wt2(X) :-
 
 wtn(exopred(P, S, O)) :-
 	!,
-	wg(S),
-	write(' '),
-	wp(P),
-	write(' '),
-	wg(O).
+	X =.. [P, S, O],
+	wt2(X).
 wtn(X) :-
 	X =.. [B|C],
 	(	atom(B),
