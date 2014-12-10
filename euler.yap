@@ -143,7 +143,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7600 2014-12-10 14:41:28Z josd $').
+version_info('$Id: euler.yap 7602 2014-12-10 20:26:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1700,6 +1700,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 		functor(Dn, P, N),
 		(	\+pred(P),
 			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
+			P \= '<http://www.w3.org/2000/10/swap/log#implies>',
 			N = 2
 		->	assertz(pred(P))
 		;	true
@@ -1742,6 +1743,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			functor(Cn, P, N),
 			(	\+pred(P),
 				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
+				P \= '<http://www.w3.org/2000/10/swap/log#implies>',
 				N = 2
 			->	assertz(pred(P))
 			;	true
@@ -2982,7 +2984,18 @@ wt0(X) :-
 	atom_concat(allv, Y, X),
 	!,
 	(	\+flag('no-qvars')
-	->	write('?U'),
+	->	(	rule_uvar(L),
+			(	rule_conc
+			->	memberchk(Y, L)
+			;	(	memberchk(Y, L)
+				->	true
+				;	retract(rule_uvar(L)),
+					assertz(rule_uvar([Y|L]))
+				)
+			)
+		->	write('?U')
+		;	write('_:sk')
+		),
 		write(Y)
 	;	atomic_list_concat(['<http://localhost/var#U', Y, '>'], Z),
 		wt(Z)
