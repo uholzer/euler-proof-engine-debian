@@ -143,7 +143,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7602 2014-12-10 20:26:19Z josd $').
+version_info('$Id: euler.yap 7632 2014-12-24 00:28:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8131,7 +8131,7 @@ dtlit([literal(A, type('<http://www.w3.org/2001/XMLSchema#string>')), '<http://w
 	atomic(A),
 	getbool(A, A),
 	!.
-dtlit([literal(A, type('<http://www.w3.org/2001/XMLSchema#string>')), '<http://eulersharp.sourceforge.net/2003/03swap/prolog#atom>'], A) :-
+dtlit([literal(A, type('<http://www.w3.org/2001/XMLSchema#string>')), prolog:atom], A) :-
 	atomic(A),
 	\+sub_atom(A, 0, 1, _, '<'),
 	!.
