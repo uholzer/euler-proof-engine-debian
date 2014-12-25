@@ -1,9 +1,9 @@
 % -----------------------------------------------------------------------------
 % Euler Yet another proof Engine - EYE looking through N3 glasses -- Jos De Roo
 % -----------------------------------------------------------------------------
-
-
-% EYE [1] is a reasoning engine supporting the RGB [2] semantic web layers.
+%
+%
+% EYE [1] is a reasoning engine supporting the RGB Semantic Web layers [2].
 % It is a semibackward reasoner enhanced with Euler path [3] detection.
 % Via N3 [4] it is interoperable with Cwm [5].
 % The EYE test cases [6] and their results [7] support the development of EYE.
@@ -15,7 +15,7 @@
 % ----------
 %
 %  [1] http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt
-%  [2] http://eulersharp.sourceforge.net/2006/02swap/rgb-note.txt
+%  [2] http://www.w3.org/DesignIssues/diagrams/sweb-stack/2006a
 %  [3] http://mathworld.wolfram.com/KoenigsbergBridgeProblem.html
 %  [4] http://www.w3.org/TeamSubmission/n3/
 %  [5] http://www.w3.org/2000/10/swap/doc/cwm
@@ -143,7 +143,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7632 2014-12-24 00:28:50Z josd $').
+version_info('$Id: euler.yap 7640 2014-12-25 17:15:13Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
