@@ -143,7 +143,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7640 2014-12-25 17:15:13Z josd $').
+version_info('$Id: euler.yap 7654 2014-12-30 00:06:04Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -729,7 +729,7 @@ opts(['--help'|_], _) :-
 	throw(halt).
 opts(['--probe'|_], _) :-
 	tmp_file(File),
-	(	atomic_list_concat(['wget --header="Cache-Control: max-age=3600" --timeout=60 --tries=1 -q http://www.agfa.com/w3c/temp/graph-100000.n3p -O ', File], Cmd),
+	(	atomic_list_concat(['curl -s http://www.agfa.com/w3c/temp/graph-100000.n3p > ', File], Cmd),
 		catch(exec(Cmd, _), _, fail)
 	->	statistics(walltime, [_, T1]),
 		S1 is 100000000/T1,
@@ -829,11 +829,7 @@ args(['--plugin', Argument|Args]) :-
 			;	tmp_file(File),
 				assertz(tmpfile(File))
 			),
-			(	flag('wget-path'(Path))
-			->	true
-			;	Path = ''
-			),
-			atomic_list_concat([Path, 'wget --header="Cache-Control: max-age=3600" -q "', Arg, '" -O ', File], Cmd),
+			atomic_list_concat(['curl -s "', Arg, '" > ', File], Cmd),
 			catch(exec(Cmd, _), Exc,
 				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
 					flush_output(user_error),
@@ -1018,11 +1014,7 @@ n3_n3p(Argument, Mode) :-
 			->	true
 			;	assertz(tmpfile(File))
 			),
-			(	flag('wget-path'(Path))
-			->	true
-			;	Path = ''
-			),
-			atomic_list_concat([Path, 'wget --header="Accept: text/*" --header="Cache-Control: max-age=3600" -q "', Arg, '" -O ', File], Cmd),
+			atomic_list_concat(['curl -s "', Arg, '" > ', File], Cmd),
 			catch(exec(Cmd, _), Exc,
 				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
 					flush_output(user_error),
