@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7667 2015-01-06 14:45:46Z josd $').
+version_info('$Id: euler.yap 7670 2015-01-06 17:07:44Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4138,6 +4138,7 @@ indentation(C) :-
 
 
 '<http://www.w3.org/2000/10/swap/log#rawType>'(A, B) :-
+	nonvar(A),
 	raw_type(A, C),
 	C = B.
 
