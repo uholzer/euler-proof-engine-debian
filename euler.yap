@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7665 2015-01-06 14:02:30Z josd $').
+version_info('$Id: euler.yap 7667 2015-01-06 14:45:46Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8548,7 +8548,7 @@ absolute_uri(A, B) :-
 	;	absolute_file_name(A, C),
 		prolog_to_os_filename(D, C),
 		atom_codes(D, E),
-		subst([[[0x20], [0'+]]], E, F),
+		subst([[[0x20], [0'%, 0'2, 0'0]]], E, F),
 		atom_codes(G, F),
 		(	current_prolog_flag(windows, true)
 		->	atomic_list_concat(['file:///', G], B)
