@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7670 2015-01-06 17:07:44Z josd $').
+version_info('$Id: euler.yap 7675 2015-01-07 20:01:59Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -533,7 +533,9 @@ n3socket(Argus) :-
 				wt(ST)
 			)
 		),
-		(	query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
+		(	nb_getval(csv_header, Header),
+			wct(Header),
+			query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
 			catch(call(Where), _, fail),
 			wct(Select),
 			fail
@@ -1285,6 +1287,10 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery
 	tr_n3p(Z, Src, tquery).
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query) :-
 	!,
+	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
+	->	nb_setval(csv_header, T)
+	;	true
+	),
 	(	flag(nope),
 		\+flag('single-answer'),
 		(	flag('no-distinct')
@@ -1299,6 +1305,10 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	!,
+	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
+	->	nb_setval(csv_header, T)
+	;	true
+	),
 	(	flag(nope),
 		\+flag('single-answer')
 	->	write(query(X, Y)),
@@ -3442,6 +3452,14 @@ wcf(A) :-
 	!,
 	sub_atom(A, 1, _, 1, B),
 	write(B).
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 1, _, '_'),
+	!,
+	sub_atom(A, 1, _, 0, B),
+	write('"'),
+	write(B),
+	write('"').
 wcf(A) :-
 	write(A).
 
@@ -7983,7 +8001,7 @@ getnumber(literal(A, _), B) :-
 	ground(A),
 	atom_codes(A, C),
 	numeral(C, D),
-	number_codes(B, D).
+	catch(number_codes(B, D), _, fail).
 
 
 getint(A, B) :-
