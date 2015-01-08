@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7677 2015-01-08 10:13:06Z josd $').
+version_info('$Id: euler.yap 7679 2015-01-08 13:39:41Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -163,6 +163,7 @@ eye
 <options>
 	--nope			no proof explanation
 	--no-qnames		no qnames in output
+	--no-qvars		no qvars in output
 	--no-numerals		no numerals in output
 	--no-distinct		no distinct answers in output
 	--single-answer		give only one answer
