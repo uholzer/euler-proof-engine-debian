@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7679 2015-01-08 13:39:41Z josd $').
+version_info('$Id: euler.yap 7683 2015-01-09 15:27:13Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1169,22 +1169,29 @@ n3_n3p(Argument, Mode) :-
 				),
 				(	ground(Rt),
 					Rt \= ':-'(_, _)
-				->	(	predicate_property(Rt, dynamic)
-					->	true
-					;	close(Rs),
-						(	retract(tmpfile(Tmp_p))
-						->	delete_file(Tmp_p)
+				->	(	Rt = dynapred(B/2)
+					->	(	flag(n3p)
+						->	format(':- dynamic(~q).~n', [B/2]),
+							format(':- multifile(~q).~n', [B/2])
 						;	true
+						)
+					;	(	predicate_property(Rt, dynamic)
+						->	true
+						;	close(Rs),
+							(	retract(tmpfile(Tmp_p))
+							->	delete_file(Tmp_p)
+							;	true
+							),
+							throw(builtin_redefinition(Rt))
 						),
-						throw(builtin_redefinition(Rt))
-					),
-					(	call(Rt)
-					->	true
-					;	strelas(Rt),
-						cnt(sc),
-						(	flag(n3p)
-						->	format('~q.~n', [Rt])
-						;	true
+						(	call(Rt)
+						->	true
+						;	strelas(Rt),
+							cnt(sc),
+							(	flag(n3p)
+							->	format('~q.~n', [Rt])
+							;	true
+							)
 						)
 					)
 				;	(	Rt = prfstep(Ct, _, Pt, _, Qt, It, Mt, St)
@@ -2885,10 +2892,28 @@ wt(rdiv(X, Y)) :-
 		;	atomic_list_concat(['~', N, 'd'], F)
 		)
 	),
-	format(F, [X]).
+	(	flag('no-numerals')
+	->	write('"')
+	;	true
+	),
+	format(F, [X]),
+	(	flag('no-numerals')
+	->	write('"^^'),
+		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
+	;	true
+	).
 wt(rdiv(X, Y)) :-
 	!,
-	format('~g', [rdiv(X, Y)]).
+	(	flag('no-numerals')
+	->	write('"')
+	;	true
+	),
+	format('~g', [rdiv(X, Y)]),
+	(	flag('no-numerals')
+	->	write('"^^'),
+		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
+	;	true
+	).
 wt(X) :-
 	number(X),
 	!,
@@ -8971,7 +8996,11 @@ dynamic_verb(Verb) :-
 			),
 			(	current_predicate(B/2)
 			->	true
-			;	dynamic(B/2)
+			;	dynamic(B/2),
+				(	flag(n3p)
+				->	format('dynapred(~q).~n', [B/2])
+				;	true
+				)
 			)
 		)
 	;	true
@@ -9409,19 +9438,20 @@ literal(Atom, DtLang) -->
 	}.
 
 
-numericliteral(Num) -->
+numericliteral(Number) -->
 	[numeric(Type, NumB)],
 	{	(	flag(turtle)
 		->	atomic_list_concat(['\'<http://www.w3.org/2001/XMLSchema#', Type, '>\''], T),
 			atom_codes(A, NumB),
 			atomic_list_concat(['\'', A, '\''], B),
-			Num = literal(B, type(T))
+			Number = literal(B, type(T))
 		;	numeral(NumB, NumC),
 			(	length(NumC, LenC),
 				LenC > 16,
 				Type = decimal
-			->	rdiv_codes(Num, NumC)
-			;	number_codes(Num, NumC)
+			->	rdiv_codes(NumD, NumC),
+				Number is NumD
+			;	number_codes(Number, NumC)
 			)
 		)
 	}.
@@ -9538,7 +9568,8 @@ pathitem(Number, []) -->
 		(	length(NumC, LenC),
 			LenC > 16,
 			Type = '\'<http://www.w3.org/2001/XMLSchema#decimal>\''
-		->	rdiv_codes(Number, NumC)
+		->	rdiv_codes(NumD, NumC),
+			Number is NumD
 		;	number_codes(Number, NumC)
 		)
 	},
