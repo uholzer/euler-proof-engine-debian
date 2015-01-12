@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7683 2015-01-09 15:27:13Z josd $').
+version_info('$Id: euler.yap 7688 2015-01-12 16:11:56Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -305,6 +305,7 @@ n3socket(Argus) :-
 	nb_setval(tuple, -1),
 	nb_setval(fdepth, 0),
 	nb_setval(defcl, true),
+	nb_setval(input_statements, 0),
 	opts(Argus, Args),
 	(	\+memberchk('--query', Args),
 		\+memberchk('--tquery', Args),
@@ -451,7 +452,7 @@ n3socket(Argus) :-
 	nb_setval(fm, 0),
 	nb_setval(lemma_count, 0),
 	nb_setval(lemma_cursor, 0),
-	nb_setval(output_triples, 0),
+	nb_setval(output_statements, 0),
 	catch(eam(0), Exc,
 		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
 			flush_output(user_error),
@@ -548,15 +549,16 @@ n3socket(Argus) :-
 	),
 	get_time(StampN),
 	datetime(StampN, StampC),
-	atom_codes(StampA, StampC),
-	nb_getval(output_triples, OutT),
+	atom_codes(Stamp, StampC),
+	nb_getval(input_statements, Inp),
+	nb_getval(output_statements, Outp),
 	(	statistics(inferences, Inf)
 	->	true
 	;	Inf = ''
 	),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
-	format(user_error, '[~w] outputTriples=~d inferences=~w seconds=~3d inferences/sec=~w~n~n', [StampA, OutT, Inf, Elaps, Speed]),
+	format(user_error, '[~w] inputStatements=~d outputStatements=~d inferences=~w seconds=~3d inferences/sec=~w~n~n', [Stamp, Inp, Outp, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
@@ -907,6 +909,9 @@ args(['--plugin', Argument|Args]) :-
 	;	true
 	),
 	nb_getval(sc, SC),
+	nb_getval(input_statements, IN),
+	Inp is SC+IN,
+	nb_setval(input_statements, Inp),
 	(	wcache(Arg, File)
 	->	format(user_error, 'GET ~w FROM ~w SC=~w~n', [Arg, File, SC])
 	;	format(user_error, 'GET ~w SC=~w~n', [Arg, SC])
@@ -1252,6 +1257,9 @@ n3_n3p(Argument, Mode) :-
 		;	true
 		),
 		nb_getval(sc, SC),
+		nb_getval(input_statements, IN),
+		Inp is SC+IN,
+		nb_setval(input_statements, Inp),
 		(	wcache(Arg, File)
 		->	format(user_error, 'GET ~w FROM ~w SC=~w~n', [Arg, File, SC])
 		;	format(user_error, 'GET ~w SC=~w~n', [Arg, SC])
@@ -2586,7 +2594,7 @@ w3(U) :-
 		ws(B),
 		write('.'),
 		nl,
-		cnt(output_triples),
+		cnt(output_statements),
 		fail
 	;	true
 	),
@@ -2608,7 +2616,7 @@ w3(U) :-
 		ws(C),
 		write('.'),
 		nl,
-		cnt(output_triples),
+		cnt(output_statements),
 		fail
 	;	(	U = branch
 		->	true
@@ -2677,7 +2685,7 @@ w3(U) :-
 			wt(C),
 			ws(C),
 			write('.'),
-			cnt(output_triples),
+			cnt(output_statements),
 			fail
 		;	true
 		),
