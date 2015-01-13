@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7688 2015-01-12 16:11:56Z josd $').
+version_info('$Id: euler.yap 7694 2015-01-13 10:18:11Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -558,7 +558,7 @@ n3socket(Argus) :-
 	),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
-	format(user_error, '[~w] inputStatements=~d outputStatements=~d inferences=~w seconds=~3d inferences/sec=~w~n~n', [Stamp, Inp, Outp, Inf, Elaps, Speed]),
+	format(user_error, '[~w] in=~d out=~d inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
