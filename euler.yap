@@ -145,7 +145,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7694 2015-01-13 10:18:11Z josd $').
+version_info('$Id: euler.yap 7698 2015-01-13 19:40:14Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9457,8 +9457,7 @@ numericliteral(Number) -->
 			(	length(NumC, LenC),
 				LenC > 16,
 				Type = decimal
-			->	rdiv_codes(NumD, NumC),
-				Number is NumD
+			->	rdiv_codes(Number, NumC)
 			;	number_codes(Number, NumC)
 			)
 		)
@@ -9576,8 +9575,7 @@ pathitem(Number, []) -->
 		(	length(NumC, LenC),
 			LenC > 16,
 			Type = '\'<http://www.w3.org/2001/XMLSchema#decimal>\''
-		->	rdiv_codes(NumD, NumC),
-			Number is NumD
+		->	rdiv_codes(Number, NumC)
 		;	number_codes(Number, NumC)
 		)
 	},
