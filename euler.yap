@@ -146,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7705 2015-01-21 16:11:45Z josd $').
+version_info('$Id: euler.yap 7706 2015-01-21 23:35:51Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1753,7 +1753,13 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			\+flag(ances)
 		->	true
 		;	term_index(Dn, Cnd),
-			assertz(prfstep(Dn, Cnd, B, Pnd, C, Rule, forward, A))
+			(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
+				Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Q6, R6),
+				prfstep('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1), _, Q3, Q4, _,
+					'<http://www.w3.org/2000/10/swap/log#implies>'(P6, Q6), forward, A)
+			->	assertz(prfstep(Dn, Cnd, Q3, Q4, C, '<http://www.w3.org/2000/10/swap/log#implies>'(P6, R6), forward, A))
+			;	assertz(prfstep(Dn, Cnd, B, Pnd, C, Rule, forward, A))
+			)
 		),
 		(	En = [Fn],
 			Ec = [Fc]
@@ -1796,7 +1802,13 @@ astep(A, B, C, Cn, Cc, Rule) :-
 				\+flag(ances)
 			->	true
 			;	term_index(Cn, Cnd),
-				assertz(prfstep(Cn, Cnd, B, Pnd, C, Rule, forward, A))
+				(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
+					Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Q6, R6),
+					prfstep('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1), _, Q3, Q4, _,
+						'<http://www.w3.org/2000/10/swap/log#implies>'(P6, Q6), forward, A)
+				->	assertz(prfstep(Cn, Cnd, Q3, Q4, C, '<http://www.w3.org/2000/10/swap/log#implies>'(P6, R6), forward, A))
+				;	assertz(prfstep(Cn, Cnd, B, Pnd, C, Rule, forward, A))
+				)
 			)
 		)
 	).
