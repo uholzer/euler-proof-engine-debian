@@ -131,6 +131,7 @@
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#reflexive>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/2).
@@ -145,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7698 2015-01-13 19:40:14Z josd $').
+version_info('$Id: euler.yap 7705 2015-01-21 16:11:45Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1359,8 +1360,14 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	write(implies(X, Y, Src)),
-	writeln('.'),
+	(	flag('single-answer')
+	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
+		writeln('.'),
+		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
+		writeln('.')
+	;	write(implies(X, Y, Src)),
+		writeln('.')
+	),
 	tr_n3p(Z, Src, Mode).
 tr_n3p([':-'(Conc, Prem)|Z], Src, Mode) :-
 	!,
