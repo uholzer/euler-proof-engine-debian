@@ -146,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7706 2015-01-21 23:35:51Z josd $').
+version_info('$Id: euler.yap 7709 2015-01-22 16:31:17Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1360,7 +1360,9 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	(	flag('single-answer')
+	(	flag('single-answer'),
+		\+cmember('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#findall>\''(_, _), X),
+		\+cmember('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#optional>\''(_, _), X)
 	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
 		writeln('.'),
 		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
@@ -1643,9 +1645,12 @@ eam(Span) :-
 		),
 		cnt(tc),
 		copy_term(Concd, Cc),
-		nb_getval(wn, W),
-		labelvars(Concd, W, N),
-		nb_setval(wn, N),
+		(	Concd \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(_, _)
+		->	nb_getval(wn, W),
+			labelvars(Concd, W, N),
+			nb_setval(wn, N)
+		;	true
+		),
 		(	flag(debug)
 		->	format(user_error, '... eam/1 assert step ~w~n', [Concd]),
 			flush_output(user_error)
@@ -7943,6 +7948,9 @@ partconc(A, [_|C], D) :-
 	partconc(A, C, D).
 
 
+commonvars('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, _), B, C) :-
+	!,
+	commonvars(A, B, C).
 commonvars(A, B, C) :-
 	term_variables(A, D),
 	term_variables(B, E),
