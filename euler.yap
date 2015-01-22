@@ -146,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7709 2015-01-22 16:31:17Z josd $').
+version_info('$Id: euler.yap 7712 2015-01-22 21:34:59Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1360,9 +1360,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	(	flag('single-answer'),
-		\+cmember('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#findall>\''(_, _), X),
-		\+cmember('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#optional>\''(_, _), X)
+	(	flag('single-answer')
 	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
 		writeln('.'),
 		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
@@ -7936,6 +7934,8 @@ relabel(A, B) :-
 
 
 partconc(_, [], []).
+partconc(_, ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)], ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)]) :-
+	!.
 partconc(A, [B|C], [B|D]) :-
 	B = answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _),
 	!,
