@@ -74,6 +74,7 @@
 :- dynamic(bstep/3).
 :- dynamic(bvar/1).
 :- dynamic(countermodel/1).
+:- dynamic(dispersed_query/1).
 :- dynamic(evar/2).
 :- dynamic(evar/3).
 :- dynamic(exopred/3).
@@ -146,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7712 2015-01-22 21:34:59Z josd $').
+version_info('$Id: euler.yap 7714 2015-01-23 10:38:18Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -316,7 +317,12 @@ n3socket(Argus) :-
 	->	assertz(flag(nope))
 	;	true
 	),
-	(	Args = []
+	(	flag('single-answer')
+	->	argz(Args, Argd, Argq),
+		append(Argq, Argd, Argz)
+	;	Argz = Args
+	),
+	(	Argz = []
 	->	opts(['--help'], _)
 	;	true
 	),
@@ -343,7 +349,7 @@ n3socket(Argus) :-
 		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
 	;	true
 	),
-	args(Args),
+	args(Argz),
 	findall(Sc,
 		(	scope(Sc)
 		),
@@ -815,6 +821,15 @@ opts([Arg|Argus], Args) :-
 	opts(Argus, Args).
 opts([Arg|Argus], [Arg|Args]) :-
 	opts(Argus, Args).
+
+
+argz([], [], []) :-
+	!.
+argz(['--query', Arg|Args], Argd, ['--query', Arg|Argq]) :-
+	!,
+	argz(Args, Argd, Argq).
+argz([Arg|Args], [Arg|Argd], Argq) :-
+	argz(Args, Argd, Argq).
 
 
 args([]) :-
@@ -1317,7 +1332,8 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.')
+		writeln('.'),
+		assertz(dispersed_query(implies(X, V, Src)))
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
@@ -1332,7 +1348,8 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.')
+		writeln('.'),
+		assertz(dispersed_query(implies(X, V, Src)))
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([X|Z], Src, query) :-
@@ -1364,7 +1381,14 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
 		writeln('.'),
 		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
-		writeln('.')
+		writeln('.'),
+		forall(
+			(	dispersed_query(implies(U, V, Srcq))
+			),
+			(	write(implies(U, V, Srcq)),
+				writeln('.')
+			)
+		)
 	;	write(implies(X, Y, Src)),
 		writeln('.')
 	),
