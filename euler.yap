@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7720 2015-01-26 15:03:29Z josd $').
+version_info('$Id: euler.yap 7723 2015-01-27 11:21:31Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9425,10 +9425,6 @@ existential -->
 		;	true
 		),
 		nb_getval(fdepth, D),
-		(	D > 1
-		->	throw(not_supported('@forSome', at_formula_depth(D)))
-		;	true
-		),
 		forall(
 			(	member(S, Symbols)
 			),
@@ -10043,7 +10039,7 @@ universal -->
 		;	true
 		),
 		nb_getval(fdepth, D),
-		(	D > 1
+		(	D > 0
 		->	throw(not_supported('@forAll', at_formula_depth(D)))
 		;	true
 		),
