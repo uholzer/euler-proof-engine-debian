@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7725 2015-01-27 13:52:30Z josd $').
+version_info('$Id: euler.yap 7727 2015-01-28 16:10:56Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -356,6 +356,20 @@ n3socket(Argus) :-
 		Scope
 	),
 	nb_setval(scope, Scope),
+	(	flag('single-answer')
+	->	forall(
+			(	implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src),
+				clist(List, Prem),
+				cartesian(List)
+			),
+			(	retract(implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src)),
+				assertz(implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src)),
+				retract(implies('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Conc, Src)),
+				assertz(implies('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Conc, Src))
+			)
+		)
+	;	true
+	),
 	findall([Dlen, Dsort, implies(Prem, dn(D), Src)],
 		(	implies(Prem, dn(D), Src),
 			nonvar(D),
@@ -7412,6 +7426,13 @@ intersection([X|Y], Z) :-
 		),
 		clist(W, Z)
 	).
+
+
+cartesian([A|B]) :-
+	\+ \+memberchk(A, B),
+	!.
+cartesian([_|B]) :-
+	cartesian(B).
 
 
 cartesian([], []).
