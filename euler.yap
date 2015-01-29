@@ -146,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7730 2015-01-29 20:55:25Z josd $').
+version_info('$Id: euler.yap 7732 2015-01-29 21:31:55Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -350,18 +350,6 @@ n3socket(Argus) :-
 		Scope
 	),
 	nb_setval(scope, Scope),
-	(	flag('single-answer')
-	->	forall(
-			(	implies(Prem, Conc, Src),
-				clist(List, Prem),
-				cartesian(List)
-			),
-			(	retract(implies(Prem, Conc, Src)),
-				assertz(implies(Prem, Conc, Src))
-			)
-		)
-	;	true
-	),
 	findall([Dlen, Dsort, implies(Prem, dn(D), Src)],
 		(	implies(Prem, dn(D), Src),
 			nonvar(D),
