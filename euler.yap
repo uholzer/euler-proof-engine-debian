@@ -74,7 +74,6 @@
 :- dynamic(bstep/3).
 :- dynamic(bvar/1).
 :- dynamic(countermodel/1).
-:- dynamic(dispersed_query/1).
 :- dynamic(evar/2).
 :- dynamic(evar/3).
 :- dynamic(exopred/3).
@@ -147,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7727 2015-01-28 16:10:56Z josd $').
+version_info('$Id: euler.yap 7730 2015-01-29 20:55:25Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -317,12 +316,7 @@ n3socket(Argus) :-
 	->	assertz(flag(nope))
 	;	true
 	),
-	(	flag('single-answer')
-	->	argz(Args, Argd, Argq),
-		append(Argq, Argd, Argz)
-	;	Argz = Args
-	),
-	(	Argz = []
+	(	Args = []
 	->	opts(['--help'], _)
 	;	true
 	),
@@ -349,7 +343,7 @@ n3socket(Argus) :-
 		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
 	;	true
 	),
-	args(Argz),
+	args(Args),
 	findall(Sc,
 		(	scope(Sc)
 		),
@@ -358,14 +352,12 @@ n3socket(Argus) :-
 	nb_setval(scope, Scope),
 	(	flag('single-answer')
 	->	forall(
-			(	implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src),
+			(	implies(Prem, Conc, Src),
 				clist(List, Prem),
 				cartesian(List)
 			),
-			(	retract(implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src)),
-				assertz(implies(Prem, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Src)),
-				retract(implies('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Conc, Src)),
-				assertz(implies('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(Prem, Conc), Conc, Src))
+			(	retract(implies(Prem, Conc, Src)),
+				assertz(implies(Prem, Conc, Src))
 			)
 		)
 	;	true
@@ -835,15 +827,6 @@ opts([Arg|Argus], Args) :-
 	opts(Argus, Args).
 opts([Arg|Argus], [Arg|Args]) :-
 	opts(Argus, Args).
-
-
-argz([], [], []) :-
-	!.
-argz(['--query', Arg|Args], Argd, ['--query', Arg|Argq]) :-
-	!,
-	argz(Args, Argd, Argq).
-argz([Arg|Args], [Arg|Argd], Argq) :-
-	argz(Args, Argd, Argq).
 
 
 args([]) :-
@@ -1346,8 +1329,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.'),
-		assertz(dispersed_query(implies(X, V, Src)))
+		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
@@ -1362,8 +1344,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.'),
-		assertz(dispersed_query(implies(X, V, Src)))
+		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([X|Z], Src, query) :-
@@ -1391,21 +1372,8 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	(	flag('single-answer')
-	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
-		writeln('.'),
-		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
-		writeln('.'),
-		forall(
-			(	dispersed_query(implies(U, V, Srcq))
-			),
-			(	write(implies(U, V, Srcq)),
-				writeln('.')
-			)
-		)
-	;	write(implies(X, Y, Src)),
-		writeln('.')
-	),
+	write(implies(X, Y, Src)),
+	writeln('.'),
 	tr_n3p(Z, Src, Mode).
 tr_n3p([':-'(Conc, Prem)|Z], Src, Mode) :-
 	!,
@@ -1681,12 +1649,9 @@ eam(Span) :-
 		),
 		cnt(tc),
 		copy_term(Concd, Cc),
-		(	Concd \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(_, _)
-		->	nb_getval(wn, W),
-			labelvars(Concd, W, N),
-			nb_setval(wn, N)
-		;	true
-		),
+		nb_getval(wn, W),
+		labelvars(Concd, W, N),
+		nb_setval(wn, N),
 		(	flag(debug)
 		->	format(user_error, '... eam/1 assert step ~w~n', [Concd]),
 			flush_output(user_error)
@@ -1794,13 +1759,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			\+flag(ances)
 		->	true
 		;	term_index(Dn, Cnd),
-			(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
-				Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Q6, R6),
-				prfstep('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1), _, Q3, Q4, _,
-					'<http://www.w3.org/2000/10/swap/log#implies>'(P6, Q6), forward, A)
-			->	assertz(prfstep(Dn, Cnd, Q3, Q4, C, '<http://www.w3.org/2000/10/swap/log#implies>'(P6, R6), forward, A))
-			;	assertz(prfstep(Dn, Cnd, B, Pnd, C, Rule, forward, A))
-			)
+			assertz(prfstep(Dn, Cnd, B, Pnd, C, Rule, forward, A))
 		),
 		(	En = [Fn],
 			Ec = [Fc]
@@ -1843,13 +1802,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 				\+flag(ances)
 			->	true
 			;	term_index(Cn, Cnd),
-				(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
-					Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Q6, R6),
-					prfstep('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1), _, Q3, Q4, _,
-						'<http://www.w3.org/2000/10/swap/log#implies>'(P6, Q6), forward, A)
-				->	assertz(prfstep(Cn, Cnd, Q3, Q4, C, '<http://www.w3.org/2000/10/swap/log#implies>'(P6, R6), forward, A))
-				;	assertz(prfstep(Cn, Cnd, B, Pnd, C, Rule, forward, A))
-				)
+				assertz(prfstep(Cn, Cnd, B, Pnd, C, Rule, forward, A))
 			)
 		)
 	).
@@ -7979,8 +7932,6 @@ relabel(A, B) :-
 
 
 partconc(_, [], []).
-partconc(_, ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)], ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)]) :-
-	!.
 partconc(A, [B|C], [B|D]) :-
 	B = answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _),
 	!,
@@ -7993,9 +7944,6 @@ partconc(A, [_|C], D) :-
 	partconc(A, C, D).
 
 
-commonvars('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, _), B, C) :-
-	!,
-	commonvars(A, B, C).
 commonvars(A, B, C) :-
 	term_variables(A, D),
 	term_variables(B, E),
