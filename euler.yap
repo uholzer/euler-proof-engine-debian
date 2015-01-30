@@ -146,7 +146,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7736 2015-01-30 14:00:33Z josd $').
+version_info('$Id: euler.yap 7740 2015-01-30 15:21:13Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1573,6 +1573,14 @@ answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
 % ----------------------------
 % EAM (Euler Abstract Machine)
 % ----------------------------
+%
+% In a nutshell:
+%
+%  1/ Select rule P => C
+%  2/ Prove P & ~C (backward chaining)
+%  3/ If  P & ~C assert C (forward chaining)
+%  4/ If C=answer(A) and single-answer stop, else backtrack to 2/ or 1/
+%  5/ If brake stop, else start again at 1/
 
 
 eam(Span) :-
