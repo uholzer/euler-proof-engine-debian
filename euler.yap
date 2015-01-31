@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7743 2015-01-31 14:54:46Z josd $').
+version_info('$Id: euler.yap 7745 2015-01-31 16:23:12Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -170,7 +170,7 @@ eye
 	--no-distinct		no distinct answers in output
 	--single-answer		give only one answer
 	--step <count>		set maximimum step count
-	--tactic <tactic>	use specific tactic
+	--tactic <tactic>	use tactic cartesian dispersion transaction
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--n3p			output N3 P-code
