@@ -74,6 +74,7 @@
 :- dynamic(bstep/3).
 :- dynamic(bvar/1).
 :- dynamic(countermodel/1).
+:- dynamic(dispersed_query/1).
 :- dynamic(evar/2).
 :- dynamic(evar/3).
 :- dynamic(exopred/3).
@@ -146,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7740 2015-01-30 15:21:13Z josd $').
+version_info('$Id: euler.yap 7743 2015-01-31 14:54:46Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -317,7 +318,12 @@ n3socket(Argus) :-
 	->	assertz(flag(nope))
 	;	true
 	),
-	(	Args = []
+	(	flag(tactic(dispersion))
+	->	argz(Args, Argd, Argq),
+		append(Argq, Argd, Argz)
+	;	Argz = Args
+	),
+	(	Argz = []
 	->	opts(['--help'], _)
 	;	true
 	),
@@ -344,7 +350,7 @@ n3socket(Argus) :-
 		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
 	;	true
 	),
-	args(Args),
+	args(Argz),
 	findall(Sc,
 		(	scope(Sc)
 		),
@@ -358,7 +364,16 @@ n3socket(Argus) :-
 				cartesian(List)
 			),
 			(	retract(implies(Prem, Conc, Src)),
-				assertz(implies(Prem, Conc, Src))
+				assertz(implies(Prem, Conc, Src)),
+				(	flag(tactic(dispersion))
+				->	forall(
+						(	dispersed_query(Query)
+						),
+						(	assertz(Query)
+						)
+					)
+				;	true
+				)
 			)
 		)
 	;	true
@@ -832,6 +847,15 @@ opts([Arg|Argus], Args) :-
 	opts(Argus, Args).
 opts([Arg|Argus], [Arg|Args]) :-
 	opts(Argus, Args).
+
+
+argz([], [], []) :-
+	!.
+argz(['--query', Arg|Args], Argd, ['--query', Arg|Argq]) :-
+	!,
+	argz(Args, Argd, Argq).
+argz([Arg|Args], [Arg|Argd], Argq) :-
+	argz(Args, Argd, Argq).
 
 
 args([]) :-
@@ -1334,7 +1358,11 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.')
+		writeln('.'),
+		(	flag(tactic(dispersion))
+		->	assertz(dispersed_query(implies(X, V, Src)))
+		;	true
+		)
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
@@ -1349,7 +1377,11 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 		writeln('.')
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
-		writeln('.')
+		writeln('.'),
+		(	flag(tactic(dispersion))
+		->	assertz(dispersed_query(implies(X, V, Src)))
+		;	true
+		)
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([X|Z], Src, query) :-
@@ -1384,6 +1416,16 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 		writeln('.')
 	;	write(implies(X, Y, Src)),
 		writeln('.')
+	),
+	(	flag(tactic(dispersion))
+	->	forall(
+			(	dispersed_query(Query)
+			),
+			(	write(Query),
+				writeln('.')
+			)
+		)
+	;	true
 	),
 	tr_n3p(Z, Src, Mode).
 tr_n3p([':-'(Conc, Prem)|Z], Src, Mode) :-
@@ -1577,10 +1619,10 @@ answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
 % In a nutshell:
 %
 %  1/ Select rule P => C
-%  2/ Prove P & ~C (backward chaining)
-%  3/ If  P & ~C assert C (forward chaining)
-%  4/ If C=answer(A) and single-answer stop, else backtrack to 2/ or 1/
-%  5/ If brake stop, else start again at 1/
+%  2/ Prove P & NOT(C) (backward chaining)
+%  3/ If P & NOT(C) assert C (forward chaining)
+%  4/ If C = answer(A) and single-answer then stop, else backtrack to 2/ or 1/
+%  5/ If brake then stop, else start again at 1/
 
 
 eam(Span) :-
