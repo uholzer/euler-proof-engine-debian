@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7747 2015-02-02 10:36:08Z josd $').
+version_info('$Id: euler.yap 7756 2015-02-02 21:36:51Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -168,9 +168,8 @@ eye
 	--no-qvars		no qvars in output
 	--no-numerals		no numerals in output
 	--no-distinct		no distinct answers in output
-	--single-answer		give only one answer
 	--step <count>		set maximimum step count
-	--tactic <tactic>	use specific tactic see --tactic --help
+	--tactic <tactic>	use specific tactic (for help see eye --tactic)
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--n3p			output N3 P-code
@@ -203,6 +202,8 @@ help_tactic_info('
 <tactic>
 	cartesian		reorder rules
 	dispersion		add query after each rule
+	linear-logic		retract rule after P & NOT(C)
+	single-answer		give only one answer
 	transaction		rewrite rules using e:transaction
 	transcartesian		reorder rules keeping transactions together').
 
@@ -716,7 +717,12 @@ opts([], []) :-
 % DEPRECATED
 opts(['--quick-answer'|Argus], Args) :-
 	!,
-	assertz(flag('single-answer')),
+	assertz(flag(tactic('single-answer'))),
+	opts(Argus, Args).
+% DEPRECATED
+opts(['--single-answer'|Argus], Args) :-
+	!,
+	assertz(flag(tactic('single-answer'))),
 	opts(Argus, Args).
 opts(['--wcache', Argument, File|Argus], Args) :-
 	!,
@@ -763,7 +769,7 @@ opts(['--step', Lim|Argus], Args) :-
 	),
 	assertz(flag(step(Limit))),
 	opts(Argus, Args).
-opts(['--tactic', '--help'|_], _) :-
+opts(['--tactic'], _) :-
 	\+flag(image(_)),
 	\+flag('debug-pvm'),
 	!,
@@ -1017,7 +1023,7 @@ args(['--query', Arg|Args]) :-
 args(['--pass'|Args]) :-
 	!,
 	(	flag(nope),
-		\+flag('single-answer')
+		\+flag(tactic('single-answer'))
 	->	assertz(query(exopred(P, S, O), exopred(P, S, O)))
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
 		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
@@ -1030,7 +1036,7 @@ args(['--pass'|Args]) :-
 args(['--pass-all'|Args]) :-
 	!,
 	(	flag(nope),
-		\+flag('single-answer')
+		\+flag(tactic('single-answer'))
 	->	assertz(query(exopred(P, S, O), exopred(P, S, O))),
 		assertz(query('<http://www.w3.org/2000/10/swap/log#implies>'(A, C), '<http://www.w3.org/2000/10/swap/log#implies>'(A, C)))
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
@@ -1375,7 +1381,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 	;	true
 	),
 	(	flag(nope),
-		\+flag('single-answer'),
+		\+flag(tactic('single-answer')),
 		(	flag('no-distinct')
 		;	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
@@ -1397,7 +1403,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	;	true
 	),
 	(	flag(nope),
-		\+flag('single-answer')
+		\+flag(tactic('single-answer'))
 	->	write(query(X, Y)),
 		writeln('.')
 	;	strela(answer(Y), V),
@@ -1412,7 +1418,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 tr_n3p([X|Z], Src, query) :-
 	!,
 	(	flag(nope),
-		\+flag('single-answer'),
+		\+flag(tactic('single-answer')),
 		(	flag('no-distinct')
 		;	X = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
@@ -1765,7 +1771,12 @@ eam(Span) :-
 		clist(Le, Conce),
 		clist(Lf, Clc),
 		astep(Src, Prem, Concs, Conce, Clc, Rule),
-		(	flag('single-answer'),
+		(	flag(tactic('linear-logic')),
+			Conc \= answer(_, _, _, _, _, _, _, _)
+		->	once(retract(implies(Prem, Conc, Src)))
+		;	true
+		),
+		(	flag(tactic('single-answer')),
 			answer(_, _, _, _, _, _, _, _)
 		->	(	flag(strings)
 			->	true
@@ -1984,7 +1995,7 @@ eam(Grd, Pnum, Env) :-
 	;	true
 	),
 	strelan(Conc, Concd),
-	(	flag('single-answer')
+	(	flag(tactic('single-answer'))
 	->	term_index(Prem, Pnd),
 		(	flag(think),
 			\+flag(nope),
