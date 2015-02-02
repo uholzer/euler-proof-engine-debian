@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7745 2015-01-31 16:23:12Z josd $').
+version_info('$Id: euler.yap 7747 2015-02-02 10:36:08Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -170,7 +170,7 @@ eye
 	--no-distinct		no distinct answers in output
 	--single-answer		give only one answer
 	--step <count>		set maximimum step count
-	--tactic <tactic>	use tactic cartesian dispersion transaction
+	--tactic <tactic>	use specific tactic see --tactic --help
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--n3p			output N3 P-code
@@ -197,6 +197,14 @@ eye
 	--pass			output deductive closure
 	--pass-all		output deductive closure plus rules
 	--pass-only-new		output only the new derived triples').
+
+
+help_tactic_info('
+<tactic>
+	cartesian		reorder rules
+	dispersion		add query after each rule
+	transaction		rewrite rules using e:transaction
+	transcartesian		reorder rules keeping transactions together').
 
 
 
@@ -357,14 +365,23 @@ n3socket(Argus) :-
 		Scope
 	),
 	nb_setval(scope, Scope),
-	(	flag(tactic(cartesian))
+	(	(	flag(tactic(cartesian))
+		;	flag(tactic(transcartesian))
+		)
 	->	forall(
 			(	implies(Prem, Conc, Src),
 				clist(List, Prem),
-				cartesian(List)
+				cartesian(List),
+				Conc \= answer(_, _, _, _, _, _, _, _)
 			),
 			(	retract(implies(Prem, Conc, Src)),
 				assertz(implies(Prem, Conc, Src)),
+				(	flag(tactic(transcartesian)),
+					Conc = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(_, Conct)
+				->	retract(implies(Conc, Conct, Src)),
+					assertz(implies(Conc, Conct, Src))
+				;	true
+				),
 				(	flag(tactic(dispersion))
 				->	forall(
 						(	dispersed_query(Query)
@@ -746,6 +763,14 @@ opts(['--step', Lim|Argus], Args) :-
 	),
 	assertz(flag(step(Limit))),
 	opts(Argus, Args).
+opts(['--tactic', '--help'|_], _) :-
+	\+flag(image(_)),
+	\+flag('debug-pvm'),
+	!,
+	help_tactic_info(Help),
+	format(user_error, '~w~n~n', [Help]),
+	flush_output(user_error),
+	throw(halt).
 opts(['--tactic', Tactic|Argus], Args) :-
 	!,
 	assertz(flag(tactic(Tactic))),
