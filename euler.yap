@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7756 2015-02-02 21:36:51Z josd $').
+version_info('$Id: euler.yap 7760 2015-02-03 13:53:49Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -323,7 +323,8 @@ n3socket(Argus) :-
 		\+memberchk('--tquery', Args),
 		\+memberchk('--pass', Args),
 		\+memberchk('--pass-all', Args),
-		\+memberchk('--pass-only-new', Args)
+		\+memberchk('--pass-only-new', Args),
+		\+memberchk('--n3p', Argus)
 	->	assertz(flag(nope))
 	;	true
 	),
@@ -996,7 +997,7 @@ args(['--turtle', Arg|Args]) :-
 	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
-	->	format('~q.~n', [scope(R)])
+	->	portray_clause(scope(R))
 	;	true
 	),
 	assertz(flag(turtle)),
@@ -1010,7 +1011,7 @@ args(['--trules', Arg|Args]) :-
 	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
-	->	format('~q.~n', [scope(R)])
+	->	portray_clause(scope(R))
 	;	true
 	),
 	n3_n3p(Arg, trules),
@@ -1028,7 +1029,7 @@ args(['--pass'|Args]) :-
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
 		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 		(	flag(n3p)
-		->	format('~q.~n', [implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')])
+		->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>'))
 		;	true
 		)
 	),
@@ -1044,9 +1045,9 @@ args(['--pass-all'|Args]) :-
 				answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 		(	flag(n3p)
-		->	format('~q.~n', [implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')]),
-			format('~q.~n', [implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
-				answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')])
+		->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
+			portray_clause(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
+				answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>'))
 		;	true
 		)
 	),
@@ -1063,7 +1064,7 @@ args([Arg|Args]) :-
 	atomic_list_concat(['<', A, '>'], R),
 	assertz(scope(R)),
 	(	flag(n3p)
-	->	format('~q.~n', [scope(R)])
+	->	portray_clause(scope(R))
 	;	true
 	),
 	n3_n3p(Arg, data),
@@ -1204,7 +1205,7 @@ n3_n3p(Argument, Mode) :-
 				(	pfx(Pp, Pu),
 					\+wpfx(Pp)
 				),
-				(	format('~q.~n', [pfx(Pp, Pu)]),
+				(	portray_clause(pfx(Pp, Pu)),
 					assertz(wpfx(Pp))
 				)
 			)
@@ -1238,7 +1239,7 @@ n3_n3p(Argument, Mode) :-
 						(	flag(n3p)
 						->	format(':- dynamic(~q).~n', [P/2]),
 							format(':- multifile(~q).~n', [P/2]),
-							format('~q.~n', [pred(P)])
+							portray_clause(pred(P))
 						;	true
 						)
 					;	true
@@ -1267,7 +1268,7 @@ n3_n3p(Argument, Mode) :-
 						;	strelas(Rt),
 							cnt(sc),
 							(	flag(n3p)
-							->	format('~q.~n', [Rt])
+							->	portray_clause(Rt)
 							;	true
 							)
 						)
@@ -1281,7 +1282,7 @@ n3_n3p(Argument, Mode) :-
 						),
 						assertz(prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St)),
 						(	flag(n3p)
-						->	format('~q.~n', [prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St)])
+						->	portray_clause(prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St))
 						;	true
 						)
 					;	(	Rt = ':-'(Ci, Pi)
@@ -1308,14 +1309,14 @@ n3_n3p(Argument, Mode) :-
 								),
 								cnt(sc),
 								(	flag(n3p)
-								->	format('~q.~n', [':-'(Ci, Pj)])
+								->	portray_clause(':-'(Ci, Pj))
 								;	assertz(':-'(Ci, Pj))
 								)
 							)
 						;	strelas(Rt),
 							cnt(sc),
 							(	flag(n3p)
-							->	format('~q.~n', [Rt])
+							->	portray_clause(Rt)
 							;	true
 							)
 						)
