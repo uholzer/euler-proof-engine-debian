@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7767 2015-02-07 23:26:11Z josd $').
+version_info('$Id: euler.yap 7770 2015-02-07 23:43:52Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -200,7 +200,6 @@ eye
 
 help_tactic_info('
 <tactic>
-	dispersion		add query after each rule
 	linear-logic		retract rule after P & NOT(C)
 	single-answer		give only one answer
 	transaction		rewrite rules using e:transaction').
@@ -326,7 +325,7 @@ n3socket(Argus) :-
 	->	assertz(flag(nope))
 	;	true
 	),
-	(	flag(tactic(dispersion))
+	(	flag(tactic('single-answer'))
 	->	argz(Args, Argd, Argq),
 		append(Argq, Argd, Argz)
 	;	Argz = Args
@@ -1359,7 +1358,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
 		writeln('.'),
-		(	flag(tactic(dispersion))
+		(	flag(tactic('single-answer'))
 		->	assertz(dispersed_query(implies(X, V, Src)))
 		;	true
 		)
@@ -1378,7 +1377,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	;	strela(answer(Y), V),
 		write(implies(X, V, Src)),
 		writeln('.'),
-		(	flag(tactic(dispersion))
+		(	flag(tactic('single-answer'))
 		->	assertz(dispersed_query(implies(X, V, Src)))
 		;	true
 		)
@@ -1417,7 +1416,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	;	write(implies(X, Y, Src)),
 		writeln('.')
 	),
-	(	flag(tactic(dispersion))
+	(	flag(tactic('single-answer'))
 	->	forall(
 			(	dispersed_query(Query)
 			),
