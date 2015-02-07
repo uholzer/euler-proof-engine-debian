@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7760 2015-02-03 13:53:49Z josd $').
+version_info('$Id: euler.yap 7767 2015-02-07 23:26:11Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -200,12 +200,10 @@ eye
 
 help_tactic_info('
 <tactic>
-	cartesian		reorder rules
 	dispersion		add query after each rule
 	linear-logic		retract rule after P & NOT(C)
 	single-answer		give only one answer
-	transaction		rewrite rules using e:transaction
-	transcartesian		reorder rules keeping transactions together').
+	transaction		rewrite rules using e:transaction').
 
 
 
@@ -367,36 +365,6 @@ n3socket(Argus) :-
 		Scope
 	),
 	nb_setval(scope, Scope),
-	(	(	flag(tactic(cartesian))
-		;	flag(tactic(transcartesian))
-		)
-	->	forall(
-			(	implies(Prem, Conc, Src),
-				clist(List, Prem),
-				cartesian(List),
-				Conc \= answer(_, _, _, _, _, _, _, _)
-			),
-			(	retract(implies(Prem, Conc, Src)),
-				assertz(implies(Prem, Conc, Src)),
-				(	flag(tactic(transcartesian)),
-					Conc = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(_, Conct)
-				->	retract(implies(Conc, Conct, Src)),
-					assertz(implies(Conc, Conct, Src))
-				;	true
-				),
-				(	flag(tactic(dispersion))
-				->	forall(
-						(	dispersed_query(Query)
-						),
-						(	assertz(Query)
-						)
-					)
-				;	true
-				)
-			)
-		)
-	;	true
-	),
 	findall([Dlen, Dsort, implies(Prem, dn(D), Src)],
 		(	implies(Prem, dn(D), Src),
 			nonvar(D),
@@ -7492,13 +7460,6 @@ intersection([X|Y], Z) :-
 		),
 		clist(W, Z)
 	).
-
-
-cartesian([A|B]) :-
-	\+ \+memberchk(A, B),
-	!.
-cartesian([_|B]) :-
-	cartesian(B).
 
 
 cartesian([], []).
