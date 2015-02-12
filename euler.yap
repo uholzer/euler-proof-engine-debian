@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7777 2015-02-09 22:08:03Z josd $').
+version_info('$Id: euler.yap 7783 2015-02-12 21:10:44Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1627,7 +1627,7 @@ eam(Span) :-
 			flush_output(user_error)
 		;	true
 		),
-		catch(call(Prem), _, fail),
+		call(Prem),
 		(	Conc = false
 		->	throw(inference_fuse(Prem))
 		;	true
