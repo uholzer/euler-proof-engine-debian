@@ -1,4 +1,4 @@
-# Euler Yet another proof Engine
+# ![EYE](http://eulersharp.sourceforge.net/2003/03swap/eye.png) Euler Yet another proof Engine
 
 - [EYE] (http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt) is a reasoning engine supporting the [RGB] (http://eulersharp.sourceforge.net/2006/02swap/rgb-note.txt) semantic web layers.
 - It is a semibackward reasoner enhanced with [Euler path] (http://mathworld.wolfram.com/KoenigsbergBridgeProblem.html) detection.
