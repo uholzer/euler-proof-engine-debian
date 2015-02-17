@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7792 2015-02-16 16:46:36Z josd $').
+version_info('$Id: euler.yap 7800 2015-02-17 22:14:08Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1416,13 +1416,17 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	write(Y),
-	writeln('.'),
-	(	flag(nope),
-		\+flag(ances)
-	->	true
-	;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
+	(	flag(tactic('linear-logic'))
+	->	write(implies(true, Y, Src)),
 		writeln('.')
+	;	write(Y),
+		writeln('.'),
+		(	flag(nope),
+			\+flag(ances)
+		->	true
+		;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
+			writeln('.')
+		)
 	),
 	tr_n3p(Z, Src, Mode).
 
@@ -1597,8 +1601,8 @@ answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
 %  1/ Select rule P => C
 %  2/ Prove P & NOT(C) (backward chaining)
 %  3/ If P & NOT(C) assert C (forward chaining)
-%  4/ If C = answer(A) and single-answer stop, else backtrack to 2/ or 1/
-%  5/ If brake or linear-logic stop, else start again at 1/
+%  4/ If C = answer(A) and tactic single-answer stop, else backtrack to 2/ or 1/
+%  5/ If brake or tactic linear-logic stop, else start again at 1/
 
 
 eam(Span) :-
