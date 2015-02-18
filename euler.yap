@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7804 2015-02-18 22:19:02Z josd $').
+version_info('$Id: euler.yap 7806 2015-02-18 22:59:36Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -989,29 +989,28 @@ args(['--pass'|Args]) :-
 		\+flag(tactic('single-answer'))
 	->	assertz(query(exopred(P, S, O), exopred(P, S, O)))
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
-		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
-		(	flag(n3p)
-		->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>'))
-		;	true
-		)
+		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>'))
+	),
+	(	flag(n3p)
+	->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>'))
+	;	true
 	),
 	args(Args).
 args(['--pass-all'|Args]) :-
 	!,
 	(	flag(nope),
 		\+flag(tactic('single-answer'))
-	->	assertz(query(exopred(P, S, O), exopred(P, S, O))),
-		assertz(query('<http://www.w3.org/2000/10/swap/log#implies>'(A, C), '<http://www.w3.org/2000/10/swap/log#implies>'(A, C)))
+	->	assertz(query(exopred(P, S, O), exopred(P, S, O)))
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
-		assertz(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
-				answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
-		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
-		(	flag(n3p)
-		->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
-			portray_clause(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
-				answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>'))
-		;	true
-		)
+		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>'))
+	),
+	assertz(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
+			answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
+	(	flag(n3p)
+	->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
+		portray_clause(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
+			answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>'))
+	;	true
 	),
 	args(Args).
 % DEPRECATED
@@ -2656,9 +2655,7 @@ w3(U) :-
 	!,
 	(	query(Q, A),
 		catch(call(Q), _, fail),
-		nb_getval(wn, W),
-		labelvars(A, W, N),
-		nb_setval(wn, N),
+		ground(A),
 		relabel(A, B),
 		indent,
 		wt(B),
