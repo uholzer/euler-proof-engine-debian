@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7800 2015-02-17 22:14:08Z josd $').
+version_info('$Id: euler.yap 7802 2015-02-18 20:58:25Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2656,9 +2656,7 @@ w3(U) :-
 	!,
 	(	query(Q, A),
 		catch(call(Q), _, fail),
-		nb_getval(wn, W),
-		labelvars(A, W, N),
-		nb_setval(wn, N),
+		ground(A),
 		relabel(A, B),
 		indent,
 		wt(B),
@@ -7986,7 +7984,8 @@ partconc(_, [], []).
 partconc(_, ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)], ['<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(A, B)]) :-
 	!.
 partconc(A, [B|C], [B|D]) :-
-	B = answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _),
+	B = answer(E, _, _, _, _, _, _, _),
+	E == '<http://www.w3.org/2000/10/swap/log#implies>',
 	!,
 	partconc(A, C, D).
 partconc(A, [B|C], [B|D]) :-
