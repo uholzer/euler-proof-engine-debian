@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7808 2015-02-19 09:21:50Z josd $').
+version_info('$Id: euler.yap 7810 2015-02-19 13:58:31Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -997,14 +997,10 @@ args(['--pass'|Args]) :-
 	args(Args).
 args(['--pass-all'|Args]) :-
 	!,
-	(	flag(nope),
-		\+flag(tactic('single-answer'))
-	->	assertz(query(exopred(P, S, O), exopred(P, S, O)))
-	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
-		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>'))
-	),
+	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 	assertz(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
 			answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
+	assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 	(	flag(n3p)
 	->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 		portray_clause(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
@@ -1526,6 +1522,8 @@ strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2
 	O1 =.. [P2, S2, O2],
 	!.
 strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
+	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
+	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
 	nonvar(O1),
 	O1 =.. [P2, S2, O2],
 	!.
