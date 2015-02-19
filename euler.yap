@@ -108,7 +108,6 @@
 :- dynamic(qevar/3).
 :- dynamic(query/2).
 :- dynamic(quvar/3).
-:- dynamic(rule_conc/0).
 :- dynamic(rule_uvar/1).
 :- dynamic(scope/1).
 :- dynamic(semantics/2).
@@ -148,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7806 2015-02-18 22:59:36Z josd $').
+version_info('$Id: euler.yap 7808 2015-02-19 09:21:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2651,6 +2650,9 @@ wh :-
 
 w3(U) :-
 	wh,
+	nb_setval(fdepth, 0),
+	nb_setval(pdepth, 0),
+	nb_setval(cdepth, 0),
 	flag(nope),
 	!,
 	(	query(Q, A),
@@ -3072,7 +3074,8 @@ wt0(X) :-
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')
 	->	(	rule_uvar(L),
-			(	rule_conc
+			(	nb_getval(pdepth, 0),
+				nb_getval(cdepth, 1)
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3093,7 +3096,8 @@ wt0(X) :-
 	!,
 	(	\+flag('no-qvars')
 	->	(	rule_uvar(L),
-			(	rule_conc
+			(	nb_getval(pdepth, 0),
+				nb_getval(cdepth, 1)
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3126,7 +3130,8 @@ wt0(X) :-
 	sub_atom(X, 22, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
 		rule_uvar(L),
-		(	rule_conc
+		(	nb_getval(pdepth, 0),
+			nb_getval(cdepth, 1)
 		->	memberchk(Y, L)
 		;	(	memberchk(Y, L)
 			->	true
@@ -3265,11 +3270,17 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 	->	wg(Y),
 		write(' <= '),
 		wg(X)
-	;	wg(X),
+	;	nb_getval(pdepth, PD),
+		PD1 is PD+1,
+		nb_setval(pdepth, PD1),
+		wg(X),
+		nb_setval(pdepth, PD),
 		write(' => '),
-		assertz(rule_conc),
+		nb_getval(cdepth, CD),
+		CD1 is CD+1,
+		nb_setval(cdepth, CD1),
 		wg(Y),
-		retract(rule_conc)
+		nb_setval(cdepth, CD)
 	),
 	retract(rule_uvar(_)),
 	!.
