@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7810 2015-02-19 13:58:31Z josd $').
+version_info('$Id: euler.yap 7812 2015-02-21 23:22:18Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -172,27 +172,29 @@ eye
 	--tactic <tactic>	use specific tactic (for help see eye --tactic)
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
-	--n3p			output N3 P-code
-	--image <file>		output PVM code
-	--strings		output log:outputString objects
-	--warn			output warning info
-	--debug			output debug info
-	--debug-cnt		output debug info about counters
-	--debug-pvm		output debug info about PVM code
-	--rule-histogram	output rule histogram
-	--profile		output profile info
-	--statistics		output statistics info
-	--probe			output speedtest info
+	--n3p			output all <data> as N3 P-code to stdout
+	--pvm <n3p-file>	output <n3p-file> as PVM code to <qlf-file>
+	--image <pvm-file>	output all <data> and all code to <pvm-file>
+	--strings		output log:outputString objects to stdout
+	--warn			output warning info to stderr
+	--debug			output debug info to stderr
+	--debug-cnt		output debug info about counters info to stderr
+	--debug-pvm		output debug info about PVM code info to stderr
+	--rule-histogram	output rule histogram info to stderr
+	--profile		output profile info to stderr
+	--statistics		output statistics info to stderr
+	--probe			output speedtest info to stderr
 	--traditional		traditional mode
 	--version		show version info
 	--license		show license info
 	--help			show help info
 <data>
-	<n3_resource>		N3 facts and rules
-	--turtle <ttl_resource>	Turtle data
-	--plugin <n3p_resource>	plugin N3 P-code
+	<n3-data>		N3 facts and rules
+	--turtle <ttl-data>	Turtle data
+	--plugin <n3p-data>	plugin N3 P-code
+	--plugin-pvm <qlf-data>	plugin PVM code
 <query>
-	--query <n3_resource>	output filtered with filter rules
+	--query <n3-query>	output filtered with filter rules
 	--pass			output deductive closure
 	--pass-all		output deductive closure plus rules
 	--pass-only-new		output only the new derived triples').
@@ -666,7 +668,7 @@ argv([], []) :-
 argv([Arg|Argvs], [U, V|Argus]) :-
 	sub_atom(Arg, B, 1, E, '='),
 	sub_atom(Arg, 0, B, _, U),
-	memberchk(U, ['--tmp-file', '--wget-path', '--image', '--yabc', '--plugin', '--turtle', '--trules', '--query', '--tquery', '--step', '--tactic']),
+	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--trules', '--query', '--tquery', '--step', '--tactic']),
 	!,
 	sub_atom(Arg, _, E, 0, V),
 	argv(Argvs, Argus).
@@ -709,6 +711,10 @@ opts(['--pcl'|Argus], Args) :-
 	!,
 	assertz(flag(n3p)),
 	opts(Argus, Args).
+opts(['--pvm'|File], _) :-
+	!,
+	qcompile(File),
+	throw(halt).
 opts(['--image', File|Argus], Args) :-
 	!,
 	assertz(flag(image(File))),
@@ -832,7 +838,7 @@ opts(['--probe'|_], _) :-
 	delete_file(File),
 	throw(halt).
 opts([Arg|Argus], Args) :-
-	\+memberchk(Arg, ['--plugin', '--turtle', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
+	\+memberchk(Arg, ['--plugin', '--plugin-pvm', '--turtle', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
 	sub_atom(Arg, 0, 2, _, '--'),
 	!,
 	sub_atom(Arg, 2, _, 0, Opt),
@@ -950,6 +956,49 @@ args(['--plugin', Argument|Args]) :-
 	(	wcache(Arg, File)
 	->	format(user_error, 'GET ~w FROM ~w SC=~w~n', [Arg, File, SC])
 	;	format(user_error, 'GET ~w SC=~w~n', [Arg, SC])
+	),
+	flush_output(user_error),
+	args(Args).
+args(['--plugin-pvm', Argument|Args]) :-
+	!,
+	absolute_uri(Argument, Arg),
+	(	wcache(Arg, File)
+	->	true
+	;	(	(	sub_atom(Arg, 0, 5, _, 'http:')
+			->	true
+			;	sub_atom(Arg, 0, 6, _, 'https:')
+			)
+		->	(	flag('tmp-file'(File))
+			->	true
+			;	tmp_file(File),
+				assertz(tmpfile(File))
+			),
+			atomic_list_concat(['curl -s "', Arg, '" -o ', File], Cmd),
+			catch(exec(Cmd, _), Exc,
+				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
+					flush_output(user_error),
+					(	retract(tmpfile(File))
+					->	delete_file(File)
+					;	true
+					),
+					halt(1)
+				)
+			)
+		;	(	sub_atom(Arg, 0, 5, _, 'file:')
+			->	parse_url(Arg, Parts),
+				memberchk(path(File), Parts)
+			;	File = Arg
+			)
+		)
+	),
+	consult(File),
+	(	retract(tmpfile(File))
+	->	delete_file(File)
+	;	true
+	),
+	(	wcache(Arg, File)
+	->	format(user_error, 'GET ~w FROM ~w~n', [Arg, File])
+	;	format(user_error, 'GET ~w~n', [Arg])
 	),
 	flush_output(user_error),
 	args(Args).
