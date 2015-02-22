@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7812 2015-02-21 23:22:18Z josd $').
+version_info('$Id: euler.yap 7815 2015-02-22 20:24:04Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -173,7 +173,7 @@ eye
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--n3p			output all <data> as N3 P-code to stdout
-	--pvm <n3p-file>	output <n3p-file> as PVM code to <qlf-file>
+	--pvm <n3p-file>	output <n3p-file> as PVM code to <pvm-file>
 	--image <pvm-file>	output all <data> and all code to <pvm-file>
 	--strings		output log:outputString objects to stdout
 	--warn			output warning info to stderr
@@ -192,7 +192,7 @@ eye
 	<n3-data>		N3 facts and rules
 	--turtle <ttl-data>	Turtle data
 	--plugin <n3p-data>	plugin N3 P-code
-	--plugin-pvm <qlf-data>	plugin PVM code
+	--plugin-pvm <pvm-data>	plugin PVM code
 <query>
 	--query <n3-query>	output filtered with filter rules
 	--pass			output deductive closure
@@ -220,6 +220,10 @@ main :-
 	prolog_flag(version, PVersion),
 	format(user_error, '~w~n', [PVersion]),
 	flush_output(user_error),
+	(	retract(prolog_file_type(qlf, qlf))
+	->	assertz(prolog_file_type(pvm, qlf))
+	;	true
+	),
 	current_prolog_flag(argv, Argv),
 	(	append(_, ['--'|Argvp], Argv)
 	->	true
@@ -711,10 +715,12 @@ opts(['--pcl'|Argus], Args) :-
 	!,
 	assertz(flag(n3p)),
 	opts(Argus, Args).
-opts(['--pvm'|File], _) :-
+opts(['--pvm', File|_], _) :-
 	!,
-	qcompile(File),
-	throw(halt).
+	(	qcompile(File)
+	->	throw(halt)
+	;	throw(failed_qcompile(File))
+	).
 opts(['--image', File|Argus], Args) :-
 	!,
 	assertz(flag(image(File))),
