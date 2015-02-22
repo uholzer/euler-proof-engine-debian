@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7815 2015-02-22 20:24:04Z josd $').
+version_info('$Id: euler.yap 7817 2015-02-22 22:42:25Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -178,8 +178,8 @@ eye
 	--strings		output log:outputString objects to stdout
 	--warn			output warning info to stderr
 	--debug			output debug info to stderr
-	--debug-cnt		output debug info about counters info to stderr
-	--debug-pvm		output debug info about PVM code info to stderr
+	--debug-cnt		output debug info about counters to stderr
+	--debug-pvm		output debug info about PVM code to stderr
 	--rule-histogram	output rule histogram info to stderr
 	--profile		output profile info to stderr
 	--statistics		output statistics info to stderr
