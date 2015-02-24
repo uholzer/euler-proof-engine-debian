@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7817 2015-02-22 22:42:25Z josd $').
+version_info('$Id: euler.yap 7821 2015-02-24 19:51:00Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3390,8 +3390,15 @@ wt2(X) :-
 
 wtn(exopred(P, S, O)) :-
 	!,
-	X =.. [P, S, O],
-	wt2(X).
+	(	atom(P)
+	->	X =.. [P, S, O],
+		wt2(X)
+	;	wg(S),
+		write(' '),
+		wt(P),
+		write(' '),
+		wg(O)
+	).
 wtn(X) :-
 	X =.. [B|C],
 	(	atom(B),
