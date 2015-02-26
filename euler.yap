@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7824 2015-02-26 11:22:28Z josd $').
+version_info('$Id: euler.yap 7826 2015-02-26 22:27:42Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -722,7 +722,19 @@ opts(['--pcl'|Argus], Args) :-
 	opts(Argus, Args).
 opts(['--pvm', File|_], _) :-
 	!,
-	(	qcompile(File)
+	(	assertz(':-'(term_expansion(T1, T2),
+				(	T1 =.. [P, S, literal(O1, O2)],
+					T3 =.. [P, S, O1, O2],
+					T4 =.. [P, _, _, _],
+					(	\+ catch(call(T4), _, fail)
+					->	X =.. [P, U, literal(V1, V2)],
+						T2 = [T3, ':-'(X, (Y =.. [P, U, V1, V2], call(Y)))]
+					;	T2 = T3
+					)
+				)
+			)
+		),
+		qcompile(File)
 	->	throw(halt)
 	;	throw(failed_qcompile(File))
 	).
@@ -939,7 +951,8 @@ args(['--plugin', Argument|Args]) :-
 			;	strelas(Rt),
 				(	Rt \= scope(_),
 					Rt \= pfx(_, _),
-					Rt \= pred(_)
+					Rt \= pred(_),
+					Rt \= scount(_)
 				->	(	flag(nope),
 						\+flag(ances)
 					->	true
