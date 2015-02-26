@@ -110,6 +110,7 @@
 :- dynamic(quvar/3).
 :- dynamic(rule_uvar/1).
 :- dynamic(scope/1).
+:- dynamic(scount/1).
 :- dynamic(semantics/2).
 :- dynamic(span/1).
 :- dynamic(table/3).
@@ -147,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7821 2015-02-24 19:51:00Z josd $').
+version_info('$Id: euler.yap 7824 2015-02-26 11:22:28Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -343,6 +344,7 @@ n3socket(Argus) :-
 		format(':- multifile(pred/1).~n', []),
 		format(':- multifile(prfstep/8).~n', []),
 		format(':- multifile(scope/1).~n', []),
+		format(':- multifile(scount/1).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#mu>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#pi>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#sigma>\'/2).~n', []),
@@ -398,7 +400,10 @@ n3socket(Argus) :-
 	;	true
 	),
 	(	flag(n3p)
-	->	throw(halt)
+	->	nb_getval(sc, SC),
+		write(scount(SC)),
+		writeln('.'),
+		throw(halt)
 	;	true
 	),
 	(	\+implies(answer(_, _, _, _, _, _, _, _), goal, '<>'),
@@ -928,7 +933,8 @@ args(['--plugin', Argument|Args]) :-
 			->	nb_setval(current_scope, Scope)
 			;	true
 			),
-			(	call(Rt)
+			(	Rt \= implies(_, _, _),
+				call(Rt)
 			->	true
 			;	strelas(Rt),
 				(	Rt \= scope(_),
@@ -1002,9 +1008,16 @@ args(['--plugin-pvm', Argument|Args]) :-
 	->	delete_file(File)
 	;	true
 	),
+	(	retract(scount(SC))
+	->	true
+	;	SC = 0
+	),
+	nb_getval(input_statements, IN),
+	Inp is SC+IN,
+	nb_setval(input_statements, Inp),
 	(	wcache(Arg, File)
-	->	format(user_error, 'GET ~w FROM ~w~n', [Arg, File])
-	;	format(user_error, 'GET ~w~n', [Arg])
+	->	format(user_error, 'GET ~w FROM ~w SC=~w~n', [Arg, File, SC])
+	;	format(user_error, 'GET ~w SC=~w~n', [Arg, SC])
 	),
 	flush_output(user_error),
 	args(Args).
