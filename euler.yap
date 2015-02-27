@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7826 2015-02-26 22:27:42Z josd $').
+version_info('$Id: euler.yap 7828 2015-02-27 09:55:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -728,7 +728,7 @@ opts(['--pvm', File|_], _) :-
 					T4 =.. [P, _, _, _],
 					(	\+ catch(call(T4), _, fail)
 					->	X =.. [P, U, literal(V1, V2)],
-						T2 = [T3, ':-'(X, (Y =.. [P, U, V1, V2], call(Y)))]
+						T2 = [':-'(dynamic(P/3)), ':-'(multifile(P/3)), ':-'(X, (Y =.. [P, U, V1, V2], call(Y))), T3]
 					;	T2 = T3
 					)
 				)
