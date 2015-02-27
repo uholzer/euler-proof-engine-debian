@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7828 2015-02-27 09:55:19Z josd $').
+version_info('$Id: euler.yap 7830 2015-02-27 16:49:12Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -723,7 +723,21 @@ opts(['--pcl'|Argus], Args) :-
 opts(['--pvm', File|_], _) :-
 	!,
 	(	assertz(':-'(term_expansion(T1, T2),
+				(	T1 =.. [P, [S1, S2|S3], O],
+					!,
+					T3 =.. [P, S1, S2, S3, O],
+					T4 =.. [P, _, _, _, _],
+					(	\+ catch(call(T4), _, fail)
+					->	X =.. [P, [U1, U2|U3], V],
+						T2 = [':-'(dynamic(P/4)), ':-'(multifile(P/4)), ':-'(X, (Y =.. [P, U1, U2, U3, V], call(Y))), T3]
+					;	T2 = T3
+					)
+				)
+			)
+		),
+		assertz(':-'(term_expansion(T1, T2),
 				(	T1 =.. [P, S, literal(O1, O2)],
+					!,
 					T3 =.. [P, S, O1, O2],
 					T4 =.. [P, _, _, _],
 					(	\+ catch(call(T4), _, fail)
