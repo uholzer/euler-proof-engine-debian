@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7830 2015-02-27 16:49:12Z josd $').
+version_info('$Id: euler.yap 7833 2015-03-02 00:09:40Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1092,12 +1092,14 @@ args(['--pass'|Args]) :-
 	args(Args).
 args(['--pass-all'|Args]) :-
 	!,
-	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
+	assertz(implies(cn([exopred(P, S, O), '<http://www.w3.org/2000/10/swap/log#notEqualTo>'(P, '<http://www.w3.org/2000/10/swap/log#implies>')]),
+			answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 	assertz(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
 			answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 	assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 	(	flag(n3p)
-	->	portray_clause(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
+	->	portray_clause(implies(cn([exopred(P, S, O), '<http://www.w3.org/2000/10/swap/log#notEqualTo>'(P, '<http://www.w3.org/2000/10/swap/log#implies>')]),
+			answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>')),
 		portray_clause(implies('<http://www.w3.org/2000/10/swap/log#implies>'(A, C),
 			answer('<http://www.w3.org/2000/10/swap/log#implies>', A, C, gamma, gamma, gamma, gamma, gamma), '<http://eulersharp.sourceforge.net/2003/03swap/pass-all>'))
 	;	true
@@ -3168,7 +3170,8 @@ wt0(X) :-
 		\+flag('no-blank')
 	->	(	rule_uvar(L),
 			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, 1)
+				nb_getval(cdepth, CD),
+				CD > 0
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3190,7 +3193,8 @@ wt0(X) :-
 	(	\+flag('no-qvars')
 	->	(	rule_uvar(L),
 			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, 1)
+				nb_getval(cdepth, CD),
+				CD > 0
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3224,7 +3228,8 @@ wt0(X) :-
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
 		rule_uvar(L),
 		(	nb_getval(pdepth, 0),
-			nb_getval(cdepth, 1)
+			nb_getval(cdepth, CD),
+			CD > 0
 		->	memberchk(Y, L)
 		;	(	memberchk(Y, L)
 			->	true
