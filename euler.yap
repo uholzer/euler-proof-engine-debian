@@ -148,7 +148,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7833 2015-03-02 00:09:40Z josd $').
+version_info('$Id: euler.yap 7841 2015-03-03 15:57:39Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -400,7 +400,7 @@ n3socket(Argus) :-
 	;	true
 	),
 	(	flag(n3p)
-	->	nb_getval(sc, SC),
+	->	nb_getval(input_statements, SC),
 		write(scount(SC)),
 		writeln('.'),
 		throw(halt)
@@ -1290,9 +1290,7 @@ n3_n3p(Argument, Mode) :-
 						P \= query
 					->	assertz(pred(P)),
 						(	flag(n3p)
-						->	format(':- dynamic(~q).~n', [P/2]),
-							format(':- multifile(~q).~n', [P/2]),
-							portray_clause(pred(P))
+						->	portray_clause(pred(P))
 						;	true
 						)
 					;	true
