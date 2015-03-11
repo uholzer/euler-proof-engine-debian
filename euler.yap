@@ -38,6 +38,7 @@
 :- endif.
 :- initialization(catch(set_prolog_stack(local, limit(2^33)), _, true)).
 :- initialization(catch(set_prolog_stack(global, limit(2^35)), _, true)).
+:- initialization(set_prolog_flag(agc_margin, 10000000)).
 :- endif.
 
 
@@ -148,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7841 2015-03-03 15:57:39Z josd $').
+version_info('$Id: euler.yap 7848 2015-03-11 22:55:51Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
