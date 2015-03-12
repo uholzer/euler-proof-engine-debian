@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7848 2015-03-11 22:55:51Z josd $').
+version_info('$Id: euler.yap 7850 2015-03-12 16:35:38Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3649,6 +3649,20 @@ wct([A|B]) :-
 wcf(A) :-
 	var(A),
 	!.
+wcf(rdiv(X, Y)) :-
+	number_codes(Y, [0'1|Z]),
+	lzero(Z, Z),
+	!,
+	(	Z = []
+	->	F = '~d.0'
+	;	length(Z, N),
+		number_codes(X, U),
+		(	length(U, N)
+		->	F = '0.~d'
+		;	atomic_list_concat(['~', N, 'd'], F)
+		)
+	),
+	format(F, [X]).
 wcf(literal(A, _)) :-
 	!,
 	write('"'),
