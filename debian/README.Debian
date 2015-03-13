@@ -1,0 +1,8 @@
+eye for Debian
+--------------
+
+This package currently installs the prolog source instead of the compiled form.
+That is, it just installs euler.yap to /usr/bin/eye.yap. A shebang is added at
+the top in order to invoke SWI-Prolog.
+
+ -- Urs Holzer <urs@andonyar.com>  Wed, 11 Mar 2015 21:40:45 +0100
