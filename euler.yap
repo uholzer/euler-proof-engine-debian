@@ -38,6 +38,7 @@
 :- endif.
 :- initialization(catch(set_prolog_stack(local, limit(2^33)), _, true)).
 :- initialization(catch(set_prolog_stack(global, limit(2^35)), _, true)).
+:- initialization(set_prolog_flag(agc_margin, 10000000)).
 :- endif.
 
 
@@ -148,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7841 2015-03-03 15:57:39Z josd $').
+version_info('$Id: euler.yap 7852 2015-03-12 20:38:06Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -203,7 +204,7 @@ eye
 
 help_tactic_info('
 <tactic>
-	linear-logic		select each rule only once
+	linear-select		select each rule only once
 	single-answer		give only one answer').
 
 
@@ -1484,7 +1485,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	(	flag(tactic('linear-logic'))
+	(	flag(tactic('linear-select'))
 	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
 		writeln('.'),
 		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
@@ -1505,7 +1506,7 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	(	flag(tactic('linear-logic'))
+	(	flag(tactic('linear-select'))
 	->	write(implies(true, Y, Src)),
 		writeln('.')
 	;	write(Y),
@@ -1693,7 +1694,7 @@ answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
 %  2/ Prove P & NOT(C) (backward chaining)
 %  3/ If P & NOT(C) assert C (forward chaining)
 %  4/ If C = answer(A) and tactic single-answer stop, else backtrack to 2/ or 1/
-%  5/ If brake or tactic linear-logic stop, else start again at 1/
+%  5/ If brake or tactic linear-select stop, else start again at 1/
 
 
 eam(Span) :-
@@ -1820,7 +1821,7 @@ eam(Span) :-
 		;	retract(brake),
 			fail
 		)
-	;	(	flag(tactic('linear-logic'))
+	;	(	flag(tactic('linear-select'))
 		;	brake
 		),
 		(	S is Span+1,
@@ -3648,6 +3649,20 @@ wct([A|B]) :-
 wcf(A) :-
 	var(A),
 	!.
+wcf(rdiv(X, Y)) :-
+	number_codes(Y, [0'1|Z]),
+	lzero(Z, Z),
+	!,
+	(	Z = []
+	->	F = '~d.0'
+	;	length(Z, N),
+		number_codes(X, U),
+		(	length(U, N)
+		->	F = '0.~d'
+		;	atomic_list_concat(['~', N, 'd'], F)
+		)
+	),
+	format(F, [X]).
 wcf(literal(A, _)) :-
 	!,
 	write('"'),
