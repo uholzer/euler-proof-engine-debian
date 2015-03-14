@@ -1,3 +1,11 @@
+euler-proof-engine (7852-1) unstable; urgency=medium
+
+  * the latest tactic is called linear-select
+  * fixing csv output for decimals (obs from Gijs Muys)
+  * finetuning atom-garbage collection margin to get nlogn performance for --pvm
+
+ -- Urs Holzer <urs@andonyar.com>  Sat, 14 Mar 2015 16:12:27 +0100
+
 euler-proof-engine (7841-1) unstable; urgency=low
 
   * Initial release
