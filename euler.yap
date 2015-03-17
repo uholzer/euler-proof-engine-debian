@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7852 2015-03-12 20:38:06Z josd $').
+version_info('$Id: euler.yap 7861 2015-03-17 14:33:57Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -874,6 +874,11 @@ opts(['--probe'|_], _) :-
 	flush_output(user_error),
 	close(In),
 	delete_file(File),
+	get_time(StampN),
+	datetime(StampN, StampC),
+	atom_codes(Stamp, StampC),
+	format(user_error, '[~w]~n~n', [Stamp]),
+	flush_output(user_error),
 	throw(halt).
 opts([Arg|Argus], Args) :-
 	\+memberchk(Arg, ['--plugin', '--plugin-pvm', '--turtle', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
