@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7861 2015-03-17 14:33:57Z josd $').
+version_info('$Id: euler.yap 7902 2015-04-02 11:01:27Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9662,12 +9662,7 @@ numericliteral(Number) -->
 			atomic_list_concat(['\'', A, '\''], B),
 			Number = literal(B, type(T))
 		;	numeral(NumB, NumC),
-			(	length(NumC, LenC),
-				LenC > 16,
-				Type = decimal
-			->	rdiv_codes(Number, NumC)
-			;	number_codes(Number, NumC)
-			)
+			number_codes(Number, NumC)
 		)
 	}.
 
@@ -9780,12 +9775,7 @@ pathitem(Number, []) -->
 		sub_atom(Atom, 1, _, 1, A),
 		atom_codes(A, NumB),
 		numeral(NumB, NumC),
-		(	length(NumC, LenC),
-			LenC > 16,
-			Type = '\'<http://www.w3.org/2001/XMLSchema#decimal>\''
-		->	rdiv_codes(Number, NumC)
-		;	number_codes(Number, NumC)
-		)
+		number_codes(Number, NumC)
 	},
 	!.
 pathitem(literal(Atom, DtLang), []) -->
