@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7902 2015-04-02 11:01:27Z josd $').
+version_info('$Id: euler.yap 7933 2015-04-08 12:32:51Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1616,6 +1616,15 @@ strelaz([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
 	strelaz(B, C).
 
 
+strelar(cn(A), cn(B)) :-
+	!,
+	strelar(A, B).
+strelar([], []) :-
+	!.
+strelar([A|B], [C|D]) :-
+	!,
+	strelar(A, C),
+	strelar(B, D).	
 strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2, P2, O2, exopred, delta, delta)) :-
 	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
 	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
