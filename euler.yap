@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7933 2015-04-08 12:32:51Z josd $').
+version_info('$Id: euler.yap 7943 2015-04-10 09:30:52Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1568,6 +1568,9 @@ tr_split([A|B], [A|C], D) :-
 % ----------------------
 
 
+strela(answer(cn(A)), cn(B)) :-
+	!,
+	strela(A, B).
 strela(answer(A), answer(P1, S2, S3, P2, O2, P3, O3, alpha)) :-
 	A =.. [P1, S1, O1],
 	\+is_list(S1),
@@ -1591,40 +1594,27 @@ strela(answer(A), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
 strela(answer(A), answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon)) :-
 	A =.. [P, P1, S1, O1],
 	!.
-strela(answer(cn(A)), cn(B)) :-
-	!,
-	strelax(A, B).
-strela(answer(A), answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)).
-
-
-strelax([], []) :-
+strela(answer(A), answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)) :-
 	!.
-strelax([A|B], [C|D]) :-
+strela([A|B], [C|D]) :-
+	!,
 	strela(answer(A), C),
-	strelax(B, D).
+	strela(B, D).
+strela(A, A).
 
 
 strelan(answer(cn(A), zeta, zeta, zeta, zeta, zeta, zeta, zeta), cn(B)) :-
 	!,
-	strelaz(A, B).
+	strelan(A, B).
+strelan([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
+	!,
+	strelan(B, C).
 strelan(A, A).
-
-
-strelaz([], []) :-
-	!.
-strelaz([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
-	strelaz(B, C).
 
 
 strelar(cn(A), cn(B)) :-
 	!,
 	strelar(A, B).
-strelar([], []) :-
-	!.
-strelar([A|B], [C|D]) :-
-	!,
-	strelar(A, C),
-	strelar(B, D).	
 strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2, P2, O2, exopred, delta, delta)) :-
 	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
 	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
@@ -1637,6 +1627,10 @@ strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1
 	nonvar(O1),
 	O1 =.. [P2, S2, O2],
 	!.
+strelar([A|B], [C|D]) :-
+	!,
+	strelar(A, C),
+	strelar(B, D).	
 strelar(A, A).
 
 
