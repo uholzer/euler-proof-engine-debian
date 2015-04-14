@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7943 2015-04-10 09:30:52Z josd $').
+version_info('$Id: euler.yap 7958 2015-04-14 14:28:07Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3253,10 +3253,13 @@ wt0(X) :-
 	->	true
 	;	(	\+flag('no-qnames'),
 			atom(X),
-			sub_atom(X, I, 1, J, '#'),
-			J > 1,
-			sub_atom(X, 0, I, _, C),
-			atom_concat(C, '#>', D),
+			(	sub_atom(X, I, 1, J, '#')
+			->	J > 1,
+				sub_atom(X, 0, I, _, C),
+				atom_concat(C, '#>', D)
+			;	J = 1,
+				D = X
+			),
 			pfx(E, D),
 			K is J-1,
 			sub_atom(X, _, K, 1, F),
