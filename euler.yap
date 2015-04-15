@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7958 2015-04-14 14:28:07Z josd $').
+version_info('$Id: euler.yap 7960 2015-04-15 14:44:39Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8038,15 +8038,13 @@ quant(':-'(_, _), allv) :-
 	!.
 quant(answer('<http://www.w3.org/2000/10/swap/log#implies>', _, _, _, _, _, _, _), allv) :-
 	!.
-quant(answer(_, _, _, _, _, _, '<http://www.w3.org/2000/10/swap/log#implies>', _), allv) :-
-	!.
 quant(answer(':-', _, _, _, _, _, _, _), allv) :-
-	!.
-quant(answer(_, _, _, _, _, _, ':-', _), allv) :-
 	!.
 quant(answer('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>', _, _, _, _, _, _, _), allv) :-
 	!.
-quant(answer(_, _, _, _, _, _, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>', _), allv) :-
+quant(answer(_, _, _, _, _, _, A, _), allv) :-
+	atom(A),
+	memberchk(A, ['<http://www.w3.org/2000/10/swap/log#implies>', ':-', '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>']),
 	!.
 quant(answer(exopred, P, _, _, _, _, _, _), allv) :-
 	P == '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>',
