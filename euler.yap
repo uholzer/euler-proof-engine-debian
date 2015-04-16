@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7960 2015-04-15 14:44:39Z josd $').
+version_info('$Id: euler.yap 7962 2015-04-16 09:59:02Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2902,6 +2902,7 @@ wi(A, B, C, Rule) :-
 
 
 wj(Cnt, A, true, C, _) :-
+	C \= '<http://www.w3.org/2000/10/swap/log#implies>'(_, _),
 	!,
 	write('<#lemma'),
 	write(Cnt),
@@ -2921,13 +2922,9 @@ wj(Cnt, A, true, C, _) :-
 		wt(Rule)
 	;	labelvars([A, C], 0, _, avar),
 		getvars(C, D),
-		(	C = '<http://www.w3.org/2000/10/swap/log#implies>'(_, _)
-		->	Q = allv
-		;	Q = some
-		),
 		(	\+flag(traditional)
 		->	true
-		;	wq(D, Q)
+		;	wq(D, some)
 		),
 		wt(C)
 	),
