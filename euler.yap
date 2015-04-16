@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7962 2015-04-16 09:59:02Z josd $').
+version_info('$Id: euler.yap 7964 2015-04-16 13:00:32Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3045,15 +3045,20 @@ wr(Y) :-
 	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
 	write('; '),
 	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-	write(' {'),
-	labelvars(Y, 0, _, avar),
-	getvars(Y, Z),
-	(	\+flag(traditional)
-	->	true
-	;	wq(Z, some)
+	write(' '),
+	(	Y = true
+	->	wt(Y)
+	;	write('{'),
+		labelvars(Y, 0, _, avar),
+		getvars(Y, Z),
+		(	\+flag(traditional)
+		->	true
+		;	wq(Z, some)
+		),
+		wt(Y),
+		write('}')
 	),
-	wt(Y),
-	write('}]').
+	write(']').
 
 
 wt(rdiv(X, Y)) :-
