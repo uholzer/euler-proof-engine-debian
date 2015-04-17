@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7967 2015-04-17 15:59:48Z josd $').
+version_info('$Id: euler.yap 7970 2015-04-17 20:55:45Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -721,8 +721,12 @@ opts(['--pcl'|Argus], Args) :-
 	!,
 	assertz(flag(n3p)),
 	opts(Argus, Args).
-opts(['--pvm', File|_], _) :-
+opts(['--pvm', File|Argus], _) :-
 	!,
+	(	memberchk('--nope', Argus)
+	->	assertz(flag(nope))
+	;	true
+	),
 	(	assertz(':-'(term_expansion(T1, T2),
 				(	T1 =.. [P, [S1, S2|S3], O],
 					!,
@@ -1647,7 +1651,7 @@ strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1
 strelar([A|B], [C|D]) :-
 	!,
 	strelar(A, C),
-	strelar(B, D).	
+	strelar(B, D).
 strelar(A, A).
 
 
