@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7964 2015-04-16 13:00:32Z josd $').
+version_info('$Id: euler.yap 7967 2015-04-17 15:59:48Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -749,6 +749,26 @@ opts(['--pvm', File|_], _) :-
 				)
 			)
 		),
+		assertz(':-'(term_expansion(T1, T1),
+				(	T1 = scope(Scope),
+					!,
+					nb_setval(current_scope, Scope)
+				)
+			)
+		),
+		assertz(':-'(term_expansion(T1, [T1, prfstep(T1, Tnd, true, _, T1, _, forward, Src)]),
+				(	\+flag(nope),
+					T1 \= ':-'(_),
+					T1 \= scope(_),
+					T1 \= pfx(_, _),
+					T1 \= pred(_),
+					T1 \= scount(_),
+					!,
+					nb_getval(current_scope, Src),
+					term_index(T1, Tnd)
+				)
+			)
+		),
 		qcompile(File)
 	->	throw(halt)
 	;	throw(failed_qcompile(File))
@@ -977,7 +997,8 @@ args(['--plugin', Argument|Args]) :-
 						\+flag(ances)
 					->	true
 					;	nb_getval(current_scope, Src),
-						assertz(prfstep(Rt, _, true, _, Rt, _, forward, Src))
+						term_index(Rt, Rnd),
+						assertz(prfstep(Rt, Rnd, true, _, Rt, _, forward, Src))
 					),
 					cnt(sc)
 				;	true
@@ -1337,11 +1358,7 @@ n3_n3p(Argument, Mode) :-
 						->	copy_term(It, Ic)
 						;	Ic = It
 						),
-						assertz(prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St)),
-						(	flag(n3p)
-						->	portray_clause(prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St))
-						;	true
-						)
+						assertz(prfstep(Ct, Cnd, Pt, Pnd, Qt, Ic, Mt, St))
 					;	(	Rt = ':-'(Ci, Pi)
 						->	(	Ci = true
 							->	call(Pi)
