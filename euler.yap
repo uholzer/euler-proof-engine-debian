@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7970 2015-04-17 20:55:45Z josd $').
+version_info('$Id: euler.yap 7973 2015-04-21 21:43:08Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -449,7 +449,7 @@ n3socket(Argus) :-
 		->	true
 		;	(	pfx('var:', _)
 			->	true
-			;	assertz(pfx('var:', '<http://localhost/var#>'))
+			;	assertz(pfx('var:', '<http://eulersharp.sourceforge.net/.well-known/genid/eye#>'))
 			),
 			(	pfx('n3:', _)
 			->	true
@@ -1557,7 +1557,7 @@ tr_tr(A, B) :-
 	atom(A),
 	!,
 	(	atom_concat('_', C, A)
-	->	atomic_list_concat(['\'<http://localhost/var#', C, '>\''], B)
+	->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', C, '>\''], B)
 	;	B = A
 	).
 tr_tr(A, A) :-
@@ -3213,7 +3213,7 @@ wt0(X) :-
 		;	write('_:sk')
 		),
 		write(Y)
-	;	atomic_list_concat(['<http://localhost/var#sk', Y, '>'], Z),
+	;	atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#sk', Y, '>'], Z),
 		wt(Z)
 	).
 wt0(X) :-
@@ -3236,14 +3236,14 @@ wt0(X) :-
 		;	write('_:sk')
 		),
 		write(Y)
-	;	atomic_list_concat(['<http://localhost/var#U', Y, '>'], Z),
+	;	atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#U', Y, '>'], Z),
 		wt(Z)
 	).
 wt0(X) :-
 	atom(X),
 	atom_concat(avar, Y, X),
 	!,
-	atomic_list_concat(['<http://localhost/var#x', Y, '>'], Z),
+	atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#x', Y, '>'], Z),
 	wt(Z).
 wt0(X) :-
 	(	\+flag(traditional)
@@ -3252,9 +3252,9 @@ wt0(X) :-
 	),
 	\+flag('no-qvars'),
 	\+flag('no-blank'),
-	sub_atom(X, 0, 22, _, '<http://localhost/var#'),
+	sub_atom(X, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#'),
 	!,
-	sub_atom(X, 22, _, 1, Y),
+	sub_atom(X, 57, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
 		rule_uvar(L),
 		(	nb_getval(pdepth, 0),
@@ -3606,7 +3606,7 @@ wv(X) :-
 	!,
 	write('[ '),
 	wp('<http://www.w3.org/2004/06/rei#uri>'),
-	write(' "http://localhost/var#x'),
+	write(' "http://eulersharp.sourceforge.net/.well-known/genid/eye#x'),
 	write(Y),
 	write('"]').
 wv(X) :-
@@ -3624,7 +3624,7 @@ wv(X) :-
 	write('"]').
 wv(X) :-
 	atom(X),
-	sub_atom(X, 0, 22, _, '<http://localhost/var#'),
+	sub_atom(X, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#'),
 	!,
 	write('[ '),
 	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
@@ -3632,8 +3632,8 @@ wv(X) :-
 	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
 	write('; '),
 	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
-	write(' "http://localhost/var#'),
-	sub_atom(X, 22, _, 1, Q),
+	write(' "http://eulersharp.sourceforge.net/.well-known/genid/eye#'),
+	sub_atom(X, 57, _, 1, Q),
 	write(Q),
 	write('"]').
 wv(X) :-
@@ -3708,9 +3708,9 @@ wcf(literal(A, _)) :-
 	write('"').
 wcf(A) :-
 	atom(A),
-	sub_atom(A, 0, 22, _, '<http://localhost/var#'),
+	sub_atom(A, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#'),
 	!,
-	sub_atom(A, 22, _, 1, B),
+	sub_atom(A, 57, _, 1, B),
 	write('_:'),
 	write(B).
 wcf(A) :-
@@ -3951,8 +3951,8 @@ indentation(C) :-
 		(	nonvar(A)
 		),
 		(	atom(A),
-			(	sub_atom(A, 0, 22, _, '<http://localhost/var#')
-			->	sub_atom(A, 22, _, 1, B)
+			(	sub_atom(A, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#')
+			->	sub_atom(A, 57, _, 1, B)
 			;	atom_concat(some, C, A),
 				atomic_list_concat(['sk', C], B)
 			)
@@ -4157,8 +4157,9 @@ indentation(C) :-
 				nb_getval(tuple, M),
 				N is M+1,
 				nb_setval(tuple, N),
-				atom_number(A, N),
-				atomic_list_concat(['<http://localhost/var#t', A, '>'], X),
+				atom_number(G, N),
+				mktail(G, A),
+				atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#t', A, '>'], X),
 				assertz(Z)
 			)
 		)
@@ -4457,7 +4458,7 @@ indentation(C) :-
 		;	nonvar(Y)
 		),
 		(	atom(X),
-			\+sub_atom(X, 0, 22, _, '<http://localhost/var#'),
+			\+sub_atom(X, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#'),
 			sub_atom(X, 1, _, 1, Y),
 			atomic_list_concat(['<', Y, '>'], X),
 			!
@@ -7268,7 +7269,7 @@ def_pfx('r:', '<http://www.w3.org/2000/10/swap/reason#>').
 def_pfx('rdfs:', '<http://www.w3.org/2000/01/rdf-schema#>').
 def_pfx('time:', '<http://www.w3.org/2000/10/swap/time#>').
 def_pfx('rdf:', '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>').
-def_pfx('var:', '<http://localhost/var#>').
+def_pfx('var:', '<http://eulersharp.sourceforge.net/.well-known/genid/eye#>').
 def_pfx('string:', '<http://www.w3.org/2000/10/swap/string#>').
 def_pfx('owl:', '<http://www.w3.org/2002/07/owl#>').
 def_pfx('n3:', '<http://www.w3.org/2004/06/rei#>').
@@ -7297,6 +7298,15 @@ fresh_pf(Pf, Pfx) :-
 fresh_pf(_, Pfx) :-
 	gensym(ns, Pfn),
 	fresh_pf(Pfn, Pfx).
+
+
+mktail(A, B) :-
+	flag('no-qvars'),
+	!,
+	C is random(2^128),
+	atom_number(D, C),
+	atomic_list_concat([A, '_', D], B).
+mktail(A, A).
 
 
 cnt(A) :-
@@ -7392,7 +7402,7 @@ tpred(A, B) :-
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')
 	->	atom_concat('_:sk', I, B)
-	;	atomic_list_concat(['<http://localhost/var#sk', I, '>'], B)
+	;	atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#sk', I, '>'], B)
 	).
 tpred(A, A).
 
@@ -8093,7 +8103,8 @@ labelvars(A, B, C, D) :-
 	var(A),
 	!,
 	atom_number(E, B),
-	atomic_list_concat([D, E], A),
+	mktail(E, F),
+	atomic_list_concat([D, F], A),
 	C is B+1.
 labelvars(A, B, B, _) :-
 	atomic(A),
@@ -8181,7 +8192,7 @@ findvars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
-		sub_atom(A, 0, 22, _, '<http://localhost/var#')
+		sub_atom(A, 0, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#')
 	->	B = [A]
 	;	B = []
 	).
@@ -9561,7 +9572,11 @@ declaration -->
 	prefix(Prefix),
 	explicituri(U),
 	{	base_uri(V),
-		resolve_uri(U, V, URI),
+		resolve_uri(U, V, W),
+		(	W = 'http://localhost/var#'
+		->	URI = 'http://eulersharp.sourceforge.net/.well-known/genid/eye#'
+		;	URI = W
+		),
 		retractall(ns(Prefix, _)),
 		assertz(ns(Prefix, URI)),
 		put_pfx(Prefix, URI)
@@ -9573,7 +9588,11 @@ declaration -->
 	prefix(Prefix),
 	explicituri(U),
 	{	base_uri(V),
-		resolve_uri(U, V, URI),
+		resolve_uri(U, V, W),
+		(	W = 'http://localhost/var#'
+		->	URI = 'http://eulersharp.sourceforge.net/.well-known/genid/eye#'
+		;	URI = W
+		),
 		retractall(ns(Prefix, _)),
 		assertz(ns(Prefix, URI)),
 		put_pfx(Prefix, URI)
@@ -9613,7 +9632,8 @@ existential -->
 			(	member(S, Symbols)
 			),
 			(	(	\+qevar(S, _, D)
-				->	gensym(qe, Q),
+				->	gensym(qe, G),
+					mktail(G, Q),
 					asserta(qevar(S, Q, D))
 				;	true
 				)
@@ -9735,13 +9755,13 @@ pathitem(Name, []) -->
 				FD >= 1
 			->	atom_concat('_', N, Name),
 				nb_setval(smod, false)
-			;	atomic_list_concat(['\'<http://localhost/var#', N, '>\''], Name)
+			;	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', N, '>\''], Name)
 			)
 		;	(	quvar(S, N, D)
 			->	(	D = 1,
 					nb_getval(fdepth, FD),
 					FD >= 1
-				->	atomic_list_concat(['\'<http://localhost/var#', N, '>\''], Name)
+				->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', N, '>\''], Name)
 				;	atom_concat('_', N, Name),
 					nb_setval(smod, false)
 				)
@@ -9811,9 +9831,10 @@ pathitem(literal(Atom, DtLang), []) -->
 pathitem(BNode, Triples) -->
 	['['],
 	!,
-	{	gensym(e, S),
+	{	gensym(e, G),
+		mktail(G, S),
 		(	nb_getval(fdepth, 0)
-		->	atomic_list_concat(['\'<http://localhost/var#', S, '>\''], BN)
+		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BN)
 		;	atom_concat('_', S, BN),
 			nb_setval(smod, false)
 		)
@@ -9888,9 +9909,10 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		;	true
 		),
 		dynamic_verb(Verb),
-		gensym(e, S),
+		gensym(e, G),
+		mktail(G, S),
 		(	nb_getval(fdepth, 0)
-		->	atomic_list_concat(['\'<http://localhost/var#', S, '>\''], BNode)
+		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BNode)
 		;	atom_concat('_', S, BNode),
 			nb_setval(smod, false)
 		),
@@ -9934,9 +9956,10 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		;	true
 		),
 		dynamic_verb(Verb),
-		gensym(e, S),
+		gensym(e, G),
+		mktail(G, S),
 		(	nb_getval(fdepth, 0)
-		->	atomic_list_concat(['\'<http://localhost/var#', S, '>\''], BNode)
+		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BNode)
 		;	atom_concat('_', S, BNode),
 			nb_setval(smod, false)
 		),
@@ -10172,14 +10195,15 @@ symbol(Name) -->
 			)
 		->	true
 		;	atom_concat(N, '_', M),
-			gensym(M, S),
+			gensym(M, G),
+			mktail(G, S),
 			(	D =:= 0
 			->	assertz(evar(N, S))
 			;	assertz(evar(N, S, D))
 			)
 		),
 		(	nb_getval(fdepth, 0)
-		->	atomic_list_concat(['\'<http://localhost/var#', S, '>\''], Name)
+		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], Name)
 		;	atom_concat('_', S, Name),
 			nb_setval(smod, false)
 		)
@@ -10222,7 +10246,8 @@ universal -->
 			(	member(S, Symbols)
 			),
 			(	(	\+quvar(S, _, D)
-				->	gensym(qu, Q),
+				->	gensym(qu, G),
+					mktail(G, Q),
 					asserta(quvar(S, Q, D))
 				;	true
 				)
@@ -10236,7 +10261,11 @@ uri(Name) -->
 	!,
 	{	base_uri(V),
 		resolve_uri(U, V, W),
-		atomic_list_concat(['\'<', W, '>\''], Name)
+		(	sub_atom(W, 0, 21, I, 'http://localhost/var#')
+		->	sub_atom(W, 21, I, 0, Ln),
+			atomic_list_concat(['\'<', 'http://eulersharp.sourceforge.net/.well-known/genid/eye#', Ln, '>\''], Name)
+		;	atomic_list_concat(['\'<', W, '>\''], Name)
+		)
 	}.
 uri(Name) -->
 	qname(Name).
@@ -10321,7 +10350,7 @@ verb(Node, Triples) -->
 				->	true
 				;	(	Node = false
 					->	true
-					;	(	sub_atom(Node, 1, 22, _, '<http://localhost/var#')
+					;	(	sub_atom(Node, 1, 57, _, '<http://eulersharp.sourceforge.net/.well-known/genid/eye#')
 						->	true
 						)
 					)
