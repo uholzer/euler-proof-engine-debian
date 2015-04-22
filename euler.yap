@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7975 2015-04-22 07:21:35Z josd $').
+version_info('$Id: euler.yap 7976 2015-04-22 13:09:58Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -444,6 +444,13 @@ n3socket(Argus) :-
 	;	(	pfx('r:', _)
 		->	true
 		;	assertz(pfx('r:', '<http://www.w3.org/2000/10/swap/reason#>'))
+		),
+		(	\+flag('no-qvars')
+		->	true
+		;	(	pfx('var:', _)
+			->	true
+			;	assertz(pfx('var:', '<http://eulersharp.sourceforge.net/.well-known/genid/eye#>'))
+			)
 		),
 		(	\+flag(traditional)
 		->	true
