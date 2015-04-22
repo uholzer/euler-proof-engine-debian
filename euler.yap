@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7973 2015-04-21 21:43:08Z josd $').
+version_info('$Id: euler.yap 7975 2015-04-22 07:21:35Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4158,7 +4158,7 @@ indentation(C) :-
 				N is M+1,
 				nb_setval(tuple, N),
 				atom_number(G, N),
-				mktail(G, A),
+				genid(G, A),
 				atomic_list_concat(['<http://eulersharp.sourceforge.net/.well-known/genid/eye#t', A, '>'], X),
 				assertz(Z)
 			)
@@ -7300,13 +7300,13 @@ fresh_pf(_, Pfx) :-
 	fresh_pf(Pfn, Pfx).
 
 
-mktail(A, B) :-
+genid(A, B) :-
 	flag('no-qvars'),
 	!,
 	C is random(2^128),
 	atom_number(D, C),
 	atomic_list_concat([A, '_', D], B).
-mktail(A, A).
+genid(A, A).
 
 
 cnt(A) :-
@@ -8103,7 +8103,7 @@ labelvars(A, B, C, D) :-
 	var(A),
 	!,
 	atom_number(E, B),
-	mktail(E, F),
+	genid(E, F),
 	atomic_list_concat([D, F], A),
 	C is B+1.
 labelvars(A, B, B, _) :-
@@ -9633,7 +9633,7 @@ existential -->
 			),
 			(	(	\+qevar(S, _, D)
 				->	gensym(qe, G),
-					mktail(G, Q),
+					genid(G, Q),
 					asserta(qevar(S, Q, D))
 				;	true
 				)
@@ -9832,7 +9832,7 @@ pathitem(BNode, Triples) -->
 	['['],
 	!,
 	{	gensym(e, G),
-		mktail(G, S),
+		genid(G, S),
 		(	nb_getval(fdepth, 0)
 		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BN)
 		;	atom_concat('_', S, BN),
@@ -9910,7 +9910,7 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		),
 		dynamic_verb(Verb),
 		gensym(e, G),
-		mktail(G, S),
+		genid(G, S),
 		(	nb_getval(fdepth, 0)
 		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BNode)
 		;	atom_concat('_', S, BNode),
@@ -9957,7 +9957,7 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		),
 		dynamic_verb(Verb),
 		gensym(e, G),
-		mktail(G, S),
+		genid(G, S),
 		(	nb_getval(fdepth, 0)
 		->	atomic_list_concat(['\'<http://eulersharp.sourceforge.net/.well-known/genid/eye#', S, '>\''], BNode)
 		;	atom_concat('_', S, BNode),
@@ -10196,7 +10196,7 @@ symbol(Name) -->
 		->	true
 		;	atom_concat(N, '_', M),
 			gensym(M, G),
-			mktail(G, S),
+			genid(G, S),
 			(	D =:= 0
 			->	assertz(evar(N, S))
 			;	assertz(evar(N, S, D))
@@ -10247,7 +10247,7 @@ universal -->
 			),
 			(	(	\+quvar(S, _, D)
 				->	gensym(qu, G),
-					mktail(G, Q),
+					genid(G, Q),
 					asserta(quvar(S, Q, D))
 				;	true
 				)
