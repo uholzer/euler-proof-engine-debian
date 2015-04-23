@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7983 2015-04-23 09:05:29Z josd $').
+version_info('$Id: euler.yap 7987 2015-04-23 21:38:48Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -215,7 +215,7 @@ help_tactic_info('
 
 
 main :-
-	Id is random(2^128),
+	Id is random(2^30)*random(2^30)*random(2^30)*random(2^30),
 	atom_number(Run, Id),
 	atomic_list_concat(['http://eulersharp.sourceforge.net/.well-known/genid/', Run, '#'], Vns),
 	nb_setval(var_ns, Vns),
