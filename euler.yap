@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7981 2015-04-22 21:29:03Z josd $').
+version_info('$Id: euler.yap 7983 2015-04-23 09:05:29Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1514,6 +1514,9 @@ tr_n3p([X|Z], Src, query) :-
 	tr_n3p(Z, Src, query).
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) :-
 	!,
+	clist(U, X),
+	tr_pr(U, V),
+	clist(V, W),
 	(	Y \= dn(_),
 		(	\+flag(ances),
 			\+flag(quiet)
@@ -1524,11 +1527,11 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	;	nb_setval(defcl, false)
 	),
 	(	flag(tactic('linear-select'))
-	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
+	->	write(implies(W, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Src)),
 		writeln('.'),
-		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
+		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Y, Src)),
 		writeln('.')
-	;	write(implies(X, Y, Src)),
+	;	write(implies(W, Y, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
@@ -1557,6 +1560,16 @@ tr_n3p([X|Z], Src, Mode) :-
 		)
 	),
 	tr_n3p(Z, Src, Mode).
+
+
+tr_pr([], []) :-
+	!.
+tr_pr(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(A, B)|C], ['\'<http://www.w3.org/2000/10/swap/log#implies>\''(D, B)|E]) :-
+	!,
+	tr_tr(A, D),
+	tr_pr(C, E).
+tr_pr([A|B], [A|C]) :-
+	tr_pr(B, C).
 
 
 tr_tr([], []) :-
@@ -9278,6 +9291,10 @@ dynamic_verb(Verb) :-
 		)
 	;	true
 	).
+
+
+fm(A) :-
+	format(user_error, '*** ~w~n', [A]).
 
 
 % Regular Expressions inspired by http://www.cs.sfu.ca/~cameron/Teaching/384/99-3/regexp-plg.html
