@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7987 2015-04-23 21:38:48Z josd $').
+version_info('$Id: euler.yap 7989 2015-04-25 14:09:45Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -582,7 +582,13 @@ n3socket(Argus) :-
 	),
 	get_time(StampN),
 	datetime(StampN, StampC),
-	atom_codes(Stamp, StampC),
+	atom_codes(StampA, StampC),
+	(	sub_atom(StampA, I, 1, 0, 'Z'),
+		I > 23
+	->	sub_atom(StampA, 0, 23, _, StampB),
+		atomic_list_concat([StampB, 'Z'], Stamp)
+	;	Stamp = StampA
+	),
 	nb_getval(input_statements, Inp),
 	nb_getval(output_statements, Outp),
 	(	statistics(inferences, Inf)
@@ -912,7 +918,13 @@ opts(['--probe'|_], _) :-
 	delete_file(File),
 	get_time(StampN),
 	datetime(StampN, StampC),
-	atom_codes(Stamp, StampC),
+	atom_codes(StampA, StampC),
+	(	sub_atom(StampA, I, 1, 0, 'Z'),
+		I > 23
+	->	sub_atom(StampA, 0, 23, _, StampB),
+		atomic_list_concat([StampB, 'Z'], Stamp)
+	;	Stamp = StampA
+	),
 	format(user_error, '[~w]~n~n', [Stamp]),
 	flush_output(user_error),
 	throw(halt).
