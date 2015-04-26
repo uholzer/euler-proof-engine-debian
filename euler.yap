@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7989 2015-04-25 14:09:45Z josd $').
+version_info('$Id: euler.yap 7991 2015-04-26 19:00:20Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -267,7 +267,7 @@ main :-
 			tell(user_error),
 			(	current_predicate(show_profile/2)
 			->	show_profile(plain, 25)
-			;	show_profile([])
+			;	show_profile([top(-1)])
 			),
 			told
 		)
