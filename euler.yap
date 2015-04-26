@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7991 2015-04-26 19:00:20Z josd $').
+version_info('$Id: euler.yap 7993 2015-04-26 19:37:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1956,7 +1956,8 @@ astep(A, B, C, Cn, Cc, Rule) :-
 				wt(Dr),
 				ws(Dr),
 				write('.'),
-				nl
+				nl,
+				cnt(output_statements)
 			;	true
 			)
 		),
@@ -2005,7 +2006,8 @@ astep(A, B, C, Cn, Cc, Rule) :-
 					wt(Cr),
 					ws(Cr),
 					write('.'),
-					nl
+					nl,
+					cnt(output_statements)
 				;	true
 				)
 			),
