@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7993 2015-04-26 19:37:19Z josd $').
+version_info('$Id: euler.yap 7995 2015-04-27 20:09:47Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -895,6 +895,7 @@ opts(['--probe'|_], _) :-
 	S2 is 100000000/T2,
 	format(user_error, 'probing file ~0f [triples/sec]~n', [S2]),
 	flush_output(user_error),
+	statistics(runtime, [_, _]),
 	(	between(1, 100, _),
 		forall(
 			(	pred(P)
@@ -910,7 +911,7 @@ opts(['--probe'|_], _) :-
 		fail
 	;	true
 	),
-	statistics(walltime, [_, T3]),
+	statistics(runtime, [_, T3]),
 	S3 is 10000000000/T3,
 	format(user_error, 'probing memory ~0f [triples/sec]~n', [S3]),
 	flush_output(user_error),
