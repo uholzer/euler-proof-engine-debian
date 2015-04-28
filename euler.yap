@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7995 2015-04-27 20:09:47Z josd $').
+version_info('$Id: euler.yap 7997 2015-04-28 19:47:23Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8133,15 +8133,6 @@ quant(answer(exopred, P, _, _, _, _, _, _), allv) :-
 quant(_, some).
 
 
-labelvars(cn([A|B]), C, D) :-
-	!,
-	quant(A, Q),
-	labelvars(A, C, E, Q),
-	(	B = [F]
-	->	true
-	;	F = cn(B)
-	),
-	labelvars(F, E, D).
 labelvars(A, B, C) :-
 	quant(A, Q),
 	labelvars(A, B, C, Q).
@@ -8156,6 +8147,14 @@ labelvars(A, B, C, D) :-
 labelvars(A, B, B, _) :-
 	atomic(A),
 	!.
+labelvars(cn([A|B]), C, D, Q) :-
+	!,
+	labelvars(A, C, E, Q),
+	(	B = [F]
+	->	true
+	;	F = cn(B)
+	),
+	labelvars(F, E, D, Q).
 labelvars([A|B], C, D, Q) :-
 	!,
 	labelvars(A, C, E, Q),
