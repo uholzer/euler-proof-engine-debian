@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8002 2015-04-29 21:08:50Z josd $').
+version_info('$Id: euler.yap 8003 2015-04-29 22:22:25Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -550,6 +550,12 @@ n3socket(Argus) :-
 	statistics(walltime, [_, T5]),
 	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
 	flush_output(user_error),
+	nb_getval(input_statements, Inp),
+	nb_getval(output_statements, Outp),
+	(	statistics(inferences, Inf)
+	->	true
+	;	Inf = ''
+	),
 	(	flag(strings)
 	->	findall([Key, Str],
 			(	'<http://www.w3.org/2000/10/swap/log#outputString>'(Key, Str)
@@ -577,7 +583,10 @@ n3socket(Argus) :-
 		;	true
 		)
 	;	TE is T1+T3+T5,
-		format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, TC, TP, BC, BP, PM, CM, FM, AM]),
+		(	Inp =\= 0
+		->	format('#ENDS ~3d [sec] IO=~d/~d TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, Inp, Outp, TC, TP, BC, BP, PM, CM, FM, AM])
+		;	format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, TC, TP, BC, BP, PM, CM, FM, AM])
+		),
 		nl
 	),
 	get_time(StampN),
@@ -588,12 +597,6 @@ n3socket(Argus) :-
 	->	sub_atom(StampA, 0, 23, _, StampB),
 		atomic_list_concat([StampB, 'Z'], Stamp)
 	;	Stamp = StampA
-	),
-	nb_getval(input_statements, Inp),
-	nb_getval(output_statements, Outp),
-	(	statistics(inferences, Inf)
-	->	true
-	;	Inf = ''
 	),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
