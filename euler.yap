@@ -89,7 +89,8 @@
 :- dynamic(goal/0).
 :- dynamic(got_answer/9).
 :- dynamic(got_dq/0).
-:- dynamic(got_labelvars/2).
+:- dynamic(got_labelvars/0).
+:- dynamic(got_labelvars/3).
 :- dynamic(got_sq/0).
 :- dynamic(got_wi/5).
 :- dynamic(graph/2).
@@ -149,7 +150,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 7997 2015-04-28 19:47:23Z josd $').
+version_info('$Id: euler.yap 8000 2015-04-29 16:23:45Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1773,6 +1774,13 @@ eam(Span) :-
 		;	true
 		),
 		implies(Prem, Conc, Src),
+		(	\+got_labelvars
+		->	true
+		;	copy_term(implies(Prem, Conc, Src), Rc),
+			labelvars(Rc, 0, _),
+			term_index(Rc, Ind),
+			nb_setval(current_rule_index, Ind)
+		),
 		ignore(Prem = exopred(_, _, _)),
 		(	var(Conc)
 		->	true
@@ -4018,13 +4026,18 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#labelvars>'(A, B) :-
-	(	got_labelvars(A, B)
+	(	got_labelvars
+	->	true
+	;	assertz(got_labelvars)
+	),
+	catch(nb_getval(current_rule_index, C), _, fail),
+	(	got_labelvars(A, B, C)
 	->	true
 	;	copy_term_nat(A, B),
 		nb_getval(wn, W),
 		labelvars(B, W, N),
 		nb_setval(wn, N),
-		assertz(got_labelvars(A, B))
+		assertz(got_labelvars(A, B, C))
 	).
 
 
@@ -8113,6 +8126,9 @@ escape_unicode([A|B], [A|C]) :-
 	escape_unicode(B, C).
 
 
+quant(A, some) :-
+	var(A),
+	!.
 quant('<http://www.w3.org/2000/10/swap/log#implies>'(_, _), allv) :-
 	!.
 quant(':-'(_, _), allv) :-
