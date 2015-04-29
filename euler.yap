@@ -89,7 +89,6 @@
 :- dynamic(goal/0).
 :- dynamic(got_answer/9).
 :- dynamic(got_dq/0).
-:- dynamic(got_labelvars/0).
 :- dynamic(got_labelvars/3).
 :- dynamic(got_sq/0).
 :- dynamic(got_wi/5).
@@ -150,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8000 2015-04-29 16:23:45Z josd $').
+version_info('$Id: euler.yap 8002 2015-04-29 21:08:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1774,13 +1773,10 @@ eam(Span) :-
 		;	true
 		),
 		implies(Prem, Conc, Src),
-		(	\+got_labelvars
-		->	true
-		;	copy_term(implies(Prem, Conc, Src), Rc),
-			labelvars(Rc, 0, _),
-			term_index(Rc, Ind),
-			nb_setval(current_rule_index, Ind)
-		),
+		copy_term(implies(Prem, Conc, Src), Rc),
+		labelvars(Rc, 0, _),
+		term_index(Rc, Ind),
+		nb_setval(current_rule_index, Ind),
 		ignore(Prem = exopred(_, _, _)),
 		(	var(Conc)
 		->	true
@@ -1950,6 +1946,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 		(	\+pred(P),
 			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
 			P \= '<http://www.w3.org/2000/10/swap/log#implies>',
+			P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>',
 			N = 2
 		->	assertz(pred(P))
 		;	true
@@ -2000,6 +1997,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			(	\+pred(P),
 				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>',
 				P \= '<http://www.w3.org/2000/10/swap/log#implies>',
+				P \= '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>',
 				N = 2
 			->	assertz(pred(P))
 			;	true
@@ -4026,10 +4024,6 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#labelvars>'(A, B) :-
-	(	got_labelvars
-	->	true
-	;	assertz(got_labelvars)
-	),
 	catch(nb_getval(current_rule_index, C), _, fail),
 	(	got_labelvars(A, B, C)
 	->	true
