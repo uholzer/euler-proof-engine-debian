@@ -149,7 +149,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8003 2015-04-29 22:22:25Z josd $').
+version_info('$Id: euler.yap 8018 2015-05-05 16:00:41Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -171,7 +171,8 @@ eye
 	--no-numerals		no numerals in output
 	--no-distinct		no distinct answers in output
 	--step <count>		set maximimum step count
-	--tactic <tactic>	use specific tactic (for help see eye --tactic)
+	--tactic linear-select	select each rule only once
+	--tactic single-answer	give only one answer
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--n3p			output all <data> as N3 P-code to stdout
@@ -198,14 +199,7 @@ eye
 <query>
 	--query <n3-query>	output filtered with filter rules
 	--pass			output deductive closure
-	--pass-all		output deductive closure plus rules
-	--pass-only-new		output only the new derived triples').
-
-
-help_tactic_info('
-<tactic>
-	linear-select		select each rule only once
-	single-answer		give only one answer').
+	--pass-all		output deductive closure plus rules').
 
 
 
@@ -820,14 +814,6 @@ opts(['--step', Lim|Argus], Args) :-
 	),
 	assertz(flag(step(Limit))),
 	opts(Argus, Args).
-opts(['--tactic'], _) :-
-	\+flag(image(_)),
-	\+flag('debug-pvm'),
-	!,
-	help_tactic_info(Help),
-	format(user_error, '~w~n~n', [Help]),
-	flush_output(user_error),
-	throw(halt).
 opts(['--tactic', Tactic|Argus], Args) :-
 	!,
 	assertz(flag(tactic(Tactic))),
