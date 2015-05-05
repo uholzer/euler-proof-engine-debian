@@ -4,6 +4,7 @@
 %
 %
 % EYE [1] is a reasoning engine supporting the RGB Semantic Web layers [2].
+% It does mixed inferencing using and producing data, builtins and proofs.
 % It is a semibackward reasoner enhanced with Euler path [3] detection.
 % Via N3 [4] it is interoperable with Cwm [5].
 % The EYE test cases [6] and their results [7] support the development of EYE.
@@ -149,7 +150,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8018 2015-05-05 16:00:41Z josd $').
+version_info('$Id: euler.yap 8020 2015-05-05 21:39:58Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
