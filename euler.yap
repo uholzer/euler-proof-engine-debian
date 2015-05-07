@@ -150,7 +150,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8025 2015-05-06 08:31:11Z josd $').
+version_info('$Id: euler.yap 8028 2015-05-07 09:13:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3292,9 +3292,9 @@ wt0(X) :-
 	),
 	\+flag('no-qvars'),
 	\+flag('no-blank'),
-	sub_atom(X, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/'),
+	nb_getval(var_ns, Vns),
+	sub_atom(X, 1, I, _, Vns),
 	!,
-	sub_atom(X, I, 1, _, '#'),
 	J is I+1,
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
@@ -3669,7 +3669,8 @@ wv(X) :-
 	write('"]').
 wv(X) :-
 	atom(X),
-	sub_atom(X, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/'),
+	nb_getval(var_ns, Vns),
+	sub_atom(X, 1, I, _, Vns),
 	!,
 	write('[ '),
 	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
@@ -3677,10 +3678,8 @@ wv(X) :-
 	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
 	write('; '),
 	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
-	nb_getval(var_ns, Vns),
 	write(' "'),
 	write(Vns),
-	sub_atom(X, I, 1, _, '#'),
 	J is I+1,
 	sub_atom(X, J, _, 1, Q),
 	write(Q),
@@ -3757,9 +3756,9 @@ wcf(literal(A, _)) :-
 	write('"').
 wcf(A) :-
 	atom(A),
-	sub_atom(A, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/'),
+	nb_getval(var_ns, Vns),
+	sub_atom(A, 1, I, _, Vns),
 	!,
-	sub_atom(A, I, 1, _, '#'),
 	J is I+1,
 	sub_atom(A, J, _, 1, B),
 	write('_:'),
@@ -4512,7 +4511,8 @@ indentation(C) :-
 		;	nonvar(Y)
 		),
 		(	atom(X),
-			\+sub_atom(X, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/'),
+			nb_getval(var_ns, Vns),
+			\+sub_atom(X, 1, _, _, Vns),
 			sub_atom(X, 1, _, 1, Y),
 			atomic_list_concat(['<', Y, '>'], X),
 			!
@@ -8238,7 +8238,8 @@ findvars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
-		sub_atom(A, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/')
+		nb_getval(var_ns, Vns),
+		sub_atom(A, 1, _, _, Vns)
 	->	B = [A]
 	;	B = []
 	).
@@ -9622,11 +9623,7 @@ declaration -->
 	prefix(Prefix),
 	explicituri(U),
 	{	base_uri(V),
-		resolve_uri(U, V, W),
-		(	W = 'http://localhost/var#'
-		->	nb_getval(var_ns, URI)
-		;	URI = W
-		),
+		resolve_uri(U, V, URI),
 		retractall(ns(Prefix, _)),
 		assertz(ns(Prefix, URI)),
 		put_pfx(Prefix, URI)
@@ -9638,11 +9635,7 @@ declaration -->
 	prefix(Prefix),
 	explicituri(U),
 	{	base_uri(V),
-		resolve_uri(U, V, W),
-		(	W = 'http://localhost/var#'
-		->	nb_getval(var_ns, URI)
-		;	URI = W
-		),
+		resolve_uri(U, V, URI),
 		retractall(ns(Prefix, _)),
 		assertz(ns(Prefix, URI)),
 		put_pfx(Prefix, URI)
@@ -10311,12 +10304,7 @@ uri(Name) -->
 	!,
 	{	base_uri(V),
 		resolve_uri(U, V, W),
-		(	sub_atom(W, 0, 21, I, 'http://localhost/var#')
-		->	sub_atom(W, 21, I, 0, Ln),
-			nb_getval(var_ns, Vns),
-			atomic_list_concat(['\'<', Vns, Ln, '>\''], Name)
-		;	atomic_list_concat(['\'<', W, '>\''], Name)
-		)
+		atomic_list_concat(['\'<', W, '>\''], Name)
 	}.
 uri(Name) -->
 	qname(Name).
