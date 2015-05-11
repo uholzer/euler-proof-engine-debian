@@ -150,7 +150,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8028 2015-05-07 09:13:19Z josd $').
+version_info('$Id: euler.yap 8031 2015-05-11 21:36:26Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4001,10 +4001,12 @@ indentation(C) :-
 		(	nonvar(A)
 		),
 		(	atom(A),
-			(	sub_atom(A, 0, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/')
-			->	sub_atom(A, I, 1, _, '#'),
-				J is I+1,
-				sub_atom(A, J, _, 1, B)
+			(	sub_atom(A, _, 19, _, '/.well-known/genid/')
+			->	(	sub_atom(A, I, 1, _, '#')
+				->	J is I+1,
+					sub_atom(A, J, _, 1, B)
+				;	B = ''
+				)
 			;	atom_concat(some, C, A),
 				atomic_list_concat(['sk', C], B)
 			)
@@ -10389,7 +10391,8 @@ verb(Node, Triples) -->
 				->	true
 				;	(	Node = false
 					->	true
-					;	(	sub_atom(Node, 1, 53, _, '<http://eulersharp.sourceforge.net/.well-known/genid/')
+					;	(	nb_getval(var_ns, Vns),
+							sub_atom(Node, 2, _, _, Vns)
 						->	true
 						)
 					)
