@@ -85,6 +85,7 @@
 :- dynamic(false/1).
 :- dynamic(fd/2).
 :- dynamic(flag/1).
+:- dynamic(flag/2).
 :- dynamic(fm/1).
 :- dynamic(fs/1).
 :- dynamic(goal/0).
@@ -150,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8031 2015-05-11 21:36:26Z josd $').
+version_info('$Id: euler.yap 8033 2015-05-12 21:00:36Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -394,8 +395,9 @@ n3socket(Argus) :-
 	statistics(walltime, [_, T3]),
 	format(user_error, 'networking ~w [msec cputime] ~w [msec walltime]~n', [T2, T3]),
 	flush_output(user_error),
-	(	flag(image(File))
+	(	flag(image, File)
 	->	retractall(flag(_)),
+		retractall(flag(_, _)),
 		retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 		reset_gensym,
 		(	current_predicate(qsave:qsave_program/1)
@@ -414,13 +416,13 @@ n3socket(Argus) :-
 	),
 	(	\+implies(answer(_, _, _, _, _, _, _, _), goal, '<>'),
 		\+query(_, _),
-		\+flag('pass-only-new'),
+		\+flag('pass-only-new'),	% DEPRECATED
 		\+flag(strings)
 	->	throw(halt)
 	;	true
 	),
 	(	nb_getval(defcl, true),
-		\+flag('no-branch')
+		\+flag('no-branch')	% DEPRECATED
 	->	assertz(flag('no-branch'))
 	;	true
 	),
@@ -429,7 +431,7 @@ n3socket(Argus) :-
 	;	version_info(V),
 		sub_atom(V, 1, _, 2, Version),
 		format('#Processed by ~w~n', [Version]),
-		(	flag(kgb)
+		(	flag(kgb)	% DEPRECATED
 		->	true
 		;	format('#eye', []),
 			wa(Argus),
@@ -437,7 +439,7 @@ n3socket(Argus) :-
 		),
 		nl
 	),
-	(	flag('no-branch')
+	(	flag('no-branch')	% DEPRECATED
 	->	true
 	;	(	pfx('e:', _)
 		->	true
@@ -464,7 +466,7 @@ n3socket(Argus) :-
 			)
 		)
 	),
-	(	flag('pass-only-new')
+	(	flag('pass-only-new')	% DEPRECATED
 	->	wh
 	;	true
 	),
@@ -707,12 +709,12 @@ opts([], []) :-
 % DEPRECATED
 opts(['--quick-answer'|Argus], Args) :-
 	!,
-	assertz(flag(tactic('single-answer'))),
+	assertz(flag(tactic, 'single-answer')),
 	opts(Argus, Args).
 % DEPRECATED
 opts(['--single-answer'|Argus], Args) :-
 	!,
-	assertz(flag(tactic('single-answer'))),
+	assertz(flag(tactic, 'single-answer')),
 	opts(Argus, Args).
 opts(['--wcache', Argument, File|Argus], Args) :-
 	!,
@@ -725,12 +727,12 @@ opts(['--wcache', Argument, File|Argus], Args) :-
 % DEPRECATED
 opts(['--tmp-file', File|Argus], Args) :-
 	!,
-	assertz(flag('tmp-file'(File))),
+	assertz(flag('tmp-file', File)),
 	opts(Argus, Args).
 % DEPRECATED
 opts(['--wget-path', Path|Argus], Args) :-
 	!,
-	assertz(flag('wget-path'(Path))),
+	assertz(flag('wget-path', Path)),
 	opts(Argus, Args).
 % DEPRECATED
 opts(['--pcl'|Argus], Args) :-
@@ -795,12 +797,12 @@ opts(['--pvm', File|Argus], _) :-
 	).
 opts(['--image', File|Argus], Args) :-
 	!,
-	assertz(flag(image(File))),
+	assertz(flag(image, File)),
 	opts(Argus, Args).
 % DEPRECATED
 opts(['--yabc', File|Argus], Args) :-
 	!,
-	assertz(flag(image(File))),
+	assertz(flag(image, File)),
 	opts(Argus, Args).
 opts(['--step', Lim|Argus], Args) :-
 	!,
@@ -813,11 +815,11 @@ opts(['--step', Lim|Argus], Args) :-
 			)
 		)
 	),
-	assertz(flag(step(Limit))),
+	assertz(flag(step, Limit)),
 	opts(Argus, Args).
 opts(['--tactic', Tactic|Argus], Args) :-
 	!,
-	assertz(flag(tactic(Tactic))),
+	assertz(flag(tactic, Tactic)),
 	opts(Argus, Args).
 opts(['--version'|_], _) :-
 	!,
@@ -829,7 +831,7 @@ opts(['--license'|_], _) :-
 	flush_output(user_error),
 	throw(halt).
 opts(['--help'|_], _) :-
-	\+flag(image(_)),
+	\+flag(image, _),
 	\+flag('debug-pvm'),
 	!,
 	help_info(Help),
@@ -954,7 +956,7 @@ args(['--plugin', Argument|Args]) :-
 			->	true
 			;	sub_atom(Arg, 0, 6, _, 'https:')
 			)
-		->	(	flag('tmp-file'(File))
+		->	(	flag('tmp-file', File)	% DEPRECATED
 			->	true
 			;	tmp_file(File),
 				assertz(tmpfile(File))
@@ -1013,7 +1015,7 @@ args(['--plugin', Argument|Args]) :-
 					Rt \= pred(_),
 					Rt \= scount(_)
 				->	(	flag(nope),
-						\+flag(ances)
+						\+flag(ances)	% DEPRECATED
 					->	true
 					;	nb_getval(current_scope, Src),
 						term_index(Rt, Rnd),
@@ -1053,7 +1055,7 @@ args(['--plugin-pvm', Argument|Args]) :-
 			->	true
 			;	sub_atom(Arg, 0, 6, _, 'https:')
 			)
-		->	(	flag('tmp-file'(File))
+		->	(	flag('tmp-file', File)	% DEPRECATED
 			->	true
 			;	tmp_file(File),
 				assertz(tmpfile(File))
@@ -1126,7 +1128,7 @@ args(['--query', Arg|Args]) :-
 args(['--pass'|Args]) :-
 	!,
 	(	flag(nope),
-		\+flag(tactic('single-answer'))
+		\+flag(tactic, 'single-answer')
 	->	assertz(query(exopred(P, S, O), exopred(P, S, O)))
 	;	assertz(implies(exopred(P, S, O), answer(P, S, O, exopred, epsilon, epsilon, epsilon, epsilon), '<http://eulersharp.sourceforge.net/2003/03swap/pass>')),
 		assertz(implies(answer(_, _, _, _, _, _, _, _), goal, '<>'))
@@ -1178,7 +1180,7 @@ args([Arg|Args]) :-
 
 n3_n3p(Argument, Mode) :-
 	absolute_uri(Argument, Arg),
-	(	flag('tmp-file'(Tmp))
+	(	flag('tmp-file', Tmp)	% DEPRECATED
 	->	true
 	;	tmp_file(Tmp)
 	),
@@ -1193,7 +1195,7 @@ n3_n3p(Argument, Mode) :-
 			;	sub_atom(Arg, 0, 6, _, 'https:')
 			)
 		->	File = Tmp,
-			(	flag('tmp-file'(_))
+			(	flag('tmp-file', _)	% DEPRECATED
 			->	true
 			;	assertz(tmpfile(File))
 			),
@@ -1447,6 +1449,7 @@ n3_n3p(Argument, Mode) :-
 
 tr_n3p([], _, _) :-
 	!.
+% DEPRECATED
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules) :-
 	!,
 	(	clast(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>\''(_, T))
@@ -1459,6 +1462,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules
 	write(implies(N, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>\''([Y|M], T), Src)),
 	writeln('.'),
 	tr_n3p(Z, Src, trules).
+% DEPRECATED
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery) :-
 	!,
 	clist(L, X),
@@ -1475,7 +1479,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 	;	true
 	),
 	(	flag(nope),
-		\+flag(tactic('single-answer')),
+		\+flag(tactic, 'single-answer'),
 		(	flag('no-distinct')
 		;	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
@@ -1493,7 +1497,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	;	true
 	),
 	(	flag(nope),
-		\+flag(tactic('single-answer'))
+		\+flag(tactic, 'single-answer')
 	->	write(query(X, Y)),
 		writeln('.')
 	;	strela(answer(Y), V),
@@ -1504,7 +1508,7 @@ tr_n3p([':-'(Y, X)|Z], Src, query) :-
 tr_n3p([X|Z], Src, query) :-
 	!,
 	(	flag(nope),
-		\+flag(tactic('single-answer')),
+		\+flag(tactic, 'single-answer'),
 		(	flag('no-distinct')
 		;	X = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
@@ -1521,15 +1525,15 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	tr_pr(U, V),
 	clist(V, W),
 	(	Y \= dn(_),
-		(	\+flag(ances),
-			\+flag(quiet)
+		(	\+flag(ances),	% DEPRECATED
+			\+flag(quiet)	% DEPRECATED
 		->	true
 		;	Y \= false
 		)
 	->	true
 	;	nb_setval(defcl, false)
 	),
-	(	flag(tactic('linear-select'))
+	(	flag(tactic, 'linear-select')
 	->	write(implies(W, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Src)),
 		writeln('.'),
 		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Y, Src)),
@@ -1550,13 +1554,13 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	(	flag(tactic('linear-select'))
+	(	flag(tactic, 'linear-select')
 	->	write(implies(true, Y, Src)),
 		writeln('.')
 	;	write(Y),
 		writeln('.'),
 		(	flag(nope),
-			\+flag(ances)
+			\+flag(ances)	% DEPRECATED
 		->	true
 		;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
 			writeln('.')
@@ -1772,8 +1776,8 @@ eam(Span) :-
 		->	true
 		;	Conc \= dn(_),
 			Conc \= goal,
-			(	\+flag(ances),
-				\+flag(quiet)
+			(	\+flag(ances),	% DEPRECATED
+				\+flag(quiet)	% DEPRECATED
 			->	true
 			;	Conc \= false
 			)
@@ -1804,7 +1808,7 @@ eam(Span) :-
 		;	true
 		),
 		cnt(tp),
-		(	flag(step(StepLim)),
+		(	flag(step, StepLim),
 			nb_getval(tp, Step),
 			Step >= StepLim
 		->	(	flag(strings)
@@ -1823,7 +1827,7 @@ eam(Span) :-
 			clist(Lw, Concd)
 		),
 		term_index(Prem, Pnd),
-		(	flag(think),
+		(	flag(think),	% DEPRECATED
 			\+flag(nope),
 			\+prfstep(_, _, Prem, Pnd, _, _, _, _)
 		->	true
@@ -1861,7 +1865,7 @@ eam(Span) :-
 		findall([D, F, E],
 			(	member([D, D, E], Lc),
 				unify(D, F),
-				(	flag(think),
+				(	flag(think),	% DEPRECATED
 					\+flag(nope)
 				->	true
 				;	catch(\+call(F), _, true)
@@ -1874,7 +1878,7 @@ eam(Span) :-
 		clist(Le, Conce),
 		clist(Lf, Clc),
 		astep(Src, Prem, Concs, Conce, Clc, Rule),
-		(	flag(tactic('single-answer')),
+		(	flag(tactic, 'single-answer'),
 			answer(_, _, _, _, _, _, _, _)
 		->	(	flag(strings)
 			->	true
@@ -1883,7 +1887,7 @@ eam(Span) :-
 		;	retract(brake),
 			fail
 		)
-	;	(	flag(tactic('linear-select'))
+	;	(	flag(tactic, 'linear-select')
 		;	brake
 		),
 		(	S is Span+1,
@@ -1895,7 +1899,7 @@ eam(Span) :-
 			->	true
 			;	w3(trunk)
 			),
-			\+flag('no-branch'),
+			\+flag('no-branch'),	% DEPRECATED
 			assertz(branch),
 			eam([], 0, []),
 			(	nb_getval(cm, CM),
@@ -1927,8 +1931,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 	term_index(B, Pnd),
 	(	Cn = cn([Dn|En]),
 		Cc = cn([Dc|Ec])
-	->	(	flag(think),
-			Dc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
+	->	(	Dc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
 		->	asserta(implies(Prem, Conc, A))
 		;	true
 		),
@@ -1945,7 +1948,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			catch(call(Dn), _, fail)
 		->	true
 		;	strelas(Dn),
-			(	flag('pass-only-new'),
+			(	flag('pass-only-new'),	% DEPRECATED
 				Dn \= answer(_, _, _, _, _, _, _, _)
 			->	indent,
 				relabel(Dn, Dr),
@@ -1958,7 +1961,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 			)
 		),
 		(	flag(nope),
-			\+flag(ances)
+			\+flag(ances)	% DEPRECATED
 		->	true
 		;	term_index(Dn, Cnd),
 			(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
@@ -1978,8 +1981,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 		astep(A, B, C, Fn, Fc, Rule)
 	;	(	Cn = true
 		->	true
-		;	(	flag(think),
-				Cc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
+		;	(	Cc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
 			->	asserta(implies(Prem, Conc, A))
 			;	true
 			),
@@ -1996,7 +1998,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 				catch(call(Cn), _, fail)
 			->	true
 			;	strelas(Cn),
-				(	flag('pass-only-new'),
+				(	flag('pass-only-new'),	% DEPRECATED
 					Cn \= answer(_, _, _, _, _, _, _, _)
 				->	indent,
 					relabel(Cn, Cr),
@@ -2009,7 +2011,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 				)
 			),
 			(	flag(nope),
-				\+flag(ances)
+				\+flag(ances)	% DEPRECATED
 			->	true
 			;	term_index(Cn, Cnd),
 				(	B = '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'(P1, Q1),
@@ -2090,7 +2092,7 @@ eam(Grd, Pnum, Env) :-
 	;	true
 	),
 	cnt(bp),
-	(	flag(step(StepLim)),
+	(	flag(step, StepLim),
 		nb_getval(tp, TP),
 		nb_getval(bp, BP),
 		Step is TP+BP,
@@ -2099,9 +2101,9 @@ eam(Grd, Pnum, Env) :-
 	;	true
 	),
 	strelan(Conc, Concd),
-	(	flag(tactic('single-answer'))
+	(	flag(tactic, 'single-answer')
 	->	term_index(Prem, Pnd),
-		(	flag(think),
+		(	flag(think),	% DEPRECATED
 			\+flag(nope),
 			\+prfstep(_, _, Prem, Pnd, _, _, _, _)
 		->	true
@@ -2131,7 +2133,7 @@ eam(Grd, Pnum, Env) :-
 	(	(	C = goal
 		->	true
 		;	C = false(_),
-			flag('quick-false')
+			flag('quick-false')	% DEPRECATED
 		)
 	->	ances(Env),
 		(	flag(strings)
@@ -2143,7 +2145,7 @@ eam(Grd, Pnum, Env) :-
 			->	true
 			;	assertz(branching)
 			),
-			(	flag('quick-possible')
+			(	flag('quick-possible')	% DEPRECATED
 			->	retract(implies(Prem, Concd, Src))
 			;	true
 			),
@@ -2159,7 +2161,7 @@ eam(Grd, Pnum, Env) :-
 					)
 				)
 			),
-			(	flag('quick-possible')
+			(	flag('quick-possible')	% DEPRECATED
 			->	assertz(implies(Prem, Concd, Src))
 			;	true
 			),
@@ -2181,7 +2183,7 @@ eam(Grd, Pnum, Env) :-
 % DEPRECATED
 memo(Src, Prem, Grd, Pnum, Conc, Env, Rule, RuleL) :-
 	term_index(Prem, Pnd),
-	(	flag(think),
+	(	flag(think),	% DEPRECATED
 		\+flag(nope),
 		\+prfstep(_, _, Prem, Pnd, _, _, _, _)
 	->	true
@@ -2217,7 +2219,7 @@ memo(Src, Prem, Grd, Pnum, Conc, Env, Rule, RuleL) :-
 	findall([D, F, E],
 		(	member([D, D, E], Lc),
 			unify(D, F),
-			(	flag(think),
+			(	flag(think),	% DEPRECATED
 				\+flag(nope)
 			->	true
 			;	catch(\+call(F), _, true)
@@ -2250,14 +2252,14 @@ memo(Src, Prem, Grd, Pnum, Conc, Env, Rule, RuleL) :-
 dstep(A, B, C, Rule) :-
 	term_index(B, Ind),
 	(	C = cn([D|E])
-	->	(	flag(think),
+	->	(	flag(think),	% DEPRECATED
 			D = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
 		->	retract(implies(Prem, Conc, A))
 		;	true
 		),
 		retract(D),
 		(	flag(nope),
-			\+flag(ances)
+			\+flag(ances)	% DEPRECATED
 		->	true
 		;	term_index(D, Cnd),
 			retract(prfstep(D, Cnd, B, Ind, _, _, _, A))
@@ -2269,14 +2271,14 @@ dstep(A, B, C, Rule) :-
 		dstep(A, B, F, Rule)
 	;	(	C = true
 		->	true
-		;	(	flag(think),
+		;	(	flag(think),	% DEPRECATED
 				C = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
 			->	retract(implies(Prem, Conc, A))
 			;	true
 			),
 			retract(C),
 			(	flag(nope),
-				\+flag(ances)
+				\+flag(ances)	% DEPRECATED
 			->	true
 			;	term_index(C, Cnd),
 				retract(prfstep(C, Cnd, B, Ind, _, _, _, A))
@@ -2353,8 +2355,8 @@ cgives(A, B) :-
 
 % DEPRECATED
 ances(Env) :-
-	(	flag(ances),
-		\+flag(quiet)
+	(	flag(ances),	% DEPRECATED
+		\+flag(quiet)	% DEPRECATED
 	->	write('[ '),
 		wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#ancestorModel>'),
 		write(' '),
@@ -2425,7 +2427,7 @@ end(goal, Env) :-
 		nl,
 		cnt(pm)
 	),
-	(	flag('quick-possible')
+	(	flag('quick-possible')	% DEPRECATED
 	->	true
 	;	(	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>'(_, _)
 		->	true
@@ -2497,10 +2499,10 @@ end(End, Env) :-
 			write(' '),
 			wg(A),
 			nl,
-			(	flag(quiet)
+			(	flag(quiet)	% DEPRECATED
 			->	true
 			;	(	flag(nope),
-					\+flag(ances)
+					\+flag(ances)	% DEPRECATED
 				->	throw(no_ances_flag)
 				;	true
 				),
@@ -2605,7 +2607,7 @@ end(End, Env) :-
 				;	'<http://www.w3.org/2000/10/swap/log#conjunction>'([R, S], Fd),
 					assertz(fd(A, Fd))
 				),
-				(	flag(think)
+				(	flag(think)	% DEPRECATED
 				->	findall(X,
 						(	hstep(X, _),
 							X \= false(_),
@@ -2636,8 +2638,8 @@ end(End, Env) :-
 		fail
 	;	true
 	),
-	(	flag(think),
-		\+flag(quiet)
+	(	flag(think),	% DEPRECATED
+		\+flag(quiet)	% DEPRECATED
 	->	findall(X,
 			(	hstep(X, _),
 				X \= false(_),
@@ -2662,7 +2664,7 @@ end(End, Env) :-
 		nl
 	;	true
 	),
-	(	flag('quick-false')
+	(	flag('quick-false')	% DEPRECATED
 	->	true
 	;	findall(X,
 			(	false(X)
@@ -2694,7 +2696,7 @@ end(End, Env) :-
 		write(' '),
 		wt(Iq),
 		nl,
-		(	flag(quiet)
+		(	flag(quiet)	% DEPRECATED
 		->	true
 		;	findall([X, Y],
 				(	cmember(Y, It),
@@ -2834,7 +2836,7 @@ w3(U) :-
 		->	fail
 		;	true
 		),
-		(	\+flag('no-branch'),
+		(	\+flag('no-branch'),	% DEPRECATED
 			\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
 		->	assertz(got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U))
 		;	true
@@ -2877,7 +2879,7 @@ w3(U) :-
 			R =.. [P, S, O1],
 			strela(answer(O), O1),
 			Rule =.. [P, S, O],
-			(	flag(think)
+			(	flag(think)	% DEPRECATED
 			->	true
 			;	\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
 			),
@@ -3234,7 +3236,7 @@ wt0(X) :-
 	atom_concat(some, Y, X),
 	!,
 	(	\+flag('no-qvars'),
-		\+flag('no-blank')
+		\+flag('no-blank')	% DEPRECATED
 	->	(	rule_uvar(L),
 			(	nb_getval(pdepth, 0),
 				nb_getval(cdepth, CD),
@@ -3291,7 +3293,7 @@ wt0(X) :-
 	;	flag(nope)
 	),
 	\+flag('no-qvars'),
-	\+flag('no-blank'),
+	\+flag('no-blank'),	% DEPRECATED
 	nb_getval(var_ns, Vns),
 	sub_atom(X, 1, I, _, Vns),
 	!,
@@ -3385,7 +3387,7 @@ wt2(literal(X, type(Y))) :-
 	wt(Y).
 wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'([X|Y], Z)) :-
 	flag(nope),
-	flag(tquery),
+	flag(tquery),	% DEPRECATED
 	!,
 	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
 	write('{'),
@@ -3401,7 +3403,7 @@ wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'([X
 	write('}').
 wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'([X|Y], Z)) :-
 	flag(nope),
-	flag(tquery),
+	flag(tquery),	% DEPRECATED
 	!,
 	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
 	write('{'),
@@ -3615,7 +3617,7 @@ wq([X|Y], allv) :-
 	write('. ').
 wq([X|Y], some) :-
 	(	\+flag('no-qvars'),
-		\+flag('no-blank')
+		\+flag('no-blank')	% DEPRECATED
 	->	write('@forSome '),
 		wt(X),
 		wk(Y),
@@ -3704,7 +3706,7 @@ ws(cn(X)) :-
 	ws(Y).
 ws(X) :-
 	X =.. Y,
-	(	flag(tquery)
+	(	flag(tquery)	% DEPRECATED
 	->	true
 	;	last(Y, Z),
 		(	\+number(Z),
@@ -3801,7 +3803,7 @@ indentation(C) :-
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#allAncestors>'(A, B) :-
 	(	flag(nope),
-		\+flag(ances)
+		\+flag(ances)	% DEPRECATED
 	->	throw(no_ances_flag)
 	;	true
 	),
@@ -3823,7 +3825,7 @@ indentation(C) :-
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#allAssertedAncestors>'(A, B) :-
 	(	flag(nope),
-		\+flag(ances)
+		\+flag(ances)	% DEPRECATED
 	->	throw(no_ances_flag)
 	;	true
 	),
@@ -3847,7 +3849,7 @@ indentation(C) :-
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#allDescendents>'(A, B) :-
 	(	flag(nope),
-		\+flag(ances)
+		\+flag(ances)	% DEPRECATED
 	->	throw(no_ances_flag)
 	;	true
 	),
@@ -3866,7 +3868,7 @@ indentation(C) :-
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#assertedTriple>'(A, B) :-
 	(	flag(nope),
-		\+flag(ances)
+		\+flag(ances)	% DEPRECATED
 	->	throw(no_ances_flag)
 	;	true
 	),
@@ -4458,7 +4460,6 @@ indentation(C) :-
 
 '<http://www.w3.org/2000/10/swap/log#implies>'(X, Y) :-
 	implies(X, Y, _),
-	\+prfstep('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y), _, _, _, _, _, _, _),
 	Y \= answer(_, _, _, _, _, _, _, _),
 	Y \= goal.
 
@@ -7371,7 +7372,7 @@ within_scope([A, B]) :-
 	->	B = 1
 	;	true
 	),
-	(	(	flag('no-span')
+	(	(	flag('no-span')	% DEPRECATED
 		;	B = 0
 		)
 	->	brake
@@ -7446,7 +7447,7 @@ tpred(A, B) :-
 	atom_concat(some, I, A),
 	!,
 	(	\+flag('no-qvars'),
-		\+flag('no-blank')
+		\+flag('no-blank')	% DEPRECATED
 	->	atom_concat('_:sk', I, B)
 	;	nb_getval(var_ns, Vns),
 		atomic_list_concat(['<', Vns, 'sk', I, '>'], B)
