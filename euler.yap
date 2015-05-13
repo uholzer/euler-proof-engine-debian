@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8033 2015-05-12 21:00:36Z josd $').
+version_info('$Id: euler.yap 8035 2015-05-13 12:34:30Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1932,7 +1932,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 	(	Cn = cn([Dn|En]),
 		Cc = cn([Dc|Ec])
 	->	(	Dc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
-		->	asserta(implies(Prem, Conc, A))
+		->	asserta(implies(Prem, Conc, '<>'))
 		;	true
 		),
 		functor(Dn, P, N),
@@ -1982,7 +1982,7 @@ astep(A, B, C, Cn, Cc, Rule) :-
 	;	(	Cn = true
 		->	true
 		;	(	Cc = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc)
-			->	asserta(implies(Prem, Conc, A))
+			->	asserta(implies(Prem, Conc, '<>'))
 			;	true
 			),
 			functor(Cn, P, N),
@@ -2948,6 +2948,17 @@ w3(U) :-
 	).
 
 
+wi('<>', _, rule(_, _, A), _) :-
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+	write(' '),
+	wg(A),
+	write(']').
 wi(A, B, C, Rule) :-
 	term_index(B, Pnd),
 	(	lemma(Cnt, A, B, Pnd, C, Rule)
@@ -6212,7 +6223,8 @@ indentation(C) :-
 				O =:= P
 			;	Offset is -J,
 				stamp_date_time(O, date(Year, Month, Day, Hour, Minute, Second, _, _, _), Offset),
-				datetime(Year, Month, Day, Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				datetime(Year, Month, Day, Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -6268,7 +6280,8 @@ indentation(C) :-
 				O =:= P
 			;	Offset is -J,
 				stamp_date_time(O, date(Year, Month, Day, Hour, Minute, Second, _, _, _), Offset),
-				datetime(Year, Month, Day, Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				datetime(Year, Month, Day, Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -6323,7 +6336,8 @@ indentation(C) :-
 				O =:= P-86400*integer(floor(P/86400))
 			;	Offset is -G,
 				stamp_date_time(O, date(_, _, _, Hour, Minute, Second, _, _, _), Offset),
-				time(Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				time(Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -6353,7 +6367,8 @@ indentation(C) :-
 				O =:= P
 			;	Offset is -J,
 				stamp_date_time(O, date(Year, Month, Day, Hour, Minute, Second, _, _, _), Offset),
-				datetime(Year, Month, Day, Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				datetime(Year, Month, Day, Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -6409,7 +6424,8 @@ indentation(C) :-
 				O =:= P
 			;	Offset is -J,
 				stamp_date_time(O, date(Year, Month, Day, Hour, Minute, Second, _, _, _), Offset),
-				datetime(Year, Month, Day, Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				datetime(Year, Month, Day, Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -6464,7 +6480,8 @@ indentation(C) :-
 				O =:= P-86400*integer(floor(P/86400))
 			;	Offset is -G,
 				stamp_date_time(O, date(_, _, _, Hour, Minute, Second, _, _, _), Offset),
-				time(Hour, Minute, Second, Offset, S),
+				fmsec(0, Second, Sec),
+				time(Hour, Minute, Sec, Offset, S),
 				atom_codes(C, S)
 			)
 		)
@@ -8730,15 +8747,22 @@ digit(A) -->
 	{	code_type(A, digit)
 	}.
 
+fmsec(A, B, C) :-
+	integer(A),
+	!,
+	C is floor(B).
+fmsec(_, B, B).
+
 
 datetime(A, B) :-
 	stamp_date_time(A, date(Year, Month, Day, Hour, Minute, Second, _, _, _), 0),
+	fmsec(A, Second, Sec),
 	ycodes(Year, C),
 	ncodes(Month, D),
 	ncodes(Day, E),
 	ncodes(Hour, F),
 	ncodes(Minute, G),
-	ncodes(Second, H),
+	ncodes(Sec, H),
 	append([C, [0'-], D, [0'-], E, [0'T], F, [0':], G, [0':], H, [0'Z]], B).
 
 
@@ -8807,9 +8831,10 @@ date(Year, Month, Day, Offset, B) :-
 
 time(A, B) :-
 	stamp_date_time(A, date(_, _, _, Hour, Minute, Second, _, _, _), 0),
+	fmsec(A, Second, Sec),
 	ncodes(Hour, F),
 	ncodes(Minute, G),
-	ncodes(Second, H),
+	ncodes(Sec, H),
 	append([F, [0':], G, [0':], H, [0'Z]], B).
 
 
