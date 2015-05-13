@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8035 2015-05-13 12:34:30Z josd $').
+version_info('$Id: euler.yap 8037 2015-05-13 14:18:23Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -8513,7 +8513,8 @@ get_time(A) :-
 memotime(datime(A, B, C, D, E, F), G) :-
 	(	mtime(datime(A, B, C, D, E, F), G)
 	->	true
-	;	date_time_stamp(date(A, B, C, D, E, F, 0, -, -), G),
+	;	date_time_stamp(date(A, B, C, D, E, F, 0, -, -), H),
+		fmsec(F, H, G),
 		assertz(mtime(datime(A, B, C, D, E, F), G))
 	).
 
@@ -8532,7 +8533,8 @@ datetime(A) -->
 	decimal(G),
 	timezone(H),
 	{	I is -H,
-		date_time_stamp(date(B, C, D, E, F, G, I, -, -), A)
+		date_time_stamp(date(B, C, D, E, F, G, I, -, -), J),
+		fmsec(G, J, A)
 	}.
 
 
@@ -8559,7 +8561,8 @@ date(A) -->
 	int(D),
 	timezone(H),
 	{	I is -H,
-		date_time_stamp(date(B, C, D, 0, 0, 0, I, -, -), A)
+		date_time_stamp(date(B, C, D, 0, 0, 0, I, -, -), E),
+		fmsec(0, E, A)
 	}.
 
 
@@ -8713,8 +8716,7 @@ decimal(A) -->
 	digits(D),
 	fraction(E),
 	{	append([B, C|D], E, F),
-		number_codes(G, F),
-		A is G*1.0
+		number_codes(A, F)
 	}.
 
 
