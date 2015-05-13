@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8041 2015-05-13 16:02:12Z josd $').
+version_info('$Id: euler.yap 8043 2015-05-13 20:14:03Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1452,12 +1452,14 @@ tr_n3p([], _, _) :-
 % DEPRECATED
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules) :-
 	!,
-	(	clast(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>\''(_, T))
+	clist(U, X),
+	tr_pr(U, V),
+	clist(V, W),
+	(	clast(W, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>\''(_, T))
 	->	true
 	;	T = 1.0
 	),
-	clist(L, X),
-	tr_split(L, K, M),
+	tr_split(V, K, M),
 	clist(K, N),
 	write(implies(N, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>\''([Y|M], T), Src)),
 	writeln('.'),
@@ -1465,8 +1467,9 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules
 % DEPRECATED
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery) :-
 	!,
-	clist(L, X),
-	tr_split(L, K, M),
+	clist(U, X),
+	tr_pr(U, V),
+	tr_split(V, K, M),
 	append(K, ['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>\''([Y|M], T)], J),
 	clist(J, N),
 	write(implies(N, answer('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>\'', [Y|M], T, gamma, gamma, gamma, gamma, gamma), Src)),
@@ -1474,6 +1477,9 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery
 	tr_n3p(Z, Src, tquery).
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query) :-
 	!,
+	clist(U, X),
+	tr_pr(U, V),
+	clist(V, W),
 	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
 	->	nb_setval(csv_header, T)
 	;	true
@@ -1483,25 +1489,28 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		(	flag('no-distinct')
 		;	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
-	->	write(query(X, Y)),
+	->	write(query(W, Y)),
 		writeln('.')
-	;	strela(answer(Y), V),
-		write(implies(X, V, Src)),
+	;	strela(answer(Y), A),
+		write(implies(W, A, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	!,
+	clist(U, X),
+	tr_pr(U, V),
+	clist(V, W),
 	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
 	->	nb_setval(csv_header, T)
 	;	true
 	),
 	(	flag(nope),
 		\+flag(tactic, 'single-answer')
-	->	write(query(X, Y)),
+	->	write(query(W, Y)),
 		writeln('.')
-	;	strela(answer(Y), V),
-		write(implies(X, V, Src)),
+	;	strela(answer(Y), A),
+		write(implies(W, A, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
@@ -1514,8 +1523,8 @@ tr_n3p([X|Z], Src, query) :-
 		)
 	->	write(query(true, X)),
 		writeln('.')
-	;	strela(answer(X), U),
-		write(implies(true, U, Src)),
+	;	strela(answer(X), A),
+		write(implies(true, A, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
@@ -1542,9 +1551,12 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
-tr_n3p([':-'(Conc, Prem)|Z], Src, Mode) :-
+tr_n3p([':-'(Y, X)|Z], Src, Mode) :-
 	!,
-	write(':-'(Conc, Prem)),
+	clist(U, X),
+	tr_pr(U, V),
+	clist(V, W),
+	write(':-'(Y, W)),
 	writeln('.'),
 	tr_n3p(Z, Src, Mode).
 tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X, Y)|Z], Src, Mode) :-
