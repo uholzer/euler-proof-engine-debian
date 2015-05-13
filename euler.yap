@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8037 2015-05-13 14:18:23Z josd $').
+version_info('$Id: euler.yap 8041 2015-05-13 16:02:12Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1573,7 +1573,10 @@ tr_pr([], []) :-
 	!.
 tr_pr(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(A, B)|C], ['\'<http://www.w3.org/2000/10/swap/log#implies>\''(D, B)|E]) :-
 	!,
-	tr_tr(A, D),
+	(	atom(A)
+	->	D = A
+	;	tr_tr(A, D)
+	),
 	tr_pr(C, E).
 tr_pr([A|B], [A|C]) :-
 	tr_pr(B, C).
