@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8047 2015-05-15 08:01:39Z josd $').
+version_info('$Id: euler.yap 8049 2015-05-15 09:06:30Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3478,17 +3478,29 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 	->	wg(Y),
 		write(' <= '),
 		wg(X)
-	;	nb_getval(pdepth, PD),
-		PD1 is PD+1,
-		nb_setval(pdepth, PD1),
+	;	(	\+atom(X)
+		->	nb_getval(pdepth, PD),
+			PD1 is PD+1,
+			nb_setval(pdepth, PD1)
+		;	true
+		),
 		wg(X),
-		nb_setval(pdepth, PD),
+		(	\+atom(X)
+		->	nb_setval(pdepth, PD)
+		;	true
+		),
 		write(' => '),
-		nb_getval(cdepth, CD),
-		CD1 is CD+1,
-		nb_setval(cdepth, CD1),
+		(	\+atom(Y)
+		->	nb_getval(cdepth, CD),
+			CD1 is CD+1,
+			nb_setval(cdepth, CD1)
+		;	true
+		),
 		wg(Y),
-		nb_setval(cdepth, CD)
+		(	\+atom(Y)
+		->	nb_setval(cdepth, CD)
+		;	true
+		)
 	),
 	retract(rule_uvar(_)),
 	!.
