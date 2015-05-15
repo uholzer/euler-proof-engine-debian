@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8043 2015-05-13 20:14:03Z josd $').
+version_info('$Id: euler.yap 8047 2015-05-15 08:01:39Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1603,7 +1603,8 @@ tr_tr([A|B], [C|D]) :-
 tr_tr(A, B) :-
 	atom(A),
 	!,
-	(	atom_concat('_', C, A)
+	(	atom_concat('_', C, A),
+		sub_atom(C, _, 1, _, '_')
 	->	nb_getval(var_ns, Vns),
 		atomic_list_concat(['\'<', Vns, C, '>\''], B)
 	;	B = A
@@ -3264,9 +3265,12 @@ wt0(X) :-
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')	% DEPRECATED
 	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, 0),
+			(	nb_getval(pdepth, PD),
 				nb_getval(cdepth, CD),
-				CD > 0
+				(	PD = 0,
+					CD > 0
+				;	PD > 1
+				)
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3327,9 +3331,12 @@ wt0(X) :-
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
 		rule_uvar(L),
-		(	nb_getval(pdepth, 0),
+		(	nb_getval(pdepth, PD),
 			nb_getval(cdepth, CD),
-			CD > 0
+			(	PD = 0,
+				CD > 0
+			;	PD > 1
+			)
 		->	memberchk(Y, L)
 		;	(	memberchk(Y, L)
 			->	true
@@ -9920,7 +9927,7 @@ pathitem(literal(Atom, DtLang), []) -->
 pathitem(BNode, Triples) -->
 	['['],
 	!,
-	{	gensym(e, S),
+	{	gensym('bn_', S),
 		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BN)
@@ -9998,7 +10005,7 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		;	true
 		),
 		dynamic_verb(Verb),
-		gensym(e, S),
+		gensym('bn_', S),
 		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BNode)
@@ -10045,7 +10052,7 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		;	true
 		),
 		dynamic_verb(Verb),
-		gensym(e, S),
+		gensym('bn_', S),
 		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BNode)
