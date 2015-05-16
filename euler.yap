@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8053 2015-05-16 13:11:14Z josd $').
+version_info('$Id: euler.yap 8055 2015-05-16 14:10:20Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1618,7 +1618,7 @@ tr_tr(A, B, C) :-
 	(	atom_concat(C, D, A),
 		sub_atom(D, _, 1, _, '_')
 	->	nb_getval(var_ns, Vns),
-		atomic_list_concat(['\'<', Vns, D, '>\''], B)
+		atomic_list_concat(['\'<', Vns, 'sf', D, '>\''], B)
 	;	B = A
 	).
 tr_tr(A, A, _) :-
@@ -3342,6 +3342,7 @@ wt0(X) :-
 	J is I+1,
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
+		\+sub_atom(Y, 0, 2, _, 'sf'),
 		rule_uvar(L),
 		(	nb_getval(pdepth, PD),
 			nb_getval(cdepth, CD),
