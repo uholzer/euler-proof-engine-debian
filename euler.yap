@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8055 2015-05-16 14:10:20Z josd $').
+version_info('$Id: euler.yap 8057 2015-05-16 18:30:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1452,14 +1452,12 @@ tr_n3p([], _, _) :-
 % DEPRECATED
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules) :-
 	!,
-	clist(U, X),
-	tr_pr(U, V),
-	clist(V, W),
-	(	clast(W, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>\''(_, T))
+	(	clast(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>\''(_, T))
 	->	true
 	;	T = 1.0
 	),
-	tr_split(V, K, M),
+	clist(L, X),
+	tr_split(L, K, M),
 	clist(K, N),
 	write(implies(N, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>\''([Y|M], T), Src)),
 	writeln('.'),
@@ -1468,8 +1466,7 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, trules
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery) :-
 	!,
 	clist(U, X),
-	tr_pr(U, V),
-	tr_split(V, K, M),
+	tr_split(U, K, M),
 	append(K, ['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>\''([Y|M], T)], J),
 	clist(J, N),
 	write(implies(N, answer('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>\'', [Y|M], T, gamma, gamma, gamma, gamma, gamma), Src)),
@@ -1477,9 +1474,6 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, tquery
 	tr_n3p(Z, Src, tquery).
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query) :-
 	!,
-	clist(U, X),
-	tr_pr(U, V),
-	clist(V, W),
 	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
 	->	nb_setval(csv_header, T)
 	;	true
@@ -1489,28 +1483,25 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, query)
 		(	flag('no-distinct')
 		;	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, _)
 		)
-	->	write(query(W, Y)),
+	->	write(query(X, Y)),
 		writeln('.')
 	;	strela(answer(Y), A),
-		write(implies(W, A, Src)),
+		write(implies(X, A, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
 tr_n3p([':-'(Y, X)|Z], Src, query) :-
 	!,
-	clist(U, X),
-	tr_pr(U, V),
-	clist(V, W),
 	(	Y = '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>\''(_, T)
 	->	nb_setval(csv_header, T)
 	;	true
 	),
 	(	flag(nope),
 		\+flag(tactic, 'single-answer')
-	->	write(query(W, Y)),
+	->	write(query(X, Y)),
 		writeln('.')
 	;	strela(answer(Y), A),
-		write(implies(W, A, Src)),
+		write(implies(X, A, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, query).
@@ -1530,9 +1521,6 @@ tr_n3p([X|Z], Src, query) :-
 	tr_n3p(Z, Src, query).
 tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) :-
 	!,
-	clist(U, X),
-	tr_pr(U, V),
-	clist(V, W),
 	(	Y \= dn(_),
 		(	\+flag(ances),	% DEPRECATED
 			\+flag(quiet)	% DEPRECATED
@@ -1543,20 +1531,17 @@ tr_n3p(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(X, Y)|Z], Src, Mode) 
 	;	nb_setval(defcl, false)
 	),
 	(	flag(tactic, 'linear-select')
-	->	write(implies(W, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Src)),
+	->	write(implies(X, '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Src)),
 		writeln('.'),
-		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(W, Y), Y, Src)),
+		write(implies('\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\''(X, Y), Y, Src)),
 		writeln('.')
-	;	write(implies(W, Y, Src)),
+	;	write(implies(X, Y, Src)),
 		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
 tr_n3p([':-'(Y, X)|Z], Src, Mode) :-
 	!,
-	clist(U, X),
-	tr_pr(U, V),
-	clist(V, W),
-	write(':-'(Y, W)),
+	write(':-'(Y, X)),
 	writeln('.'),
 	tr_n3p(Z, Src, Mode).
 tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X, Y)|Z], Src, Mode) :-
@@ -1565,7 +1550,7 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	writeln('.'),
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
-	tr_tr(X, Y, '_'),
+	tr_tr(X, Y),
 	(	flag(tactic, 'linear-select')
 	->	write(implies(true, Y, Src)),
 		writeln('.')
@@ -1581,53 +1566,28 @@ tr_n3p([X|Z], Src, Mode) :-
 	tr_n3p(Z, Src, Mode).
 
 
-tr_pr([], []) :-
+tr_tr([], []) :-
 	!.
-tr_pr(['\'<http://www.w3.org/2000/10/swap/log#implies>\''(A, B)|C], ['\'<http://www.w3.org/2000/10/swap/log#implies>\''(D, B)|E]) :-
+tr_tr([A|B], [C|D]) :-
 	!,
-	(	atom(A)
-	->	D = A
-	;	tr_tr(A, D, '_')
-	),
-	tr_pr(C, E).
-tr_pr([A|B], [C|D]) :-
-	A \= '\';\''(_, _),
-	A \= '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#call>\''(_, _),
-	A \= '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#findall>\''(_, _),
-	A \= '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#optional>\''(_, _),
-	A \= '\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#valuation>\''(_, _),
-	A \= '\'<http://www.w3.org/2000/10/swap/log#equalTo>\''(_, _),
-	A \= '\'<http://www.w3.org/2000/10/swap/log#includes>\''(_, _),
-	A \= '\'<http://www.w3.org/2000/10/swap/log#notIncludes>\''(_, _),
-	!,
-	tr_tr(A, C, '__'),
-	tr_pr(B, D).
-tr_pr([A|B], [A|C]) :-
-	tr_pr(B, C).
-
-
-tr_tr([], [], _) :-
-	!.
-tr_tr([A|B], [C|D], E) :-
-	!,
-	tr_tr(A, C, E),
-	tr_tr(B, D, E).
-tr_tr(A, B, C) :-
+	tr_tr(A, C),
+	tr_tr(B, D).
+tr_tr(A, B) :-
 	atom(A),
 	!,
-	(	atom_concat(C, D, A),
-		sub_atom(D, _, 1, _, '_')
+	(	atom_concat('_', C, A),
+		sub_atom(C, _, 1, _, '_')
 	->	nb_getval(var_ns, Vns),
-		atomic_list_concat(['\'<', Vns, 'sf', D, '>\''], B)
+		atomic_list_concat(['\'<', Vns, C, '>\''], B)
 	;	B = A
 	).
-tr_tr(A, A, _) :-
+tr_tr(A, A) :-
 	number(A),
 	!.
-tr_tr(A, B, C) :-
-	A =.. [D|E],
-	tr_tr(E, F, C),
-	B =.. [D|F].
+tr_tr(A, B) :-
+	A =.. [C|D],
+	tr_tr(D, E),
+	B =.. [C|E].
 
 
 tr_split([], [], []) :-
@@ -3277,12 +3237,9 @@ wt0(X) :-
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')	% DEPRECATED
 	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, PD),
+			(	nb_getval(pdepth, 0),
 				nb_getval(cdepth, CD),
-				(	PD = 0,
-					CD > 0
-				;	PD > 1
-				)
+				CD > 0
 			->	memberchk(Y, L)
 			;	(	memberchk(Y, L)
 				->	true
@@ -3342,7 +3299,6 @@ wt0(X) :-
 	J is I+1,
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
-		\+sub_atom(Y, 0, 2, _, 'sf'),
 		rule_uvar(L),
 		(	nb_getval(pdepth, PD),
 			nb_getval(cdepth, CD),
@@ -9953,14 +9909,10 @@ pathitem(BNode, Triples) -->
 	['['],
 	!,
 	{	gensym('bn_', S),
-		nb_getval(fdepth, FD),
-		(	FD = 0
+		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BN)
-		;	(	FD = 1
-			->	atom_concat('_', S, BN)
-			;	atom_concat('__', S, BN)
-			),
+		;	atom_concat('_', S, BN),
 			nb_setval(smod, false)
 		)
 	},
@@ -10035,14 +9987,10 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		),
 		dynamic_verb(Verb),
 		gensym('bn_', S),
-		nb_getval(fdepth, FD),
-		(	FD = 0
+		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BNode)
-		;	(	FD = 1
-			->	atom_concat('_', S, BNode)
-			;	atom_concat('__', S, BNode)
-			),
+		;	atom_concat('_', S, BNode),
 			nb_setval(smod, false)
 		),
 		(	Verb = isof(V)
@@ -10086,14 +10034,10 @@ pathtail(Node, Verb, PNode, [Triple|Triples]) -->
 		),
 		dynamic_verb(Verb),
 		gensym('bn_', S),
-		nb_getval(fdepth, FD),
-		(	FD = 0
+		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], BNode)
-		;	(	FD = 1
-			->	atom_concat('_', S, BNode)
-			;	atom_concat('__', S, BNode)
-			),
+		;	atom_concat('_', S, BNode),
 			nb_setval(smod, false)
 		),
 		(	Verb = isof(V)
@@ -10334,14 +10278,10 @@ symbol(Name) -->
 			;	assertz(evar(N, S, D))
 			)
 		),
-		nb_getval(fdepth, FD),
-		(	FD = 0
+		(	nb_getval(fdepth, 0)
 		->	nb_getval(var_ns, Vns),
 			atomic_list_concat(['\'<', Vns, S, '>\''], Name)
-		;	(	FD = 1
-			->	atom_concat('_', S, Name)
-			;	atom_concat('__', S, Name)
-			),
+		;	atom_concat('_', S, Name),
 			nb_setval(smod, false)
 		)
 	}.
