@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8057 2015-05-16 18:30:50Z josd $').
+version_info('$Id: euler.yap 8061 2015-05-19 16:07:33Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1551,10 +1551,10 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	(	flag(tactic, 'linear-select')
-	->	write(implies(true, Y, Src)),
-		writeln('.')
-	;	write(Y),
+	(	\+flag(tactic, 'linear-select'),
+		uvars(Y, U),
+		U = []
+	->	write(Y),
 		writeln('.'),
 		(	flag(nope),
 			\+flag(ances)	% DEPRECATED
@@ -1562,6 +1562,8 @@ tr_n3p([X|Z], Src, Mode) :-
 		;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
 			writeln('.')
 		)
+	;	write(implies(true, Y, Src)),
+		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
 
@@ -3932,6 +3934,7 @@ indentation(C) :-
 	hstep(A, _).
 
 
+% DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#distinct>'(A, B) :-
 	when(
 		(	nonvar(A)
@@ -4133,6 +4136,7 @@ indentation(C) :-
 	).
 
 
+% DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#reverse>'(A, B) :-
 	reverse(A, B).
 
@@ -8278,6 +8282,26 @@ findvars(A, B) :-
 	findvars(C, B).
 
 
+uvars(A, B) :-
+	atomic(A),
+	!,
+	(	atom(A),
+		sub_atom(A, 0, 1, _, '_')
+	->	B = [A]
+	;	B = []
+	).
+uvars([], []) :-
+	!.
+uvars([A|B], C) :-
+	uvars(A, D),
+	uvars(B, E),
+	append(D, E, C),
+	!.
+uvars(A, B) :-
+	A =.. C,
+	uvars(C, B).
+
+
 raw_type(A, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#List>') :-
 	is_list(A),
 	!.
@@ -9590,12 +9614,14 @@ barename_csl_tail([]) -->
 	[].
 
 
+% DEPRECATED
 boolean(true) -->
 	['@', name('true')],
 	!.
 boolean(true) -->
 	[name('true')],
 	!.
+% DEPRECATED
 boolean(false) -->
 	['@', name('false')],
 	!.
@@ -9609,6 +9635,7 @@ boolean(Boolean) -->
 	}.
 
 
+% DEPRECATED
 declaration -->
 	['@', name(base)],
 	!,
@@ -9638,6 +9665,7 @@ declaration -->
 		assertz(base_uri(URI))
 	},
 	withoutdot.
+% DEPRECATED
 declaration -->
 	['@', name(keywords)],
 	!,
@@ -9650,6 +9678,7 @@ declaration -->
 		retractall(keywords(_)),
 		assertz(keywords(List))
 	}.
+% DEPRECATED
 declaration -->
 	['@', name(prefix)],
 	!,
@@ -9694,6 +9723,7 @@ dtlang(type(T)) -->
 	[].
 
 
+% DEPRECATED
 existential -->
 	['@', name(forSome)],
 	!,
@@ -10304,6 +10334,7 @@ symbol_csl_tail([]) -->
 	[].
 
 
+% DEPRECATED
 universal -->
 	['@', name(forAll)],
 	!,
@@ -10373,6 +10404,7 @@ verb(':-', []) -->
 		),
 		assertz(back)
 	}.
+% DEPRECATED
 verb(V, []) -->
 	['@', name(a)],
 	!,
@@ -10383,6 +10415,7 @@ verb(V, []) -->
 	!,
 	{	V = '\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>\''
 	}.
+% DEPRECATED
 verb(Node, Triples) -->
 	['@', name(has)],
 	!,
@@ -10391,6 +10424,7 @@ verb(Node, Triples) -->
 	[name(has)],
 	!,
 	expression(Node, Triples).
+% DEPRECATED
 verb(isof(Node), Triples) -->
 	['@', name(is)],
 	!,
