@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8061 2015-05-19 16:07:33Z josd $').
+version_info('$Id: euler.yap 8073 2015-05-21 22:38:46Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4238,6 +4238,16 @@ indentation(C) :-
 				assertz(Z)
 			)
 		)
+	).
+
+
+'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#whenGround>'(A, B) :-
+	(	atom(A),
+		(	sub_atom(A, _, 19, _, '/.well-known/genid/')
+		;	atom_concat(some, _, A)
+		)
+	->	true
+	;	A = B
 	).
 
 
