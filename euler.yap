@@ -11,9 +11,6 @@
 % See also README.Linux [8], README.Windows [9] and README.MacOSX [10].
 %
 %
-% References
-% ----------
-%
 %  [1] http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt
 %  [2] http://www.w3.org/DesignIssues/diagrams/sweb-stack/2006a
 %  [3] http://mathworld.wolfram.com/KoenigsbergBridgeProblem.html
@@ -150,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8079 2015-05-23 17:04:18Z josd $').
+version_info('$Id: euler.yap 8086 2015-05-23 21:31:32Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
