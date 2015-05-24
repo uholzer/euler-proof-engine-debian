@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8086 2015-05-23 21:31:32Z josd $').
+version_info('$Id: euler.yap 8095 2015-05-24 18:58:26Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -201,9 +201,9 @@ eye
 
 
 
-% -------------------
-% Main with N3 Socket
-% -------------------
+% ------------------------------
+% GRE (Generic Reasoning Engine)
+% ------------------------------
 
 
 main :-
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(n3socket(Argus), Exc,
+	catch(demi(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** n3socket ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** demi ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -302,7 +302,12 @@ main :-
 	halt(EC).
 
 
-n3socket(Argus) :-
+
+% --------------------
+% demi (demix and mix)
+% --------------------
+
+demi(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
