@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8100 2015-05-24 21:44:08Z josd $').
+version_info('$Id: euler.yap 8102 2015-05-25 10:13:22Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3439,7 +3439,11 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 	->	true
 	;	R = []
 	),
-	assertz(rule_uvar(R)),
+	(	nb_getval(pdepth, 0),
+		nb_getval(cdepth, 0)
+	->	assertz(rule_uvar(R))
+	;	true
+	),
 	(	catch(clause(Y, Z), _, fail)
 	->	wg(Y),
 		write(' <= '),
@@ -3468,7 +3472,11 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 		;	true
 		)
 	),
-	retract(rule_uvar(_)),
+	(	nb_getval(pdepth, 0),
+		nb_getval(cdepth, 0)
+	->	retract(rule_uvar(_))
+	;	true
+	),
 	!.
 wt2(':-'(X, Y)) :-
 	(	rule_uvar(R)
