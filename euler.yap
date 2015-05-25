@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8102 2015-05-25 10:13:22Z josd $').
+version_info('$Id: euler.yap 8104 2015-05-25 20:40:44Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------------------
-% demi (demix and mix)
-% --------------------
+% ---------------------
+% demi (detail and mix)
+% ---------------------
 %
 % using and producing triples, rules and proofs
 
