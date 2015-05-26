@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8111 2015-05-26 13:37:50Z josd $').
+version_info('$Id: euler.yap 8114 2015-05-26 21:18:31Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(semi(Argus), Exc,
+	catch(semico(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** semi ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** semico ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,14 +357,19 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -------------------
-% semi (semantic mix)
-% -------------------
+% -----------------------------------
+% semico (semantic mixed computation)
+% -----------------------------------
 %
 % using and producing triples, rules and proofs
+%
+% inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
+%	Mixed computation is processing of an incomplete information. Its product
+%	are a partially processed information and a so-called residual program
+%	destined to complete in sequel the processing of the remaining information.
 
 
-semi(Argus) :-
+semico(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
