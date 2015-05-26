@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8107 2015-05-25 21:40:11Z josd $').
+version_info('$Id: euler.yap 8111 2015-05-26 13:37:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(demi(Argus), Exc,
+	catch(semi(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** demi ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** semi ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,14 +357,14 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ---------------------
-% demi (detach and mix)
-% ---------------------
+% -------------------
+% semi (semantic mix)
+% -------------------
 %
 % using and producing triples, rules and proofs
 
 
-demi(Argus) :-
+semi(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
