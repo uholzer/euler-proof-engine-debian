@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8114 2015-05-26 21:18:31Z josd $').
+version_info('$Id: euler.yap 8116 2015-05-27 16:14:43Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(semico(Argus), Exc,
+	catch(rapid(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** semico ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** rapid ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -----------------------------------
-% semico (semantic mixed computation)
-% -----------------------------------
+% --------------------------------------------------
+% rapid (reasoning as processing of incomplete data)
+% --------------------------------------------------
 %
 % using and producing triples, rules and proofs
 %
@@ -369,7 +369,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 %	destined to complete in sequel the processing of the remaining information.
 
 
-semico(Argus) :-
+rapid(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
