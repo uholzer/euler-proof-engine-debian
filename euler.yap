@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8116 2015-05-27 16:14:43Z josd $').
+version_info('$Id: euler.yap 8118 2015-05-27 20:19:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------------------------------------------------
-% rapid (reasoning as processing of incomplete data)
-% --------------------------------------------------
+% -----------------------------------------------
+% RAPID (Reasoning As Processing Incomplete Data)
+% -----------------------------------------------
 %
 % using and producing triples, rules and proofs
 %
@@ -1909,7 +1909,7 @@ pstep(Rule) :-
 
 
 % ----------------------
-% strela (stretch relax)
+% STRELA (STRetch rELAx)
 % ----------------------
 
 
