@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8118 2015-05-27 20:19:50Z josd $').
+version_info('$Id: euler.yap 8120 2015-05-30 14:07:02Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(rapid(Argus), Exc,
+	catch(grid(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** rapid ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** grid ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -----------------------------------------------
-% RAPID (Reasoning As Processing Incomplete Data)
-% -----------------------------------------------
+% --------------------------------------------
+% GRID (Global Reasoning with Incomplete Data)
+% --------------------------------------------
 %
 % using and producing triples, rules and proofs
 %
@@ -369,7 +369,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 %	destined to complete in sequel the processing of the remaining information.
 
 
-rapid(Argus) :-
+grid(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
