@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8120 2015-05-30 14:07:02Z josd $').
+version_info('$Id: euler.yap 8123 2015-05-31 20:53:46Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1908,9 +1908,9 @@ pstep(Rule) :-
 	cnt(RTP).
 
 
-% ----------------------
-% STRELA (STRetch rELAx)
-% ----------------------
+% -----------------------------
+% SRM (Stretch Relax Mechanism)
+% -----------------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
