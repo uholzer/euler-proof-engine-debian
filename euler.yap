@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8123 2015-05-31 20:53:46Z josd $').
+version_info('$Id: euler.yap 8127 2015-06-02 22:25:04Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(grid(Argus), Exc,
+	catch(eye(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** grid ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** eye ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,11 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------------------------------------------
-% GRID (Global Reasoning with Incomplete Data)
-% --------------------------------------------
-%
-% using and producing triples, rules and proofs
+% ----------------------------
+% EYE (thE partiallY completE)
+% ----------------------------
 %
 % inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
 %	Mixed computation is processing of an incomplete information. Its product
@@ -369,7 +367,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 %	destined to complete in sequel the processing of the remaining information.
 
 
-grid(Argus) :-
+eye(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
