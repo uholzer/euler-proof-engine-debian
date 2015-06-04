@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8133 2015-06-04 22:53:06Z josd $').
+version_info('$Id: euler.yap 8135 2015-06-04 23:24:30Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -----------------------------------------------------
-% GRID (General-purpose Reasoning with Incomplete Data)
-% -----------------------------------------------------
+% ---------------------------------------------------
+% GRID (Goal oriented Reasoning with Incomplete Data)
+% ---------------------------------------------------
 %
 % inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
 %	Mixed computation is processing of an incomplete information. Its product
