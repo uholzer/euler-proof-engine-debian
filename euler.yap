@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8135 2015-06-04 23:24:30Z josd $').
+version_info('$Id: euler.yap 8137 2015-06-05 19:36:35Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ---------------------------------------------------
-% GRID (Goal oriented Reasoning with Incomplete Data)
-% ---------------------------------------------------
+% -------------------
+% eyemix (eye mixing)
+% -------------------
 %
 % inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
 %	Mixed computation is processing of an incomplete information. Its product
@@ -1906,9 +1906,9 @@ pstep(Rule) :-
 	cnt(RTP).
 
 
-% -----------------------------
-% SRM (Stretch Relax Mechanism)
-% -----------------------------
+% ----------------------
+% strela (stretch relax)
+% ----------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
