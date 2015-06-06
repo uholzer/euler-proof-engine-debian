@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8142 2015-06-06 10:10:01Z josd $').
+version_info('$Id: euler.yap 8144 2015-06-06 12:57:56Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(gomix(Argus), Exc,
+	catch(go(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** gomix ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** go ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,18 +357,12 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ----------------------------
-% gomix (goal oriented mixing)
-% ----------------------------
-%
-% inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
-%
-% Mixed computation is processing of an incomplete information. Its product
-% are a partially processed information and a so-called residual program
-% destined to complete in sequel the processing of the remaining information.
+% ---------------------
+% go (goal orientation)
+% ---------------------
 
 
-gomix(Argus) :-
+go(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
