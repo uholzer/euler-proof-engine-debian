@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8140 2015-06-05 19:56:12Z josd $').
+version_info('$Id: euler.yap 8142 2015-06-06 10:10:01Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(eyemix(Argus), Exc,
+	catch(gomix(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** eyemix ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** gomix ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -------------------
-% eyemix (eye mixing)
-% -------------------
+% ----------------------------
+% gomix (goal oriented mixing)
+% ----------------------------
 %
 % inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
 %
@@ -368,7 +368,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 % destined to complete in sequel the processing of the remaining information.
 
 
-eyemix(Argus) :-
+gomix(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
