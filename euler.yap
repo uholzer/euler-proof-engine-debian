@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8144 2015-06-06 12:57:56Z josd $').
+version_info('$Id: euler.yap 8146 2015-06-08 19:40:57Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(go(Argus), Exc,
+	catch(gold(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** go ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** gold ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,12 +357,12 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ---------------------
-% go (goal orientation)
-% ---------------------
+% --------------------------------
+% GOLD (Goal Oriented Linked Data)
+% --------------------------------
 
 
-go(Argus) :-
+gold(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -1901,9 +1901,9 @@ pstep(Rule) :-
 	cnt(RTP).
 
 
-% ----------------------
-% strela (stretch relax)
-% ----------------------
+% -------------------------
+% SRC (Stretch Relax Cycle)
+% -------------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
