@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8146 2015-06-08 19:40:57Z josd $').
+version_info('$Id: euler.yap 8148 2015-06-08 23:25:38Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3286,11 +3286,8 @@ wt0(X) :-
 	->	true
 	;	flag(nope)
 	),
-	\+flag('no-qvars'),
-	\+flag('no-blank'),	% DEPRECATED
 	nb_getval(var_ns, Vns),
 	sub_atom(X, 1, I, _, Vns),
-	!,
 	J is I+1,
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
@@ -3309,8 +3306,11 @@ wt0(X) :-
 			)
 		)
 	->	write('?')
-	;	write('_:')
+	;	\+flag('no-qvars'),
+		\+flag('no-blank'),	% DEPRECATED
+		write('_:')
 	),
+	!,
 	write(Y).
 wt0(X) :-
 	(	wtcache(X, W)
