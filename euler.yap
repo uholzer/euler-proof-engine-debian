@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8148 2015-06-08 23:25:38Z josd $').
+version_info('$Id: euler.yap 8152 2015-06-09 15:14:30Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(gold(Argus), Exc,
+	catch(eyec(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** gold ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** eyec ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,12 +357,12 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------------------------------
-% GOLD (Goal Oriented Linked Data)
-% --------------------------------
+% ------------------
+% EYEC (EYE Control)
+% ------------------
 
 
-gold(Argus) :-
+eyec(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
