@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8164 2015-06-12 20:58:59Z josd $').
+version_info('$Id: euler.yap 8166 2015-06-12 22:30:45Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -357,9 +357,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ------
-% eyehow
-% ------
+% ------------------
+% eyehow (eye usage)
+% ------------------
 
 
 eyehow(Argus) :-
@@ -1902,9 +1902,9 @@ pstep(Rule) :-
 
 
 
-% ------
-% strela
-% ------
+% ----------------------
+% strela (stretch relax)
+% ----------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
