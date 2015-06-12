@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8162 2015-06-11 23:58:26Z josd $').
+version_info('$Id: euler.yap 8164 2015-06-12 20:58:59Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -241,10 +241,10 @@ main :-
 		)
 	;	true
 	),
-	catch(eyefit(Argus), Exc,
+	catch(eyehow(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** eyefit ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** eyehow ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -357,12 +357,12 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ----------------
-% eyefit (eye fit)
-% ----------------
+% ------
+% eyehow
+% ------
 
 
-eyefit(Argus) :-
+eyehow(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -1902,9 +1902,9 @@ pstep(Rule) :-
 
 
 
-% ----------------------
-% strela (stretch relax)
-% ----------------------
+% ------
+% strela
+% ------
 
 
 strela(answer(cn(A)), cn(B)) :-
