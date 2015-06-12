@@ -147,7 +147,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8160 2015-06-11 09:46:56Z josd $').
+version_info('$Id: euler.yap 8162 2015-06-11 23:58:26Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4872,7 +4872,8 @@ indentation(C) :-
 		(	X = [Y|Z],
 			nonvar(Z)
 		)
-	).
+	),
+	!.
 
 
 '<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'(X, Y) :-
@@ -4881,7 +4882,8 @@ indentation(C) :-
 		),
 		(	X = [_|Y]
 		)
-	).
+	),
+	!.
 
 
 '<http://www.w3.org/2000/10/swap/string#concatenation>'(X, literal(Y, type('<http://www.w3.org/2001/XMLSchema#string>'))) :-
