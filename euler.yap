@@ -8,7 +8,9 @@
 % Via N3 [4] it is interoperable with Cwm [5].
 % The EYE test cases [6] and their results [7] support the development of EYE.
 %
-% See also README.Linux [8], README.Windows [9] and README.MacOSX [10].
+% EYE can be installed manually on Linux [8], Windows [9] and MacOSX [10].
+% EYE is also available in a Docker container for command line use [11]
+% and in a Docker container for HTTP client use [12].
 %
 %
 %  [1] http://eulersharp.sourceforge.net/2006/02swap/eye-note.txt
@@ -21,6 +23,8 @@
 %  [8] http://eulersharp.sourceforge.net/README.Linux
 %  [9] http://eulersharp.sourceforge.net/README.Windows
 % [10] http://eulersharp.sourceforge.net/README.MacOSX
+% [11] https://registry.hub.docker.com/u/bdevloed/eye/
+% [12] https://registry.hub.docker.com/u/bdevloed/eyeserver/
 
 
 
@@ -147,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8172 2015-06-16 21:41:02Z josd $').
+version_info('$Id: euler.yap 8175 2015-06-17 10:09:13Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
