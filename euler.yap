@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8175 2015-06-17 10:09:13Z josd $').
+version_info('$Id: euler.yap 8177 2015-06-18 09:13:15Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -245,10 +245,10 @@ main :-
 		)
 	;	true
 	),
-	catch(perform(Argus), Exc,
+	catch(n3socket(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** perform ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** n3socket ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -362,11 +362,14 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 % --------
-% perform
+% n3socket
 % --------
+%
+% to cover the GRE (Generic Reasoning Engine) performance needs
+% designissues http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 
 
-perform(Argus) :-
+n3socket(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -5076,10 +5079,11 @@ indentation(C) :-
 
 
 
-% -----------------------------------------------------------------------------
+% ------------
 % RIF builtins
+% ------------
+%
 % according to RIF Datatypes and Built-Ins 1.0 -- http://www.w3.org/TR/rif-dtb/
-% -----------------------------------------------------------------------------
 
 
 % 4.1.1.1 pred:literal-not-identical
@@ -9604,11 +9608,12 @@ regexp_wildcard([A|B], [A|C]) :-
 
 
 
-% ---------------------------------------------------------------
+% ---------
 % N3 Parser
+% ---------
+%
 % according to http://www.w3.org/2000/10/swap/grammar/n3-ietf.txt
 % inspired by http://code.google.com/p/km-rdf/wiki/Henry
-% ---------------------------------------------------------------
 
 
 barename(BareName) -->
