@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8177 2015-06-18 09:13:15Z josd $').
+version_info('$Id: euler.yap 8181 2015-06-18 15:02:33Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -245,10 +245,10 @@ main :-
 		)
 	;	true
 	),
-	catch(n3socket(Argus), Exc,
+	catch(n3mix(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** n3socket ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** n3mix ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -361,15 +361,19 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------
-% n3socket
-% --------
+% --------------------------------
+% n3mix (language and computation)
+% --------------------------------
 %
-% to cover the GRE (Generic Reasoning Engine) performance needs
-% designissues http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
+% according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
+%
+% inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
+%	Mixed computation is processing of an incomplete information. Its product
+%	are a partially processed information and a so-called residual program
+%	destined to complete in sequel the processing of the remaining information.
 
 
-n3socket(Argus) :-
+n3mix(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -1909,9 +1913,9 @@ pstep(Rule) :-
 
 
 
-% ----------------------
-% strela (stretch relax)
-% ----------------------
+% --------------------------
+% strela (stretch and relax)
+% --------------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
@@ -9613,6 +9617,7 @@ regexp_wildcard([A|B], [A|C]) :-
 % ---------
 %
 % according to http://www.w3.org/2000/10/swap/grammar/n3-ietf.txt
+%
 % inspired by http://code.google.com/p/km-rdf/wiki/Henry
 
 
