@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8181 2015-06-18 15:02:33Z josd $').
+version_info('$Id: euler.yap 8184 2015-06-18 16:20:54Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -362,7 +362,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 % --------------------------------
-% n3mix (language and computation)
+% n3mix (notation and computation)
 % --------------------------------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
