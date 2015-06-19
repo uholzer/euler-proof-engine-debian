@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8184 2015-06-18 16:20:54Z josd $').
+version_info('$Id: euler.yap 8189 2015-06-19 11:50:23Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -194,7 +194,7 @@ eye
 	--license		show license info
 	--help			show help info
 <data>
-	<n3-data>		N3 facts and rules
+	<n3-data>		N3 triples and rules
 	--turtle <ttl-data>	Turtle data
 	--plugin <n3p-data>	plugin N3 P-code
 	--plugin-pvm <pvm-data>	plugin PVM code
@@ -245,10 +245,10 @@ main :-
 		)
 	;	true
 	),
-	catch(n3mix(Argus), Exc,
+	catch(mila(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** n3mix ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** mila ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -361,9 +361,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% --------------------------------
-% n3mix (notation and computation)
-% --------------------------------
+% ---------------------------
+% mila (mixed language agent)
+% ---------------------------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 %
@@ -373,7 +373,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 %	destined to complete in sequel the processing of the remaining information.
 
 
-n3mix(Argus) :-
+mila(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
