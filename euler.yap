@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8189 2015-06-19 11:50:23Z josd $').
+version_info('$Id: euler.yap 8191 2015-06-19 22:23:14Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -361,9 +361,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ---------------------------
-% mila (mixed language agent)
-% ---------------------------
+% ---------------------
+% mila (mixed language)
+% ---------------------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 %
@@ -1913,9 +1913,9 @@ pstep(Rule) :-
 
 
 
-% --------------------------
-% strela (stretch and relax)
-% --------------------------
+% ----------------------
+% strela (stretch relax)
+% ----------------------
 
 
 strela(answer(cn(A)), cn(B)) :-
