@@ -92,6 +92,7 @@
 :- dynamic(got_answer/9).
 :- dynamic(got_dq/0).
 :- dynamic(got_labelvars/3).
+:- dynamic(got_pi/0).
 :- dynamic(got_sq/0).
 :- dynamic(got_wi/5).
 :- dynamic(graph/2).
@@ -139,7 +140,6 @@
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'/2).
 :- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/2).
-:- dynamic('<http://www.w3.org/2000/10/swap/list#in>'/2).
 :- dynamic('<http://www.w3.org/2000/10/swap/log#implies>'/2).
 :- dynamic('<http://www.w3.org/2000/10/swap/log#outputString>'/2).
 :- dynamic('<http://www.w3.org/2002/07/owl#sameAs>'/2).
@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8194 2015-06-22 13:29:34Z josd $').
+version_info('$Id: euler.yap 8196 2015-06-23 09:26:59Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -196,6 +196,7 @@ eye
 <data>
 	<n3-data>		N3 triples and rules
 	--turtle <ttl-data>	Turtle data
+	--proof <n3-proof>	N3 proof
 	--plugin <n3p-data>	plugin N3 P-code
 	--plugin-pvm <pvm-data>	plugin PVM code
 <query>
@@ -352,7 +353,7 @@ argv([], []) :-
 argv([Arg|Argvs], [U, V|Argus]) :-
 	sub_atom(Arg, B, 1, E, '='),
 	sub_atom(Arg, 0, B, _, U),
-	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--trules', '--query', '--tquery', '--step', '--tactic']),
+	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--step', '--tactic']),
 	!,
 	sub_atom(Arg, _, E, 0, V),
 	argv(Argvs, Argus).
@@ -391,6 +392,9 @@ mila(Argus) :-
 	nb_setval(fdepth, 0),
 	nb_setval(defcl, true),
 	nb_setval(input_statements, 0),
+	nb_setval(fdepth, 0),
+	nb_setval(pdepth, 0),
+	nb_setval(cdepth, 0),
 	opts(Argus, Args),
 	(	\+memberchk('--query', Args),
 		\+memberchk('--tquery', Args),
@@ -430,7 +434,6 @@ mila(Argus) :-
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>\'/2).~n', []),
-		format(':- multifile(\'<http://www.w3.org/2000/10/swap/list#in>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2000/10/swap/log#implies>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
 	;	true
@@ -937,7 +940,7 @@ opts(['--probe'|_], _) :-
 	flush_output(user_error),
 	throw(halt).
 opts([Arg|Argus], Args) :-
-	\+memberchk(Arg, ['--plugin', '--plugin-pvm', '--turtle', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
+	\+memberchk(Arg, ['--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
 	sub_atom(Arg, 0, 2, _, '--'),
 	!,
 	sub_atom(Arg, 2, _, 0, Opt),
@@ -1113,6 +1116,24 @@ args(['--turtle', Arg|Args]) :-
 	assertz(flag(turtle)),
 	n3_n3p(Arg, data),
 	retract(flag(turtle)),
+	args(Args).
+args(['--proof', Arg|Args]) :-
+	absolute_uri(Arg, A),
+	atomic_list_concat(['<', A, '>'], R),
+	assertz(scope(R)),
+	(	flag(n3p)
+	->	portray_clause(scope(R))
+	;	true
+	),
+	n3_n3p(Arg, data),
+	(	got_pi
+	->	true
+	;	assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Inference>'),
+				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]), G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
+		assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Extraction>'),
+				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]), G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
+		assertz(got_pi)
+	),
 	args(Args).
 % DEPRECATED
 args(['--trules', Arg|Args]) :-
