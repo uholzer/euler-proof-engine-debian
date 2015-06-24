@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8198 2015-06-23 16:02:51Z josd $').
+version_info('$Id: euler.yap 8200 2015-06-24 22:15:21Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4278,10 +4278,8 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#whenGround>'(A, B) :-
-	(	atom(A),
-		(	sub_atom(A, _, 19, _, '/.well-known/genid/')
-		;	atom_concat(some, _, A)
-		)
+	(	evars(A, C),
+		C \= []
 	->	true
 	;	A = B
 	).
@@ -8349,6 +8347,28 @@ uvars([A|B], C) :-
 uvars(A, B) :-
 	A =.. C,
 	uvars(C, B).
+
+
+evars(A, B) :-
+	atomic(A),
+	!,
+	(	atom(A),
+		(	sub_atom(A, _, 19, _, '/.well-known/genid/')
+		;	atom_concat(some, _, A)
+		)
+	->	B = [A]
+	;	B = []
+	).
+evars([], []) :-
+	!.
+evars([A|B], C) :-
+	evars(A, D),
+	evars(B, E),
+	append(D, E, C),
+	!.
+evars(A, B) :-
+	A =.. C,
+	evars(C, B).
 
 
 raw_type(A, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#List>') :-
