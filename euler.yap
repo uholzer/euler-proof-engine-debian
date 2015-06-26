@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8200 2015-06-24 22:15:21Z josd $').
+version_info('$Id: euler.yap 8210 2015-06-26 23:24:54Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4141,6 +4141,13 @@ indentation(C) :-
 	E =.. [A, C, F],
 	catch(call(E), _, fail),
 	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#propertyChainExtension>'(B, [F, D]).
+
+
+'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#random>'([A|_], B) :-
+	catch(nb_getval(random, C), _, C = 1298074214633706835075030044377087),
+	D is mod(19134702400093278081449423917*C+359334085968622831041960188598043661065388726959079837, 43143988327398957279342419750374600193),
+	nb_setval(random, D),
+	B is mod(D, A).
 
 
 % DEPRECATED
@@ -9227,7 +9234,6 @@ prolog_sym(get_mutable, get_mutable, rel).
 prolog_sym(get_time, get_time, rel).
 prolog_sym(get0, get0, rel).
 prolog_sym(getcwd, getcwd, rel).
-prolog_sym(getrand, getrand, rel).
 prolog_sym(ground, ground, rel).
 prolog_sym(halt, halt, rel).
 prolog_sym(if, soft_cut, rel).
@@ -9350,7 +9356,7 @@ prolog_sym(set_prolog_flag, set_prolog_flag, rel).
 prolog_sym(set_stream_position, set_stream_position, rel).
 prolog_sym(setarg, setarg, rel).
 prolog_sym(setof, setof, rel).
-prolog_sym(setrand, setrand, rel).
+prolog_sym(set_random, set_random, rel).
 prolog_sym(sign, sign, func).
 prolog_sym(simple, simple, rel).
 prolog_sym(sin, sin, func).
