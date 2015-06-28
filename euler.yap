@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8210 2015-06-26 23:24:54Z josd $').
+version_info('$Id: euler.yap 8212 2015-06-28 18:30:36Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4036,19 +4036,32 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#graphDifference>'(A, B) :-
-	nonvar(A),
-	difference(A, M),
-	unify(M, B).
+	when(
+		(	nonvar(A)
+		),
+		(	difference(A, M),
+			unify(M, B)
+		)
+	).
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#graphIntersection>'(A, B) :-
-	nonvar(A),
-	intersection(A, M),
-	unify(M, B).
+	when(
+		(	nonvar(A)
+		),
+		(	intersection(A, M),
+			unify(M, B)
+		)
+	).
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#graphList>'(A, B) :-
-	clistflat(B, A).
+	when(
+		(	nonvar(A)
+		),
+		(	clistflat(B, A)
+		)
+	).
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#label>'(A, literal(B, type('<http://www.w3.org/2001/XMLSchema#string>'))) :-
