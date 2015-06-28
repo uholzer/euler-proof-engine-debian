@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8212 2015-06-28 18:30:36Z josd $').
+version_info('$Id: euler.yap 8216 2015-06-28 19:47:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1579,7 +1579,7 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
 	(	\+flag(tactic, 'linear-select'),
-		uvars(Y, U),
+		pvars(Y, U),
 		U = []
 	->	write(Y),
 		writeln('.'),
@@ -4298,7 +4298,7 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#whenGround>'(A, B) :-
-	(	evars(A, C),
+	(	qvars(A, C),
 		C \= []
 	->	true
 	;	A = B
@@ -8349,7 +8349,7 @@ findvars(A, B) :-
 	findvars(C, B).
 
 
-uvars(A, B) :-
+pvars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
@@ -8357,19 +8357,22 @@ uvars(A, B) :-
 	->	B = [A]
 	;	B = []
 	).
-uvars([], []) :-
+pvars([], []) :-
 	!.
-uvars([A|B], C) :-
-	uvars(A, D),
-	uvars(B, E),
+pvars([A|B], C) :-
+	pvars(A, D),
+	pvars(B, E),
 	append(D, E, C),
 	!.
-uvars(A, B) :-
+pvars(A, B) :-
 	A =.. C,
-	uvars(C, B).
+	pvars(C, B).
 
 
-evars(A, B) :-
+qvars(A, [A]) :-
+	var(A),
+	!.
+qvars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
@@ -8379,16 +8382,16 @@ evars(A, B) :-
 	->	B = [A]
 	;	B = []
 	).
-evars([], []) :-
+qvars([], []) :-
 	!.
-evars([A|B], C) :-
-	evars(A, D),
-	evars(B, E),
+qvars([A|B], C) :-
+	qvars(A, D),
+	qvars(B, E),
 	append(D, E, C),
 	!.
-evars(A, B) :-
+qvars(A, B) :-
 	A =.. C,
-	evars(C, B).
+	qvars(C, B).
 
 
 raw_type(A, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#List>') :-
