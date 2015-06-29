@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8216 2015-06-28 19:47:19Z josd $').
+version_info('$Id: euler.yap 8220 2015-06-29 10:37:09Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4298,10 +4298,14 @@ indentation(C) :-
 
 
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#whenGround>'(A, B) :-
-	(	qvars(A, C),
-		C \= []
-	->	true
-	;	A = B
+	when(
+		(	ground(A)
+		),
+		(	qvars(A, C),
+			C \= []
+		->	true
+		;	A = B
+		)
 	).
 
 
@@ -8369,9 +8373,6 @@ pvars(A, B) :-
 	pvars(C, B).
 
 
-qvars(A, [A]) :-
-	var(A),
-	!.
 qvars(A, B) :-
 	atomic(A),
 	!,
