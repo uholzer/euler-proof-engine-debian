@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8220 2015-06-29 10:37:09Z josd $').
+version_info('$Id: euler.yap 8228 2015-07-01 12:01:03Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -7482,7 +7482,10 @@ within_scope([A, B]) :-
 
 
 exopred(P, S, O) :-
-	pred(P),
+	(	var(P)
+	->	pred(P)
+	;	current_predicate(P/2)
+	),
 	call(P, S, O).
 
 
