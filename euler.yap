@@ -19,7 +19,7 @@
 %  [4] http://www.w3.org/TeamSubmission/n3/
 %  [5] http://www.w3.org/2000/10/swap/doc/cwm
 %  [6] http://eulersharp.sourceforge.net/2006/02swap/etc.sh
-%  [7] http://eulersharp.sourceforge.net/2006/02swap/etc.n3
+%  [7] http://eulersharp.sourceforge.net/2006/02swap/etc/
 %  [8] http://eulersharp.sourceforge.net/README.Linux
 %  [9] http://eulersharp.sourceforge.net/README.Windows
 % [10] http://eulersharp.sourceforge.net/README.MacOSX
@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8228 2015-07-01 12:01:03Z josd $').
+version_info('$Id: euler.yap 8233 2015-07-03 14:31:10Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1129,8 +1129,6 @@ args(['--proof', Arg|Args]) :-
 	(	got_pi
 	->	true
 	;	assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Inference>'),
-				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]), G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
-		assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Extraction>'),
 				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]), G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
 		assertz(got_pi)
 	),
