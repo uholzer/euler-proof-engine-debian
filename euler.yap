@@ -132,6 +132,7 @@
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#mu>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#pi>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#sigma>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#reflexive>'/2).
 :- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>'/2).
@@ -151,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8233 2015-07-03 14:31:10Z josd $').
+version_info('$Id: euler.yap 8240 2015-07-03 15:35:53Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -11357,4 +11358,3 @@ white_space(0xA) :-
 	cnt(line_number).
 white_space(0xD).
 white_space(0x20).
-
