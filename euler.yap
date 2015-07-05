@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8240 2015-07-03 15:35:53Z josd $').
+version_info('$Id: euler.yap 8243 2015-07-05 19:07:29Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -363,11 +363,11 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ---------------------
-% mila (mixed language)
-% ---------------------
+% ------------------------------
+% mila (mixed language approach)
+% ------------------------------
 %
-% a language in notation 3 to support mixed computation with triples, builtins and lemmas
+% an approach to support mixed computation with triples, builtins and lemmas
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 %
