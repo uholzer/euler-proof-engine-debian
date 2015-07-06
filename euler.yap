@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8243 2015-07-05 19:07:29Z josd $').
+version_info('$Id: euler.yap 8245 2015-07-06 14:12:40Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -363,11 +363,11 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% ------------------------------
-% mila (mixed language approach)
-% ------------------------------
+% -----------------------------
+% mila (mixed language) support
+% -----------------------------
 %
-% an approach to support mixed computation with triples, builtins and lemmas
+% a language to support mixed computation with triples, builtins and lemmas
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 %
@@ -429,13 +429,17 @@ mila(Argus) :-
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#mu>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#pi>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/fl-rules#sigma>\'/2).~n', []),
+		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#reflexive>\'/2).~n', []),
+		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>\'/2).~n', []),
 		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\'/2).~n', []),
+		format(':- multifile(\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2000/10/swap/log#implies>\'/2).~n', []),
+		format(':- multifile(\'<http://www.w3.org/2000/10/swap/log#outputString>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
 	;	true
 	),
