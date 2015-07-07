@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8245 2015-07-06 14:12:40Z josd $').
+version_info('$Id: euler.yap 8252 2015-07-07 07:32:51Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -247,10 +247,10 @@ main :-
 		)
 	;	true
 	),
-	catch(mila(Argus), Exc,
+	catch(mix(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** mila ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** mix ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -363,11 +363,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -----------------------------
-% mila (mixed language) support
-% -----------------------------
-%
-% a language to support mixed computation with triples, builtins and lemmas
+% -----------------------
+% mix (mixed computation)
+% -----------------------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 %
@@ -377,7 +375,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 %	destined to complete in sequel the processing of the remaining information.
 
 
-mila(Argus) :-
+mix(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
