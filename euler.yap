@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8254 2015-07-07 12:56:43Z josd $').
+version_info('$Id: euler.yap 8256 2015-07-07 22:08:28Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -247,10 +247,10 @@ main :-
 		)
 	;	true
 	),
-	catch(mila(Argus), Exc,
+	catch(twinkle(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** mila ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** twinkle ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -363,20 +363,14 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -----------------------------
-% mila (mixed language) support
-% -----------------------------
+% -------
+% twinkle
+% -------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
-%
-% inspired by http://ershov-arc.iis.nsk.su/archive/eaindex.asp?lang=2&did=2492
-%
-%	Mixed computation is processing of an incomplete information. Its product
-%	are a partially processed information and a so-called residual program
-%	destined to complete in sequel the processing of the remaining information.
 
 
-mila(Argus) :-
+twinkle(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
