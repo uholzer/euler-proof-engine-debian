@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8256 2015-07-07 22:08:28Z josd $').
+version_info('$Id: euler.yap 8261 2015-07-09 23:16:54Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -363,9 +363,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -------
-% twinkle
-% -------
+% -------------------------------
+% twinkle (partial understanding)
+% -------------------------------
 %
 % according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
 
@@ -7665,6 +7665,7 @@ conjoin(N, [true|Y], I, J) :-
 	!,
 	conjoin(N, Y, I, J).
 conjoin(N, [X|Y], I, K) :-
+	\+atom(X),
 	copy_term_nat(X, Z),
 	labelvars(Z, I, J, some),
 	agraph(N, Z),
