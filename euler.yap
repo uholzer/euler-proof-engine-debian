@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8261 2015-07-09 23:16:54Z josd $').
+version_info('$Id: euler.yap 8263 2015-07-10 10:17:50Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -7661,15 +7661,20 @@ couple([A|B], [C|D], [E|F], [[A, C, E]|G]) :-
 
 conjoin(_, [], _, _) :-
 	!.
-conjoin(N, [true|Y], I, J) :-
-	!,
-	conjoin(N, Y, I, J).
 conjoin(N, [X|Y], I, K) :-
-	\+atom(X),
-	copy_term_nat(X, Z),
-	labelvars(Z, I, J, some),
-	agraph(N, Z),
-	conjoin(N, Y, J, K).
+	when(
+		(	nonvar(X)
+		),
+		(	(	X = true
+			->	J = I
+			;	\+atom(X),
+				copy_term_nat(X, Z),
+				labelvars(Z, I, J, some),
+				agraph(N, Z)
+			),
+			conjoin(N, Y, J, K)
+		)
+	).
 
 
 agraph(N, cn([X|Y])) :-
