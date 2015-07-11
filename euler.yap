@@ -152,7 +152,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8265 2015-07-10 12:29:46Z josd $').
+version_info('$Id: euler.yap 8267 2015-07-11 19:57:38Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -247,10 +247,10 @@ main :-
 		)
 	;	true
 	),
-	catch(twinkle(Argus), Exc,
+	catch(strela(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** twinkle ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** strela ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -363,14 +363,12 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 
 
 
-% -------------------------------
-% twinkle (partial understanding)
-% -------------------------------
-%
-% according to http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues
+% ----------------------
+% strela (stretch relax)
+% ----------------------
 
 
-twinkle(Argus) :-
+strela(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -1195,12 +1193,6 @@ args([Arg|Args]) :-
 	args(Args).
 
 
-
-% ------------------
-% N3 to N3P compiler
-% ------------------
-
-
 n3_n3p(Argument, Mode) :-
 	absolute_uri(Argument, Arg),
 	(	flag('tmp-file', Tmp)	% DEPRECATED
@@ -1629,6 +1621,129 @@ tr_split([A|B], [A|C], D) :-
 	tr_split(B, C, D).
 
 
+strela(answer(cn(A)), cn(B)) :-
+	!,
+	strela(A, B).
+strela(answer(A), answer(P1, S2, S3, P2, O2, P3, O3, alpha)) :-
+	A =.. [P1, S1, O1],
+	\+is_list(S1),
+	S1 =.. [P2, S2, O2],
+	\+is_list(O1),
+	O1 =.. [P3, S3, O3],
+	!.
+strela(answer(A), answer(P1, S1, S2, P2, O2, beta, beta, beta)) :-
+	A =.. [P1, S1, O1],
+	\+is_list(O1),
+	O1 =.. [P2, S2, O2],
+	!.
+strela(answer(A), answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma)) :-
+	A =.. [P1, S1, O1],
+	!.
+strela(answer(A), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
+	A =.. [P, P1, S1, O1],
+	\+is_list(O1),
+	O1 =.. [P2, S2, O2],
+	!.
+strela(answer(A), answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon)) :-
+	A =.. [P, P1, S1, O1],
+	!.
+strela(answer(A), answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)) :-
+	!.
+strela([A|B], [C|D]) :-
+	!,
+	strela(answer(A), C),
+	strela(B, D).
+strela(A, A).
+
+
+strelan(answer(cn(A), zeta, zeta, zeta, zeta, zeta, zeta, zeta), cn(B)) :-
+	!,
+	strelan(A, B).
+strelan([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
+	!,
+	strelan(B, C).
+strelan(A, A).
+
+
+strelar(cn(A), cn(B)) :-
+	!,
+	strelar(A, B).
+strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2, P2, O2, exopred, delta, delta)) :-
+	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
+	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
+	nonvar(O1),
+	O1 =.. [P2, S2, O2],
+	!.
+strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
+	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
+	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
+	nonvar(O1),
+	O1 =.. [P2, S2, O2],
+	!.
+strelar([A|B], [C|D]) :-
+	!,
+	strelar(A, C),
+	strelar(B, D).
+strelar(A, A).
+
+
+strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
+	atomic(A1),
+	!,
+	(	\+pred(A1)
+	->	assertz(pred(A1))
+	;	true
+	),
+	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
+	assertz(B).
+strelas(A) :-
+	ground(A),
+	A =.. [P, [S1, S2|S3], O],
+	!,
+	(	current_predicate(P/4)
+	->	true
+	;	dynamic(P/4),
+		X =.. [P, [U1, U2|U3], V],
+		assertz(':-'(X,
+				(	Y =.. [P, U1, U2, U3, V],
+					call(Y)
+				)
+			)
+		)
+	),
+	B =.. [P, S1, S2, S3, O],
+	assertz(B).
+strelas(A) :-
+	ground(A),
+	A =.. [P, S, literal(O1, O2)],
+	!,
+	(	current_predicate(P/3)
+	->	true
+	;	dynamic(P/3),
+		X =.. [P, U, literal(V1, V2)],
+		assertz(':-'(X,
+				(	Y =.. [P, U, V1, V2],
+					call(Y)
+				)
+			)
+		)
+	),
+	B =.. [P, S, O1, O2],
+	assertz(B).
+strelas(A) :-
+	assertz(A).
+
+
+answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
+	pred(A1),
+	(	current_predicate(A1/7)
+	->	true
+	;	dynamic(A1/7)
+	),
+	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
+	call(B).
+
+
 
 % ----------------------------
 % EAM (Euler Abstract Machine)
@@ -1929,135 +2044,6 @@ pstep(Rule) :-
 	cnt(RTC),
 	lookup(RTP, tp, RuleL),
 	cnt(RTP).
-
-
-
-% ----------------------
-% strela (stretch relax)
-% ----------------------
-
-
-strela(answer(cn(A)), cn(B)) :-
-	!,
-	strela(A, B).
-strela(answer(A), answer(P1, S2, S3, P2, O2, P3, O3, alpha)) :-
-	A =.. [P1, S1, O1],
-	\+is_list(S1),
-	S1 =.. [P2, S2, O2],
-	\+is_list(O1),
-	O1 =.. [P3, S3, O3],
-	!.
-strela(answer(A), answer(P1, S1, S2, P2, O2, beta, beta, beta)) :-
-	A =.. [P1, S1, O1],
-	\+is_list(O1),
-	O1 =.. [P2, S2, O2],
-	!.
-strela(answer(A), answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma)) :-
-	A =.. [P1, S1, O1],
-	!.
-strela(answer(A), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
-	A =.. [P, P1, S1, O1],
-	\+is_list(O1),
-	O1 =.. [P2, S2, O2],
-	!.
-strela(answer(A), answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon)) :-
-	A =.. [P, P1, S1, O1],
-	!.
-strela(answer(A), answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)) :-
-	!.
-strela([A|B], [C|D]) :-
-	!,
-	strela(answer(A), C),
-	strela(B, D).
-strela(A, A).
-
-
-strelan(answer(cn(A), zeta, zeta, zeta, zeta, zeta, zeta, zeta), cn(B)) :-
-	!,
-	strelan(A, B).
-strelan([A|B], [answer(A, zeta, zeta, zeta, zeta, zeta, zeta, zeta)|C]) :-
-	!,
-	strelan(B, C).
-strelan(A, A).
-
-
-strelar(cn(A), cn(B)) :-
-	!,
-	strelar(A, B).
-strelar(answer(P1, S1, O1, gamma, gamma, gamma, gamma, gamma), answer(P1, S1, S2, P2, O2, exopred, delta, delta)) :-
-	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
-	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
-	nonvar(O1),
-	O1 =.. [P2, S2, O2],
-	!.
-strelar(answer(P1, S1, O1, P, epsilon, epsilon, epsilon, epsilon), answer(P1, S1, S2, P2, O2, P, delta, delta)) :-
-	P1 \= '<http://www.w3.org/2000/10/swap/log#implies>',
-	P1 \= '<http://www.w3.org/2000/10/swap/log#outputString>',
-	nonvar(O1),
-	O1 =.. [P2, S2, O2],
-	!.
-strelar([A|B], [C|D]) :-
-	!,
-	strelar(A, C),
-	strelar(B, D).
-strelar(A, A).
-
-
-strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
-	atomic(A1),
-	!,
-	(	\+pred(A1)
-	->	assertz(pred(A1))
-	;	true
-	),
-	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
-	assertz(B).
-strelas(A) :-
-	ground(A),
-	A =.. [P, [S1, S2|S3], O],
-	!,
-	(	current_predicate(P/4)
-	->	true
-	;	dynamic(P/4),
-		X =.. [P, [U1, U2|U3], V],
-		assertz(':-'(X,
-				(	Y =.. [P, U1, U2, U3, V],
-					call(Y)
-				)
-			)
-		)
-	),
-	B =.. [P, S1, S2, S3, O],
-	assertz(B).
-strelas(A) :-
-	ground(A),
-	A =.. [P, S, literal(O1, O2)],
-	!,
-	(	current_predicate(P/3)
-	->	true
-	;	dynamic(P/3),
-		X =.. [P, U, literal(V1, V2)],
-		assertz(':-'(X,
-				(	Y =.. [P, U, V1, V2],
-					call(Y)
-				)
-			)
-		)
-	),
-	B =.. [P, S, O1, O2],
-	assertz(B).
-strelas(A) :-
-	assertz(A).
-
-
-answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
-	pred(A1),
-	(	current_predicate(A1/7)
-	->	true
-	;	dynamic(A1/7)
-	),
-	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
-	call(B).
 
 
 
