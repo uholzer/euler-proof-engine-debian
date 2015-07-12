@@ -1,8 +1,7 @@
 % -----------------------------------------------------------------------------
 % Euler Yet another proof Engine - EYE looking through N3 glasses -- Jos De Roo
 % -----------------------------------------------------------------------------
-%
-%
+
 % EYE [1] is a reasoning engine supporting the RGB Semantic Web layers [2].
 % It is a semibackward reasoner enhanced with Euler path [3] detection.
 % Via N3 [4] it is interoperable with Cwm [5].
@@ -152,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8270 2015-07-12 19:17:32Z josd $').
+version_info('$Id: euler.yap 8272 2015-07-12 21:27:35Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2672,6 +2671,16 @@ indentation(C) :-
 	nb_setval(indentation, B).
 
 
+answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
+	pred(A1),
+	(	current_predicate(A1/7)
+	->	true
+	;	dynamic(A1/7)
+	),
+	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
+	call(B).
+
+
 strela(answer(cn(A)), cn(B)) :-
 	!,
 	strela(A, B).
@@ -2785,21 +2794,11 @@ strelas(A) :-
 	assertz(A).
 
 
-answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
-	pred(A1),
-	(	current_predicate(A1/7)
-	->	true
-	;	dynamic(A1/7)
-	),
-	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
-	call(B).
-
-
 
 % ----------------------------
 % EAM (Euler Abstract Machine)
 % ----------------------------
-%
+
 % In a nutshell:
 %
 %  1/ Select rule P => C
@@ -5107,7 +5106,7 @@ end(End, Env) :-
 % ------------
 % RIF builtins
 % ------------
-%
+
 % according to RIF Datatypes and Built-Ins 1.0 -- http://www.w3.org/TR/rif-dtb/
 
 
@@ -9661,9 +9660,8 @@ regexp_wildcard([A|B], [A|C]) :-
 % ---------
 % N3 Parser
 % ---------
-%
+
 % according to http://www.w3.org/2000/10/swap/grammar/n3-ietf.txt
-%
 % inspired by http://code.google.com/p/km-rdf/wiki/Henry
 
 
