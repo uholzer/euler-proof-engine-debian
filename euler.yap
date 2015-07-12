@@ -29,7 +29,7 @@
 
 
 % ----------
-% Directives
+% directives
 % ----------
 
 
@@ -148,11 +148,11 @@
 
 
 % -----
-% Infos
+% infos
 % -----
 
 
-version_info('$Id: euler.yap 8267 2015-07-11 19:57:38Z josd $').
+version_info('$Id: euler.yap 8270 2015-07-12 19:17:32Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1621,6 +1621,1057 @@ tr_split([A|B], [A|C], D) :-
 	tr_split(B, C, D).
 
 
+wa([]) :-
+	!.
+wa(['--wget-path', _|A]) :-
+	!,
+	wa(A).
+wa([A|B]) :-
+	format(' ~w', [A]),
+	wa(B).
+
+
+wh :-
+	(	flag('no-qnames')
+	->	true
+	;	nb_setval(wpfx, false),
+		forall(
+			(	pfx(A, B),
+				\+wpfx(A)
+			),
+			(	(	\+flag(traditional)
+				->	format('PREFIX ~w ~w~n', [A, B])
+				;	format('@prefix ~w ~w.~n', [A, B])
+				),
+				assertz(wpfx(A)),
+				nb_setval(wpfx, true)
+			)
+		),
+		(	nb_getval(wpfx, true)
+		->	nl
+		;	true
+		)
+	).
+
+
+w3(U) :-
+	wh,
+	nb_setval(fdepth, 0),
+	nb_setval(pdepth, 0),
+	nb_setval(cdepth, 0),
+	flag(nope),
+	!,
+	(	query(Q, A),
+		catch(call(Q), _, fail),
+		ground(A),
+		relabel(A, B),
+		indent,
+		wt(B),
+		ws(B),
+		write('.'),
+		nl,
+		cnt(output_statements),
+		fail
+	;	true
+	),
+	(	answer(B1, B2, B3, B4, B5, B6, B7, B8),
+		(	B4 = exopred,
+			answer(B1, B2, B3, gamma, gamma, gamma, gamma, gamma)
+		->	fail
+		;	true
+		),
+		(	\+flag('no-branch'),	% DEPRECATED
+			\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
+		->	assertz(got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U))
+		;	true
+		),
+		relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
+		strela(answer(C), answer(C1, C2, C3, C4, C5, C6, C7, C8)),
+		indent,
+		wt(C),
+		ws(C),
+		write('.'),
+		nl,
+		cnt(output_statements),
+		fail
+	;	(	U = branch
+		->	true
+		;	nl
+		)
+	).
+w3(U) :-
+	(	prfstep(answer(Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8), _, _, _, _, _, _, _),
+		\+got_answer(Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, _),
+		!,
+		indent,
+		write('[ '),
+		wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+		write(' '),
+		wp('<http://www.w3.org/2000/10/swap/reason#Proof>'),
+		write(', '),
+		wp('<http://www.w3.org/2000/10/swap/reason#Conjunction>'),
+		write(';'),
+		indentation(2),
+		nl,
+		indent,
+		(	prfstep(answer(B1, B2, B3, B4, B5, B6, B7, B8), _, B, Pnd, Cn, R, _, A),
+			(	B4 = exopred,
+				prfstep(answer(B1, B2, B3, gamma, gamma, gamma, gamma, gamma),_, _, _, _, _, _, _)
+			->	fail
+			;	true
+			),
+			R =.. [P, S, O1],
+			strela(answer(O), O1),
+			Rule =.. [P, S, O],
+			(	flag(think)	% DEPRECATED
+			->	true
+			;	\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
+			),
+			assertz(got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U)),
+			relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
+			strela(answer(C), Cn),
+			\+got_wi(A, B, Pnd, C, Rule),
+			assertz(got_wi(A, B, Pnd, C, Rule)),
+			wp('<http://www.w3.org/2000/10/swap/reason#component>'),
+			write(' '),
+			wi(A, B, C, Rule),
+			write(';'),
+			nl,
+			indent,
+			fail
+		;	retractall(got_wi(_, _, _, _, _))
+		),
+		wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+		write(' {'),
+		indentation(2),
+		(	got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U),
+			relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
+			strela(answer(C), answer(C1, C2, C3, C4, C5, C6, C7, C8)),
+			nl,
+			indent,
+			getvars(C, D),
+			(	C = '<http://www.w3.org/2000/10/swap/log#implies>'(_, _)
+			->	Q = allv
+			;	Q = some
+			),
+			(	\+flag(traditional)
+			->	true
+			;	wq(D, Q)
+			),
+			wt(C),
+			ws(C),
+			write('.'),
+			cnt(output_statements),
+			fail
+		;	true
+		),
+		indentation(-2),
+		nl,
+		indent,
+		write('}].'),
+		indentation(-2),
+		nl,
+		nl
+	;	true
+	),
+	(	nb_getval(lemma_count, Lco),
+		nb_getval(lemma_cursor, Lcu),
+		Lcu < Lco
+	->	repeat,
+		cnt(lemma_cursor),
+		nb_getval(lemma_cursor, Cursor),
+		lemma(Cursor, Ai, Bi, _, Ci, Di),
+		indent,
+		wj(Cursor, Ai, Bi, Ci, Di),
+		nl,
+		nl,
+		nb_getval(lemma_count, Cnt),
+		Cursor = Cnt,
+		!
+	;	true
+	).
+
+
+wi('<>', _, rule(_, _, A), _) :-
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+	write(' '),
+	wg(A),
+	write(']').
+wi(A, B, C, Rule) :-
+	term_index(B, Pnd),
+	(	lemma(Cnt, A, B, Pnd, C, Rule)
+	->	true
+	;	cnt(lemma_count),
+		nb_getval(lemma_count, Cnt),
+		assertz(lemma(Cnt, A, B, Pnd, C, Rule))
+	),
+	write('<#lemma'),
+	write(Cnt),
+	write('>').
+
+
+wj(Cnt, A, true, C, _) :-
+	C \= '<http://www.w3.org/2000/10/swap/log#implies>'(_, _),
+	!,
+	write('<#lemma'),
+	write(Cnt),
+	write('> '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Extraction>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+	write(' {'),
+	(	C = rule(PVars, EVars, Rule)
+	->	(	\+flag(traditional)
+		->	true
+		;	wq(PVars, allv),
+			wq(EVars, some)
+		),
+		wt(Rule)
+	;	labelvars([A, C], 0, _, avar),
+		getvars(C, D),
+		(	\+flag(traditional)
+		->	true
+		;	wq(D, some)
+		),
+		wt(C)
+	),
+	write('};'),
+	nl,
+	indentation(2),
+	indent,
+	wp('<http://www.w3.org/2000/10/swap/reason#because>'),
+	write(' [ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Parsing>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#source>'),
+	write(' '),
+	wt(A),
+	write('].'),
+	indentation(-2).
+wj(Cnt, A, B, C, Rule) :-
+	write('<#lemma'),
+	write(Cnt),
+	write('> '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Inference>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+	write(' {'),
+	Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc),
+	unifiable(Prem, B, Bs),
+	(	unifiable(Conc, C, Cs)
+	->	true
+	;	(	Conc = dn(G),
+			member(H, G),
+			unifiable(H, C, Cs)
+		->	true
+		;	Cs = []
+		)
+	),
+	append(Bs, Cs, Ds),
+	sort(Ds, Bindings),
+	term_variables(Prem, PVars),
+	term_variables(Conc, CVars),
+	nb_getval(wn, W),
+	labelvars([A, B, C], W, N, some),
+	nb_setval(wn, N),
+	labelvars([Rule, PVars, CVars], 0, _, avar),
+	findall(V,
+		(	member(V, CVars),
+			\+member(V, PVars)
+		),
+		EVars
+	),
+	getvars(C, D),
+	(	C = '<http://www.w3.org/2000/10/swap/log#implies>'(_, _)
+	->	Q = allv
+	;	Q = some
+	),
+	indentation(2),
+	(	\+flag(traditional)
+	->	true
+	;	wq(D, Q)
+	),
+	wt(C),
+	indentation(-2),
+	write('}; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#evidence>'),
+	write(' ('),
+	indentation(2),
+	wr(B),
+	write(');'),
+	retractall(got_wi(_, _, _, _, _)),
+	nl,
+	indent,
+	(	\+flag(traditional)
+	->	true
+	;	wb(Bindings)
+	),
+	wp('<http://www.w3.org/2000/10/swap/reason#rule>'),
+	write(' '),
+	wi(A, true, rule(PVars, EVars, Rule), _),
+	write('.'),
+	indentation(-2).
+
+
+wr(exopred(P, S, O)) :-
+	!,
+	U =.. [P, S, O],
+	wr(U).
+wr(cn([X])) :-
+	!,
+	wr(X).
+wr(cn([X|Y])) :-
+	!,
+	wr(X),
+	(	Y = [Z]
+	->	true
+	;	Z = cn(Y)
+	),
+	wr(Z).
+wr(Z) :-
+	term_index(Z, Cnd),
+	prfstep(Z, Cnd, Y, Pnd, Q, Rule, _, X),
+	!,
+	(	\+got_wi(X, Y, Pnd, Q, Rule)
+	->	assertz(got_wi(X, Y, Pnd, Q, Rule)),
+		nl,
+		indent,
+		wi(X, Y, Q, Rule)
+	;	true
+	).
+wr(Y) :-
+	nl,
+	indent,
+	write('[ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
+	write(' '),
+	(	Y = true
+	->	wt(Y)
+	;	write('{'),
+		labelvars(Y, 0, _, avar),
+		getvars(Y, Z),
+		(	\+flag(traditional)
+		->	true
+		;	wq(Z, some)
+		),
+		wt(Y),
+		write('}')
+	),
+	write(']').
+
+
+wt(rdiv(X, Y)) :-
+	number_codes(Y, [0'1|Z]),
+	lzero(Z, Z),
+	!,
+	(	Z = []
+	->	F = '~d.0'
+	;	length(Z, N),
+		number_codes(X, U),
+		(	length(U, N)
+		->	F = '0.~d'
+		;	atomic_list_concat(['~', N, 'd'], F)
+		)
+	),
+	(	flag('no-numerals')
+	->	write('"')
+	;	true
+	),
+	format(F, [X]),
+	(	flag('no-numerals')
+	->	write('"^^'),
+		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
+	;	true
+	).
+wt(rdiv(X, Y)) :-
+	!,
+	(	flag('no-numerals')
+	->	write('"')
+	;	true
+	),
+	format('~g', [rdiv(X, Y)]),
+	(	flag('no-numerals')
+	->	write('"^^'),
+		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
+	;	true
+	).
+wt(X) :-
+	number(X),
+	!,
+	(	flag('no-numerals')
+	->	dtlit([U, V], X),
+		dtlit([U, V], W),
+		wt(W)
+	;	write(X)
+	).
+wt(cn([X])) :-
+	!,
+	wt(X).
+wt(cn([X|Y])) :-
+	!,
+	wt(X),
+	ws(X),
+	write('.'),
+	nl,
+	indent,
+	(	Y = [Z]
+	->	true
+	;	Z = cn(Y)
+	),
+	wt(Z).
+% DEPRECATED
+wt(dn(X)) :-
+	!,
+	wt(X),
+	write('!'),
+	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#disjunction>').
+wt(set(X)) :-
+	!,
+	write('($'),
+	wl(X),
+	write(' $)').
+wt([]) :-
+	!,
+	write('()').
+wt([X|Y]) :-
+	!,
+	(	\+last_tail([X|Y], [])
+	->	write('[ '),
+		wt('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'),
+		write(' '),
+		wg(X),
+		write('; '),
+		wt('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'),
+		write(' '),
+		wt(Y),
+		write(']')
+	;	write('('),
+		wg(X),
+		wl(Y),
+		write(')')
+	).
+wt(X) :-
+	functor(X, _, A),
+	(	A = 0,
+		!,
+		wt0(X)
+	;	A = 1,
+		!,
+		wt1(X)
+	;	A = 2,
+		!,
+		wt2(X)
+	;	wtn(X)
+	).
+
+
+wt0(!) :-
+	!,
+	write('() '),
+	wp(!),
+	write(' true').
+wt0(X) :-
+	atom(X),
+	atom_concat(some, Y, X),
+	!,
+	(	\+flag('no-qvars'),
+		\+flag('no-blank')	% DEPRECATED
+	->	(	rule_uvar(L),
+			(	nb_getval(pdepth, 0),
+				nb_getval(cdepth, CD),
+				CD > 0
+			->	memberchk(Y, L)
+			;	(	memberchk(Y, L)
+				->	true
+				;	retract(rule_uvar(L)),
+					assertz(rule_uvar([Y|L]))
+				)
+			)
+		->	write('?U')
+		;	write('_:sk')
+		),
+		write(Y)
+	;	nb_getval(var_ns, Vns),
+		atomic_list_concat(['<', Vns, 'sk', Y, '>'], Z),
+		wt(Z)
+	).
+wt0(X) :-
+	atom(X),
+	atom_concat(allv, Y, X),
+	!,
+	(	\+flag('no-qvars')
+	->	(	rule_uvar(L),
+			(	nb_getval(pdepth, 0),
+				nb_getval(cdepth, CD),
+				CD > 0
+			->	memberchk(Y, L)
+			;	(	memberchk(Y, L)
+				->	true
+				;	retract(rule_uvar(L)),
+					assertz(rule_uvar([Y|L]))
+				)
+			)
+		->	write('?U')
+		;	write('_:sk')
+		),
+		write(Y)
+	;	nb_getval(var_ns, Vns),
+		atomic_list_concat(['<', Vns, 'U', Y, '>'], Z),
+		wt(Z)
+	).
+wt0(X) :-
+	atom(X),
+	atom_concat(avar, Y, X),
+	!,
+	nb_getval(var_ns, Vns),
+	atomic_list_concat(['<', Vns, 'x', Y, '>'], Z),
+	wt(Z).
+wt0(X) :-
+	(	\+flag(traditional)
+	->	true
+	;	flag(nope)
+	),
+	nb_getval(var_ns, Vns),
+	sub_atom(X, 1, I, _, Vns),
+	J is I+1,
+	sub_atom(X, J, _, 1, Y),
+	(	\+sub_atom(Y, 0, 2, _, 'qe'),
+		rule_uvar(L),
+		(	nb_getval(pdepth, PD),
+			nb_getval(cdepth, CD),
+			(	PD = 0,
+				CD > 0
+			;	PD > 1
+			)
+		->	memberchk(Y, L)
+		;	(	memberchk(Y, L)
+			->	true
+			;	retract(rule_uvar(L)),
+				assertz(rule_uvar([Y|L]))
+			)
+		)
+	->	write('?')
+	;	\+flag('no-qvars'),
+		\+flag('no-blank'),	% DEPRECATED
+		write('_:')
+	),
+	!,
+	write(Y).
+wt0(X) :-
+	(	wtcache(X, W)
+	->	true
+	;	(	\+flag('no-qnames'),
+			atom(X),
+			(	sub_atom(X, I, 1, J, '#')
+			->	J > 1,
+				sub_atom(X, 0, I, _, C),
+				atom_concat(C, '#>', D)
+			;	J = 1,
+				D = X
+			),
+			pfx(E, D),
+			K is J-1,
+			sub_atom(X, _, K, 1, F),
+			atom_codes(F, G),
+			atom_codes('^[A-Z_a-z][\\\\-0-9A-Z_a-z]*$', H),
+			regex(H, G, _)
+		->	atom_concat(E, F, W)
+		;	(	\+flag(strings),
+				atom(X),
+				\+ (sub_atom(X, 0, 1, _, '<'), sub_atom(X, _, 1, 0, '>')),
+				X \= true,
+				X \= false
+			->	W = literal(X, type('<http://eulersharp.sourceforge.net/2003/03swap/prolog#atom>'))
+			;	W = X
+			)
+		),
+		assertz(wtcache(X, W))
+	),
+	(	W = literal(X, type('<http://eulersharp.sourceforge.net/2003/03swap/prolog#atom>'))
+	->	wt2(W)
+	;	write(W)
+	).
+
+
+wt1(X) :-
+	X =.. [B|C],
+	wt(C),
+	write(' '),
+	wp(B),
+	write(' true').
+
+
+wt2(literal(X, lang(Y))) :-
+	!,
+	write('"'),
+	atom_codes(X, U),
+	escape_unicode(U, V),
+	atom_codes(Z, V),
+	write(Z),
+	write('"@'),
+	write(Y).
+wt2(literal(X, type('<http://www.w3.org/2001/XMLSchema#string>'))) :-
+	!,
+	write('"'),
+	atom_codes(X, U),
+	escape_unicode(U, V),
+	atom_codes(Z, V),
+	write(Z),
+	write('"').
+wt2(literal(X, type(Y))) :-
+	!,
+	write('"'),
+	atom_codes(X, U),
+	escape_unicode(U, V),
+	atom_codes(Z, V),
+	write(Z),
+	write('"^^'),
+	wt(Y).
+wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'([X|Y], Z)) :-
+	flag(nope),
+	flag(tquery),	% DEPRECATED
+	!,
+	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
+	write('{'),
+	wt(U),
+	write('. _: '),
+	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>'),
+	write(' '),
+	wt(Z),
+	write('} '),
+	wp('<http://www.w3.org/2000/10/swap/log#implies>'),
+	write(' {'),
+	wt(X),
+	write('}').
+wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'([X|Y], Z)) :-
+	flag(nope),
+	flag(tquery),	% DEPRECATED
+	!,
+	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
+	write('{'),
+	wt(U),
+	write('. _: '),
+	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>'),
+	write(' '),
+	wt(Z),
+	write('} '),
+	wp('<http://www.w3.org/2000/10/swap/log#implies>'),
+	write(' {'),
+	wt(X),
+	write('}').
+wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
+	(	flag(nope)
+	->	U = X
+	;	(	X = when(A, B)
+		->	c_append(B, istep(_, _, _, _), C),
+			U = when(A, C)
+		;	cn_conj(X, V),
+			c_append(V, istep(_, _, _, _), U)
+		)
+	),
+	(	flag('rule-histogram')
+	->	(	U = when(D, E)
+		->	c_append(E, pstep(_), F),
+			Z = when(D, F)
+		;	cn_conj(U, W),
+			c_append(W, pstep(_), Z)
+		)
+	;	Z = U
+	),
+	(	rule_uvar(R)
+	->	true
+	;	R = []
+	),
+	(	nb_getval(pdepth, 0),
+		nb_getval(cdepth, 0)
+	->	assertz(rule_uvar(R))
+	;	true
+	),
+	(	catch(clause(Y, Z), _, fail)
+	->	wg(Y),
+		write(' <= '),
+		wg(X)
+	;	(	\+atom(X)
+		->	nb_getval(pdepth, PD),
+			PD1 is PD+1,
+			nb_setval(pdepth, PD1)
+		;	true
+		),
+		wg(X),
+		(	\+atom(X)
+		->	nb_setval(pdepth, PD)
+		;	true
+		),
+		write(' => '),
+		(	\+atom(Y)
+		->	nb_getval(cdepth, CD),
+			CD1 is CD+1,
+			nb_setval(cdepth, CD1)
+		;	true
+		),
+		wg(Y),
+		(	\+atom(Y)
+		->	nb_setval(cdepth, CD)
+		;	true
+		)
+	),
+	(	nb_getval(pdepth, 0),
+		nb_getval(cdepth, 0)
+	->	retract(rule_uvar(_))
+	;	true
+	),
+	!.
+wt2(':-'(X, Y)) :-
+	(	rule_uvar(R)
+	->	true
+	;	R = []
+	),
+	assertz(rule_uvar(R)),
+	wg(X),
+	write(' <= '),
+	wg(Y),
+	retract(rule_uvar(_)),
+	!.
+wt2(is(O, T)) :-
+	!,
+	(	number(T),
+		T < 0
+	->	P = -,
+		Q is -T,
+		S = [Q]
+	;	T =.. [P|S]
+	),
+	wg(S),
+	write(' '),
+	wp(P),
+	write(' '),
+	wg(O).
+wt2(prolog:X) :-
+	!,
+	(	X = '\'C\''
+	->	Y = 'C'
+	;	(	X = '\';\''
+		->	Y = disjunction
+		;	prolog_sym(Y, X, _)
+		)
+	),
+	atomic_list_concat(['<http://eulersharp.sourceforge.net/2003/03swap/prolog#', Y, '>'], Z),
+	wt0(Z).
+wt2(X) :-
+	X =.. [P, S, O],
+	(	prolog_sym(_, P, _)
+	->	wt([S, O]),
+		write(' '),
+		wp(P),
+		write(' true')
+	;	wg(S),
+		write(' '),
+		wp(P),
+		write(' '),
+		wg(O)
+	).
+
+
+wtn(exopred(P, S, O)) :-
+	!,
+	(	atom(P)
+	->	X =.. [P, S, O],
+		wt2(X)
+	;	wg(S),
+		write(' '),
+		wt(P),
+		write(' '),
+		wg(O)
+	).
+wtn(X) :-
+	X =.. [B|C],
+	(	atom(B),
+		\+sub_atom(B, 0, 1, _, '<'),
+		\+prolog_sym(_, B, _),
+		X \= true,
+		X \= false
+	->	wt([B|C]),
+		write('^'),
+		wp('<http://eulersharp.sourceforge.net/2003/03swap/prolog#univ>')
+	;	wt(C),
+		write(' '),
+		wp(B),
+		write(' true')
+	).
+
+
+wg(X) :-
+	functor(X, F, A),
+	(	(	F = exopred,
+			!
+		;	F = cn,
+			!
+		;	prolog_sym(_, F, _),
+			F \= true,
+			F \= false,
+			F \= '-',
+			!
+		;	A >= 2,
+			F \= '.',
+			F \= '[|]',
+			F \= ':',
+			F \= literal,
+			F \= rdiv
+		)
+	->	write('{'),
+		indentation(2),
+		nb_getval(fdepth, D),
+		E is D+1,
+		nb_setval(fdepth, E),
+		wt(X),
+		nb_setval(fdepth, D),
+		indentation(-2),
+		write('}')
+	;	wt(X)
+	).
+
+
+wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>') :-
+	\+flag('no-qnames'),
+	!,
+	write('a').
+wp('<http://www.w3.org/2000/10/swap/log#implies>') :-
+	\+flag('no-qnames'),
+	!,
+	write('=>').
+wp(':-') :-
+	\+flag('no-qnames'),
+	!,
+	write('<=').
+wp(X) :-
+	(	prolog_sym(Y, X, _),
+		X \= true,
+		X \= false
+	->	atomic_list_concat(['<http://eulersharp.sourceforge.net/2003/03swap/prolog#', Y, '>'], Z),
+		wt(Z)
+	;	wg(X)
+	).
+
+
+wk([]) :-
+	!.
+wk([X|Y]) :-
+	write(', '),
+	wt(X),
+	wk(Y).
+
+
+wl([]) :-
+	!.
+wl([X|Y]) :-
+	write(' '),
+	wg(X),
+	wl(Y).
+
+
+wq([], _) :-
+	!.
+wq([X|Y], allv) :-
+	!,
+	write('@forAll '),
+	wt(X),
+	wk(Y),
+	write('. ').
+wq([X|Y], some) :-
+	(	\+flag('no-qvars'),
+		\+flag('no-blank')	% DEPRECATED
+	->	write('@forSome '),
+		wt(X),
+		wk(Y),
+		write('. ')
+	;	true
+	).
+
+
+wb([]) :-
+	!.
+wb([X = Y|Z]) :-
+	wp('<http://www.w3.org/2000/10/swap/reason#binding>'),
+	write(' [ '),
+	wp('<http://www.w3.org/2000/10/swap/reason#variable>'),
+	write(' '),
+	wv(X),
+	write('; '),
+	wp('<http://www.w3.org/2000/10/swap/reason#boundTo>'),
+	write(' '),
+	wv(Y),
+	write('];'),
+	nl,
+	indent,
+	wb(Z).
+
+
+wv(X) :-
+	atom(X),
+	atom_concat(avar, Y, X),
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/2004/06/rei#uri>'),
+	write(' "'),
+	nb_getval(var_ns, Vns),
+	write(Vns),
+	write('x'),
+	write(Y),
+	write('"]').
+wv(X) :-
+	atom(X),
+	atom_concat(some, Y, X),
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
+	write('; '),
+	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
+	write(' "_:sk'),
+	write(Y),
+	write('"]').
+wv(X) :-
+	atom(X),
+	nb_getval(var_ns, Vns),
+	sub_atom(X, 1, I, _, Vns),
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
+	write(' '),
+	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
+	write('; '),
+	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
+	write(' "'),
+	write(Vns),
+	J is I+1,
+	sub_atom(X, J, _, 1, Q),
+	write(Q),
+	write('"]').
+wv(X) :-
+	atom(X),
+	sub_atom(X, 1, _, 1, U),
+	atomic_list_concat(['<', U, '>'], X),
+	!,
+	write('[ '),
+	wp('<http://www.w3.org/2004/06/rei#uri>'),
+	write(' "'),
+	write(U),
+	write('"]').
+wv(X) :-
+	wg(X).
+
+
+ws(cn(X)) :-
+	!,
+	last(X, Y),
+	ws(Y).
+ws(X) :-
+	X =.. Y,
+	(	flag(tquery)	% DEPRECATED
+	->	true
+	;	last(Y, Z),
+		(	\+number(Z),
+			Z \= rdiv(_, _)
+		->	true
+		;	write(' ')
+		)
+	).
+
+
+wct([]) :-
+	!,
+	nl.
+wct([A]) :-
+	!,
+	wcf(A),
+	nl.
+wct([A|B]) :-
+	wcf(A),
+	write(','),
+	wct(B).
+
+
+wcf(A) :-
+	var(A),
+	!.
+wcf(rdiv(X, Y)) :-
+	number_codes(Y, [0'1|Z]),
+	lzero(Z, Z),
+	!,
+	(	Z = []
+	->	F = '~d.0'
+	;	length(Z, N),
+		number_codes(X, U),
+		(	length(U, N)
+		->	F = '0.~d'
+		;	atomic_list_concat(['~', N, 'd'], F)
+		)
+	),
+	format(F, [X]).
+wcf(literal(A, _)) :-
+	!,
+	write('"'),
+	atom_codes(A, B),
+	escape_string(C, B),
+	subst([[[0'"], [0'", 0'"]]], C, D),
+	atom_codes(E, D),
+	write(E),
+	write('"').
+wcf(A) :-
+	atom(A),
+	nb_getval(var_ns, Vns),
+	sub_atom(A, 1, I, _, Vns),
+	!,
+	J is I+1,
+	sub_atom(A, J, _, 1, B),
+	write('_:'),
+	write(B).
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 1, _, '<'),
+	!,
+	sub_atom(A, 1, _, 1, B),
+	write(B).
+wcf(A) :-
+	atom(A),
+	sub_atom(A, 0, 1, _, '_'),
+	!,
+	sub_atom(A, 1, _, 0, B),
+	write('"'),
+	write(B),
+	write('"').
+wcf(A) :-
+	write(A).
+
+
+indent:-
+	nb_getval(indentation, A),
+	tab(A).
+
+
+indentation(C) :-
+	nb_getval(indentation, A),
+	B is A+C,
+	nb_setval(indentation, B).
+
+
 strela(answer(cn(A)), cn(B)) :-
 	!,
 	strela(A, B).
@@ -2769,1063 +3820,6 @@ end(End, Env) :-
 	;	true
 	),
 	cnt(fm).
-
-
-
-% ------------
-% proof output
-% ------------
-
-
-wa([]) :-
-	!.
-wa(['--wget-path', _|A]) :-
-	!,
-	wa(A).
-wa([A|B]) :-
-	format(' ~w', [A]),
-	wa(B).
-
-
-wh :-
-	(	flag('no-qnames')
-	->	true
-	;	nb_setval(wpfx, false),
-		forall(
-			(	pfx(A, B),
-				\+wpfx(A)
-			),
-			(	(	\+flag(traditional)
-				->	format('PREFIX ~w ~w~n', [A, B])
-				;	format('@prefix ~w ~w.~n', [A, B])
-				),
-				assertz(wpfx(A)),
-				nb_setval(wpfx, true)
-			)
-		),
-		(	nb_getval(wpfx, true)
-		->	nl
-		;	true
-		)
-	).
-
-
-w3(U) :-
-	wh,
-	nb_setval(fdepth, 0),
-	nb_setval(pdepth, 0),
-	nb_setval(cdepth, 0),
-	flag(nope),
-	!,
-	(	query(Q, A),
-		catch(call(Q), _, fail),
-		ground(A),
-		relabel(A, B),
-		indent,
-		wt(B),
-		ws(B),
-		write('.'),
-		nl,
-		cnt(output_statements),
-		fail
-	;	true
-	),
-	(	answer(B1, B2, B3, B4, B5, B6, B7, B8),
-		(	B4 = exopred,
-			answer(B1, B2, B3, gamma, gamma, gamma, gamma, gamma)
-		->	fail
-		;	true
-		),
-		(	\+flag('no-branch'),	% DEPRECATED
-			\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
-		->	assertz(got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U))
-		;	true
-		),
-		relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
-		strela(answer(C), answer(C1, C2, C3, C4, C5, C6, C7, C8)),
-		indent,
-		wt(C),
-		ws(C),
-		write('.'),
-		nl,
-		cnt(output_statements),
-		fail
-	;	(	U = branch
-		->	true
-		;	nl
-		)
-	).
-w3(U) :-
-	(	prfstep(answer(Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8), _, _, _, _, _, _, _),
-		\+got_answer(Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, _),
-		!,
-		indent,
-		write('[ '),
-		wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-		write(' '),
-		wp('<http://www.w3.org/2000/10/swap/reason#Proof>'),
-		write(', '),
-		wp('<http://www.w3.org/2000/10/swap/reason#Conjunction>'),
-		write(';'),
-		indentation(2),
-		nl,
-		indent,
-		(	prfstep(answer(B1, B2, B3, B4, B5, B6, B7, B8), _, B, Pnd, Cn, R, _, A),
-			(	B4 = exopred,
-				prfstep(answer(B1, B2, B3, gamma, gamma, gamma, gamma, gamma),_, _, _, _, _, _, _)
-			->	fail
-			;	true
-			),
-			R =.. [P, S, O1],
-			strela(answer(O), O1),
-			Rule =.. [P, S, O],
-			(	flag(think)	% DEPRECATED
-			->	true
-			;	\+got_answer(B1, B2, B3, B4, B5, B6, B7, B8, _)
-			),
-			assertz(got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U)),
-			relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
-			strela(answer(C), Cn),
-			\+got_wi(A, B, Pnd, C, Rule),
-			assertz(got_wi(A, B, Pnd, C, Rule)),
-			wp('<http://www.w3.org/2000/10/swap/reason#component>'),
-			write(' '),
-			wi(A, B, C, Rule),
-			write(';'),
-			nl,
-			indent,
-			fail
-		;	retractall(got_wi(_, _, _, _, _))
-		),
-		wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-		write(' {'),
-		indentation(2),
-		(	got_answer(B1, B2, B3, B4, B5, B6, B7, B8, U),
-			relabel([B1, B2, B3, B4, B5, B6, B7, B8], [C1, C2, C3, C4, C5, C6, C7, C8]),
-			strela(answer(C), answer(C1, C2, C3, C4, C5, C6, C7, C8)),
-			nl,
-			indent,
-			getvars(C, D),
-			(	C = '<http://www.w3.org/2000/10/swap/log#implies>'(_, _)
-			->	Q = allv
-			;	Q = some
-			),
-			(	\+flag(traditional)
-			->	true
-			;	wq(D, Q)
-			),
-			wt(C),
-			ws(C),
-			write('.'),
-			cnt(output_statements),
-			fail
-		;	true
-		),
-		indentation(-2),
-		nl,
-		indent,
-		write('}].'),
-		indentation(-2),
-		nl,
-		nl
-	;	true
-	),
-	(	nb_getval(lemma_count, Lco),
-		nb_getval(lemma_cursor, Lcu),
-		Lcu < Lco
-	->	repeat,
-		cnt(lemma_cursor),
-		nb_getval(lemma_cursor, Cursor),
-		lemma(Cursor, Ai, Bi, _, Ci, Di),
-		indent,
-		wj(Cursor, Ai, Bi, Ci, Di),
-		nl,
-		nl,
-		nb_getval(lemma_count, Cnt),
-		Cursor = Cnt,
-		!
-	;	true
-	).
-
-
-wi('<>', _, rule(_, _, A), _) :-
-	!,
-	write('[ '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-	write(' '),
-	wg(A),
-	write(']').
-wi(A, B, C, Rule) :-
-	term_index(B, Pnd),
-	(	lemma(Cnt, A, B, Pnd, C, Rule)
-	->	true
-	;	cnt(lemma_count),
-		nb_getval(lemma_count, Cnt),
-		assertz(lemma(Cnt, A, B, Pnd, C, Rule))
-	),
-	write('<#lemma'),
-	write(Cnt),
-	write('>').
-
-
-wj(Cnt, A, true, C, _) :-
-	C \= '<http://www.w3.org/2000/10/swap/log#implies>'(_, _),
-	!,
-	write('<#lemma'),
-	write(Cnt),
-	write('> '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Extraction>'),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-	write(' {'),
-	(	C = rule(PVars, EVars, Rule)
-	->	(	\+flag(traditional)
-		->	true
-		;	wq(PVars, allv),
-			wq(EVars, some)
-		),
-		wt(Rule)
-	;	labelvars([A, C], 0, _, avar),
-		getvars(C, D),
-		(	\+flag(traditional)
-		->	true
-		;	wq(D, some)
-		),
-		wt(C)
-	),
-	write('};'),
-	nl,
-	indentation(2),
-	indent,
-	wp('<http://www.w3.org/2000/10/swap/reason#because>'),
-	write(' [ '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Parsing>'),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#source>'),
-	write(' '),
-	wt(A),
-	write('].'),
-	indentation(-2).
-wj(Cnt, A, B, C, Rule) :-
-	write('<#lemma'),
-	write(Cnt),
-	write('> '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Inference>'),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-	write(' {'),
-	Rule = '<http://www.w3.org/2000/10/swap/log#implies>'(Prem, Conc),
-	unifiable(Prem, B, Bs),
-	(	unifiable(Conc, C, Cs)
-	->	true
-	;	(	Conc = dn(G),
-			member(H, G),
-			unifiable(H, C, Cs)
-		->	true
-		;	Cs = []
-		)
-	),
-	append(Bs, Cs, Ds),
-	sort(Ds, Bindings),
-	term_variables(Prem, PVars),
-	term_variables(Conc, CVars),
-	nb_getval(wn, W),
-	labelvars([A, B, C], W, N, some),
-	nb_setval(wn, N),
-	labelvars([Rule, PVars, CVars], 0, _, avar),
-	findall(V,
-		(	member(V, CVars),
-			\+member(V, PVars)
-		),
-		EVars
-	),
-	getvars(C, D),
-	(	C = '<http://www.w3.org/2000/10/swap/log#implies>'(_, _)
-	->	Q = allv
-	;	Q = some
-	),
-	indentation(2),
-	(	\+flag(traditional)
-	->	true
-	;	wq(D, Q)
-	),
-	wt(C),
-	indentation(-2),
-	write('}; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#evidence>'),
-	write(' ('),
-	indentation(2),
-	wr(B),
-	write(');'),
-	retractall(got_wi(_, _, _, _, _)),
-	nl,
-	indent,
-	(	\+flag(traditional)
-	->	true
-	;	wb(Bindings)
-	),
-	wp('<http://www.w3.org/2000/10/swap/reason#rule>'),
-	write(' '),
-	wi(A, true, rule(PVars, EVars, Rule), _),
-	write('.'),
-	indentation(-2).
-
-
-wr(exopred(P, S, O)) :-
-	!,
-	U =.. [P, S, O],
-	wr(U).
-wr(cn([X])) :-
-	!,
-	wr(X).
-wr(cn([X|Y])) :-
-	!,
-	wr(X),
-	(	Y = [Z]
-	->	true
-	;	Z = cn(Y)
-	),
-	wr(Z).
-wr(Z) :-
-	term_index(Z, Cnd),
-	prfstep(Z, Cnd, Y, Pnd, Q, Rule, _, X),
-	!,
-	(	\+got_wi(X, Y, Pnd, Q, Rule)
-	->	assertz(got_wi(X, Y, Pnd, Q, Rule)),
-		nl,
-		indent,
-		wi(X, Y, Q, Rule)
-	;	true
-	).
-wr(Y) :-
-	nl,
-	indent,
-	write('[ '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Fact>'),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#gives>'),
-	write(' '),
-	(	Y = true
-	->	wt(Y)
-	;	write('{'),
-		labelvars(Y, 0, _, avar),
-		getvars(Y, Z),
-		(	\+flag(traditional)
-		->	true
-		;	wq(Z, some)
-		),
-		wt(Y),
-		write('}')
-	),
-	write(']').
-
-
-wt(rdiv(X, Y)) :-
-	number_codes(Y, [0'1|Z]),
-	lzero(Z, Z),
-	!,
-	(	Z = []
-	->	F = '~d.0'
-	;	length(Z, N),
-		number_codes(X, U),
-		(	length(U, N)
-		->	F = '0.~d'
-		;	atomic_list_concat(['~', N, 'd'], F)
-		)
-	),
-	(	flag('no-numerals')
-	->	write('"')
-	;	true
-	),
-	format(F, [X]),
-	(	flag('no-numerals')
-	->	write('"^^'),
-		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
-	;	true
-	).
-wt(rdiv(X, Y)) :-
-	!,
-	(	flag('no-numerals')
-	->	write('"')
-	;	true
-	),
-	format('~g', [rdiv(X, Y)]),
-	(	flag('no-numerals')
-	->	write('"^^'),
-		wt('<http://www.w3.org/2001/XMLSchema#decimal>')
-	;	true
-	).
-wt(X) :-
-	number(X),
-	!,
-	(	flag('no-numerals')
-	->	dtlit([U, V], X),
-		dtlit([U, V], W),
-		wt(W)
-	;	write(X)
-	).
-wt(cn([X])) :-
-	!,
-	wt(X).
-wt(cn([X|Y])) :-
-	!,
-	wt(X),
-	ws(X),
-	write('.'),
-	nl,
-	indent,
-	(	Y = [Z]
-	->	true
-	;	Z = cn(Y)
-	),
-	wt(Z).
-% DEPRECATED
-wt(dn(X)) :-
-	!,
-	wt(X),
-	write('!'),
-	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#disjunction>').
-wt(set(X)) :-
-	!,
-	write('($'),
-	wl(X),
-	write(' $)').
-wt([]) :-
-	!,
-	write('()').
-wt([X|Y]) :-
-	!,
-	(	\+last_tail([X|Y], [])
-	->	write('[ '),
-		wt('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'),
-		write(' '),
-		wg(X),
-		write('; '),
-		wt('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'),
-		write(' '),
-		wt(Y),
-		write(']')
-	;	write('('),
-		wg(X),
-		wl(Y),
-		write(')')
-	).
-wt(X) :-
-	functor(X, _, A),
-	(	A = 0,
-		!,
-		wt0(X)
-	;	A = 1,
-		!,
-		wt1(X)
-	;	A = 2,
-		!,
-		wt2(X)
-	;	wtn(X)
-	).
-
-
-wt0(!) :-
-	!,
-	write('() '),
-	wp(!),
-	write(' true').
-wt0(X) :-
-	atom(X),
-	atom_concat(some, Y, X),
-	!,
-	(	\+flag('no-qvars'),
-		\+flag('no-blank')	% DEPRECATED
-	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, CD),
-				CD > 0
-			->	memberchk(Y, L)
-			;	(	memberchk(Y, L)
-				->	true
-				;	retract(rule_uvar(L)),
-					assertz(rule_uvar([Y|L]))
-				)
-			)
-		->	write('?U')
-		;	write('_:sk')
-		),
-		write(Y)
-	;	nb_getval(var_ns, Vns),
-		atomic_list_concat(['<', Vns, 'sk', Y, '>'], Z),
-		wt(Z)
-	).
-wt0(X) :-
-	atom(X),
-	atom_concat(allv, Y, X),
-	!,
-	(	\+flag('no-qvars')
-	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, CD),
-				CD > 0
-			->	memberchk(Y, L)
-			;	(	memberchk(Y, L)
-				->	true
-				;	retract(rule_uvar(L)),
-					assertz(rule_uvar([Y|L]))
-				)
-			)
-		->	write('?U')
-		;	write('_:sk')
-		),
-		write(Y)
-	;	nb_getval(var_ns, Vns),
-		atomic_list_concat(['<', Vns, 'U', Y, '>'], Z),
-		wt(Z)
-	).
-wt0(X) :-
-	atom(X),
-	atom_concat(avar, Y, X),
-	!,
-	nb_getval(var_ns, Vns),
-	atomic_list_concat(['<', Vns, 'x', Y, '>'], Z),
-	wt(Z).
-wt0(X) :-
-	(	\+flag(traditional)
-	->	true
-	;	flag(nope)
-	),
-	nb_getval(var_ns, Vns),
-	sub_atom(X, 1, I, _, Vns),
-	J is I+1,
-	sub_atom(X, J, _, 1, Y),
-	(	\+sub_atom(Y, 0, 2, _, 'qe'),
-		rule_uvar(L),
-		(	nb_getval(pdepth, PD),
-			nb_getval(cdepth, CD),
-			(	PD = 0,
-				CD > 0
-			;	PD > 1
-			)
-		->	memberchk(Y, L)
-		;	(	memberchk(Y, L)
-			->	true
-			;	retract(rule_uvar(L)),
-				assertz(rule_uvar([Y|L]))
-			)
-		)
-	->	write('?')
-	;	\+flag('no-qvars'),
-		\+flag('no-blank'),	% DEPRECATED
-		write('_:')
-	),
-	!,
-	write(Y).
-wt0(X) :-
-	(	wtcache(X, W)
-	->	true
-	;	(	\+flag('no-qnames'),
-			atom(X),
-			(	sub_atom(X, I, 1, J, '#')
-			->	J > 1,
-				sub_atom(X, 0, I, _, C),
-				atom_concat(C, '#>', D)
-			;	J = 1,
-				D = X
-			),
-			pfx(E, D),
-			K is J-1,
-			sub_atom(X, _, K, 1, F),
-			atom_codes(F, G),
-			atom_codes('^[A-Z_a-z][\\\\-0-9A-Z_a-z]*$', H),
-			regex(H, G, _)
-		->	atom_concat(E, F, W)
-		;	(	\+flag(strings),
-				atom(X),
-				\+ (sub_atom(X, 0, 1, _, '<'), sub_atom(X, _, 1, 0, '>')),
-				X \= true,
-				X \= false
-			->	W = literal(X, type('<http://eulersharp.sourceforge.net/2003/03swap/prolog#atom>'))
-			;	W = X
-			)
-		),
-		assertz(wtcache(X, W))
-	),
-	(	W = literal(X, type('<http://eulersharp.sourceforge.net/2003/03swap/prolog#atom>'))
-	->	wt2(W)
-	;	write(W)
-	).
-
-
-wt1(X) :-
-	X =.. [B|C],
-	wt(C),
-	write(' '),
-	wp(B),
-	write(' true').
-
-
-wt2(literal(X, lang(Y))) :-
-	!,
-	write('"'),
-	atom_codes(X, U),
-	escape_unicode(U, V),
-	atom_codes(Z, V),
-	write(Z),
-	write('"@'),
-	write(Y).
-wt2(literal(X, type('<http://www.w3.org/2001/XMLSchema#string>'))) :-
-	!,
-	write('"'),
-	atom_codes(X, U),
-	escape_unicode(U, V),
-	atom_codes(Z, V),
-	write(Z),
-	write('"').
-wt2(literal(X, type(Y))) :-
-	!,
-	write('"'),
-	atom_codes(X, U),
-	escape_unicode(U, V),
-	atom_codes(Z, V),
-	write(Z),
-	write('"^^'),
-	wt(Y).
-wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'([X|Y], Z)) :-
-	flag(nope),
-	flag(tquery),	% DEPRECATED
-	!,
-	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
-	write('{'),
-	wt(U),
-	write('. _: '),
-	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>'),
-	write(' '),
-	wt(Z),
-	write('} '),
-	wp('<http://www.w3.org/2000/10/swap/log#implies>'),
-	write(' {'),
-	wt(X),
-	write('}').
-wt2('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'([X|Y], Z)) :-
-	flag(nope),
-	flag(tquery),	% DEPRECATED
-	!,
-	'<http://www.w3.org/2000/10/swap/log#conjunction>'(Y, U),
-	write('{'),
-	wt(U),
-	write('. _: '),
-	wp('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#true>'),
-	write(' '),
-	wt(Z),
-	write('} '),
-	wp('<http://www.w3.org/2000/10/swap/log#implies>'),
-	write(' {'),
-	wt(X),
-	write('}').
-wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
-	(	flag(nope)
-	->	U = X
-	;	(	X = when(A, B)
-		->	c_append(B, istep(_, _, _, _), C),
-			U = when(A, C)
-		;	cn_conj(X, V),
-			c_append(V, istep(_, _, _, _), U)
-		)
-	),
-	(	flag('rule-histogram')
-	->	(	U = when(D, E)
-		->	c_append(E, pstep(_), F),
-			Z = when(D, F)
-		;	cn_conj(U, W),
-			c_append(W, pstep(_), Z)
-		)
-	;	Z = U
-	),
-	(	rule_uvar(R)
-	->	true
-	;	R = []
-	),
-	(	nb_getval(pdepth, 0),
-		nb_getval(cdepth, 0)
-	->	assertz(rule_uvar(R))
-	;	true
-	),
-	(	catch(clause(Y, Z), _, fail)
-	->	wg(Y),
-		write(' <= '),
-		wg(X)
-	;	(	\+atom(X)
-		->	nb_getval(pdepth, PD),
-			PD1 is PD+1,
-			nb_setval(pdepth, PD1)
-		;	true
-		),
-		wg(X),
-		(	\+atom(X)
-		->	nb_setval(pdepth, PD)
-		;	true
-		),
-		write(' => '),
-		(	\+atom(Y)
-		->	nb_getval(cdepth, CD),
-			CD1 is CD+1,
-			nb_setval(cdepth, CD1)
-		;	true
-		),
-		wg(Y),
-		(	\+atom(Y)
-		->	nb_setval(cdepth, CD)
-		;	true
-		)
-	),
-	(	nb_getval(pdepth, 0),
-		nb_getval(cdepth, 0)
-	->	retract(rule_uvar(_))
-	;	true
-	),
-	!.
-wt2(':-'(X, Y)) :-
-	(	rule_uvar(R)
-	->	true
-	;	R = []
-	),
-	assertz(rule_uvar(R)),
-	wg(X),
-	write(' <= '),
-	wg(Y),
-	retract(rule_uvar(_)),
-	!.
-wt2(is(O, T)) :-
-	!,
-	(	number(T),
-		T < 0
-	->	P = -,
-		Q is -T,
-		S = [Q]
-	;	T =.. [P|S]
-	),
-	wg(S),
-	write(' '),
-	wp(P),
-	write(' '),
-	wg(O).
-wt2(prolog:X) :-
-	!,
-	(	X = '\'C\''
-	->	Y = 'C'
-	;	(	X = '\';\''
-		->	Y = disjunction
-		;	prolog_sym(Y, X, _)
-		)
-	),
-	atomic_list_concat(['<http://eulersharp.sourceforge.net/2003/03swap/prolog#', Y, '>'], Z),
-	wt0(Z).
-wt2(X) :-
-	X =.. [P, S, O],
-	(	prolog_sym(_, P, _)
-	->	wt([S, O]),
-		write(' '),
-		wp(P),
-		write(' true')
-	;	wg(S),
-		write(' '),
-		wp(P),
-		write(' '),
-		wg(O)
-	).
-
-
-wtn(exopred(P, S, O)) :-
-	!,
-	(	atom(P)
-	->	X =.. [P, S, O],
-		wt2(X)
-	;	wg(S),
-		write(' '),
-		wt(P),
-		write(' '),
-		wg(O)
-	).
-wtn(X) :-
-	X =.. [B|C],
-	(	atom(B),
-		\+sub_atom(B, 0, 1, _, '<'),
-		\+prolog_sym(_, B, _),
-		X \= true,
-		X \= false
-	->	wt([B|C]),
-		write('^'),
-		wp('<http://eulersharp.sourceforge.net/2003/03swap/prolog#univ>')
-	;	wt(C),
-		write(' '),
-		wp(B),
-		write(' true')
-	).
-
-
-wg(X) :-
-	functor(X, F, A),
-	(	(	F = exopred,
-			!
-		;	F = cn,
-			!
-		;	prolog_sym(_, F, _),
-			F \= true,
-			F \= false,
-			F \= '-',
-			!
-		;	A >= 2,
-			F \= '.',
-			F \= '[|]',
-			F \= ':',
-			F \= literal,
-			F \= rdiv
-		)
-	->	write('{'),
-		indentation(2),
-		nb_getval(fdepth, D),
-		E is D+1,
-		nb_setval(fdepth, E),
-		wt(X),
-		nb_setval(fdepth, D),
-		indentation(-2),
-		write('}')
-	;	wt(X)
-	).
-
-
-wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>') :-
-	\+flag('no-qnames'),
-	!,
-	write('a').
-wp('<http://www.w3.org/2000/10/swap/log#implies>') :-
-	\+flag('no-qnames'),
-	!,
-	write('=>').
-wp(':-') :-
-	\+flag('no-qnames'),
-	!,
-	write('<=').
-wp(X) :-
-	(	prolog_sym(Y, X, _),
-		X \= true,
-		X \= false
-	->	atomic_list_concat(['<http://eulersharp.sourceforge.net/2003/03swap/prolog#', Y, '>'], Z),
-		wt(Z)
-	;	wg(X)
-	).
-
-
-wk([]) :-
-	!.
-wk([X|Y]) :-
-	write(', '),
-	wt(X),
-	wk(Y).
-
-
-wl([]) :-
-	!.
-wl([X|Y]) :-
-	write(' '),
-	wg(X),
-	wl(Y).
-
-
-wq([], _) :-
-	!.
-wq([X|Y], allv) :-
-	!,
-	write('@forAll '),
-	wt(X),
-	wk(Y),
-	write('. ').
-wq([X|Y], some) :-
-	(	\+flag('no-qvars'),
-		\+flag('no-blank')	% DEPRECATED
-	->	write('@forSome '),
-		wt(X),
-		wk(Y),
-		write('. ')
-	;	true
-	).
-
-
-wb([]) :-
-	!.
-wb([X = Y|Z]) :-
-	wp('<http://www.w3.org/2000/10/swap/reason#binding>'),
-	write(' [ '),
-	wp('<http://www.w3.org/2000/10/swap/reason#variable>'),
-	write(' '),
-	wv(X),
-	write('; '),
-	wp('<http://www.w3.org/2000/10/swap/reason#boundTo>'),
-	write(' '),
-	wv(Y),
-	write('];'),
-	nl,
-	indent,
-	wb(Z).
-
-
-wv(X) :-
-	atom(X),
-	atom_concat(avar, Y, X),
-	!,
-	write('[ '),
-	wp('<http://www.w3.org/2004/06/rei#uri>'),
-	write(' "'),
-	nb_getval(var_ns, Vns),
-	write(Vns),
-	write('x'),
-	write(Y),
-	write('"]').
-wv(X) :-
-	atom(X),
-	atom_concat(some, Y, X),
-	!,
-	write('[ '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
-	write('; '),
-	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
-	write(' "_:sk'),
-	write(Y),
-	write('"]').
-wv(X) :-
-	atom(X),
-	nb_getval(var_ns, Vns),
-	sub_atom(X, 1, I, _, Vns),
-	!,
-	write('[ '),
-	wp('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'),
-	write(' '),
-	wp('<http://www.w3.org/2000/10/swap/reason#Existential>'),
-	write('; '),
-	wp('<http://www.w3.org/2004/06/rei#nodeId>'),
-	write(' "'),
-	write(Vns),
-	J is I+1,
-	sub_atom(X, J, _, 1, Q),
-	write(Q),
-	write('"]').
-wv(X) :-
-	atom(X),
-	sub_atom(X, 1, _, 1, U),
-	atomic_list_concat(['<', U, '>'], X),
-	!,
-	write('[ '),
-	wp('<http://www.w3.org/2004/06/rei#uri>'),
-	write(' "'),
-	write(U),
-	write('"]').
-wv(X) :-
-	wg(X).
-
-
-ws(cn(X)) :-
-	!,
-	last(X, Y),
-	ws(Y).
-ws(X) :-
-	X =.. Y,
-	(	flag(tquery)	% DEPRECATED
-	->	true
-	;	last(Y, Z),
-		(	\+number(Z),
-			Z \= rdiv(_, _)
-		->	true
-		;	write(' ')
-		)
-	).
-
-
-wct([]) :-
-	!,
-	nl.
-wct([A]) :-
-	!,
-	wcf(A),
-	nl.
-wct([A|B]) :-
-	wcf(A),
-	write(','),
-	wct(B).
-
-
-wcf(A) :-
-	var(A),
-	!.
-wcf(rdiv(X, Y)) :-
-	number_codes(Y, [0'1|Z]),
-	lzero(Z, Z),
-	!,
-	(	Z = []
-	->	F = '~d.0'
-	;	length(Z, N),
-		number_codes(X, U),
-		(	length(U, N)
-		->	F = '0.~d'
-		;	atomic_list_concat(['~', N, 'd'], F)
-		)
-	),
-	format(F, [X]).
-wcf(literal(A, _)) :-
-	!,
-	write('"'),
-	atom_codes(A, B),
-	escape_string(C, B),
-	subst([[[0'"], [0'", 0'"]]], C, D),
-	atom_codes(E, D),
-	write(E),
-	write('"').
-wcf(A) :-
-	atom(A),
-	nb_getval(var_ns, Vns),
-	sub_atom(A, 1, I, _, Vns),
-	!,
-	J is I+1,
-	sub_atom(A, J, _, 1, B),
-	write('_:'),
-	write(B).
-wcf(A) :-
-	atom(A),
-	sub_atom(A, 0, 1, _, '<'),
-	!,
-	sub_atom(A, 1, _, 1, B),
-	write(B).
-wcf(A) :-
-	atom(A),
-	sub_atom(A, 0, 1, _, '_'),
-	!,
-	sub_atom(A, 1, _, 0, B),
-	write('"'),
-	write(B),
-	write('"').
-wcf(A) :-
-	write(A).
-
-
-indent:-
-	nb_getval(indentation, A),
-	tab(A).
-
-
-indentation(C) :-
-	nb_getval(indentation, A),
-	B is A+C,
-	nb_setval(indentation, B).
 
 
 
@@ -11342,3 +11336,4 @@ white_space(0xA) :-
 	cnt(line_number).
 white_space(0xD).
 white_space(0x20).
+
