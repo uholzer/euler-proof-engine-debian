@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8281 2015-07-14 08:26:02Z josd $').
+version_info('$Id: euler.yap 8291 2015-07-14 23:04:20Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -246,10 +246,10 @@ main :-
 		)
 	;	true
 	),
-	catch(cc(Argus), Exc,
+	catch(eyecc(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** cc ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** eyecc ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -361,7 +361,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-cc(Argus) :-
+eyecc(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
