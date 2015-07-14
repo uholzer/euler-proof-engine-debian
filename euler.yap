@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8277 2015-07-13 19:22:23Z josd $').
+version_info('$Id: euler.yap 8281 2015-07-14 08:26:02Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -246,10 +246,10 @@ main :-
 		)
 	;	true
 	),
-	catch(main(Argus), Exc,
+	catch(cc(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** main ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** cc ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -307,7 +307,61 @@ main :-
 	halt(EC).
 
 
-main(Argus) :-
+argp(In, List) :-
+	get_code(In, C0),
+	argt(C0, In, C1, Tok1),
+	(	Tok1 == end_of_file
+	->	List = []
+	;	List = [Tok1|Tokens],
+		argp(C1, In, Tokens)
+	).
+
+
+argp(C0, In, List) :-
+	argt(C0, In, C1, H),
+	(	H == end_of_file
+	->	List = []
+	;	List = [H|T],
+		argp(C1, In, T)
+	).
+
+
+argt(-1, _, -1, end_of_file) :-
+	!.
+argt(C0, In, C, Token) :-
+	white_space(C0),
+	!,
+	get_code(In, C1),
+	argt(C1, In, C, Token).
+argt(C0, In, C, Token) :-
+	get_code(In, C1),
+	argn(C1, In, C, T),
+	atom_codes(Token, [C0|T]).
+
+
+argn(C0, In, C, [C0|T]) :-
+	\+white_space(C0),
+	C0 \= -1,
+	!,
+	get_code(In, C1),
+	argn(C1, In, C, T).
+argn(C, _, C, []).
+
+
+argv([], []) :-
+	!.
+argv([Arg|Argvs], [U, V|Argus]) :-
+	sub_atom(Arg, B, 1, E, '='),
+	sub_atom(Arg, 0, B, _, U),
+	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--step', '--tactic']),
+	!,
+	sub_atom(Arg, _, E, 0, V),
+	argv(Argvs, Argus).
+argv([Arg|Argvs], [Arg|Argus]) :-
+	argv(Argvs, Argus).
+
+
+cc(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -655,60 +709,6 @@ main(Argus) :-
 		flush_output(user_error)
 	;	true
 	).
-
-
-argp(In, List) :-
-	get_code(In, C0),
-	argt(C0, In, C1, Tok1),
-	(	Tok1 == end_of_file
-	->	List = []
-	;	List = [Tok1|Tokens],
-		argp(C1, In, Tokens)
-	).
-
-
-argp(C0, In, List) :-
-	argt(C0, In, C1, H),
-	(	H == end_of_file
-	->	List = []
-	;	List = [H|T],
-		argp(C1, In, T)
-	).
-
-
-argt(-1, _, -1, end_of_file) :-
-	!.
-argt(C0, In, C, Token) :-
-	white_space(C0),
-	!,
-	get_code(In, C1),
-	argt(C1, In, C, Token).
-argt(C0, In, C, Token) :-
-	get_code(In, C1),
-	argn(C1, In, C, T),
-	atom_codes(Token, [C0|T]).
-
-
-argn(C0, In, C, [C0|T]) :-
-	\+white_space(C0),
-	C0 \= -1,
-	!,
-	get_code(In, C1),
-	argn(C1, In, C, T).
-argn(C, _, C, []).
-
-
-argv([], []) :-
-	!.
-argv([Arg|Argvs], [U, V|Argus]) :-
-	sub_atom(Arg, B, 1, E, '='),
-	sub_atom(Arg, 0, B, _, U),
-	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--step', '--tactic']),
-	!,
-	sub_atom(Arg, _, E, 0, V),
-	argv(Argvs, Argus).
-argv([Arg|Argvs], [Arg|Argus]) :-
-	argv(Argvs, Argus).
 
 
 opts([], []) :-
