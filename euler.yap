@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8291 2015-07-14 23:04:20Z josd $').
+version_info('$Id: euler.yap 8293 2015-07-15 13:11:19Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9845,10 +9845,7 @@ formulacontent(Formula) -->
 	{	(	nb_getval(fdepth, 1),
 			retract(back)
 		->	L = List
-		;	(	nb_getval(smod, true)
-			->	sort(List, L)
-			;	distinct(List, L)
-			)
+		;	distinct(List, L)
 		),
 		clist(L, Formula)
 	}.
