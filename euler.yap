@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8296 2015-07-15 15:31:10Z josd $').
+version_info('$Id: euler.yap 8298 2015-07-15 20:28:20Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -247,10 +247,10 @@ main :-
 		)
 	;	true
 	),
-	catch(eyecc(Argus), Exc,
+	catch(eye_computing(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** eyecc ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** eye_computing ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -362,7 +362,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-eyecc(Argus) :-
+eye_computing(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -7464,7 +7464,7 @@ within_scope([A, B]) :-
 exopred(P, S, O) :-
 	(	var(P)
 	->	pred(P)
-	;	current_predicate(P/2)
+	;	catch(current_predicate(P/2), _, fail)
 	),
 	call(P, S, O).
 
