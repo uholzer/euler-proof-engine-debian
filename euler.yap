@@ -151,7 +151,7 @@
 % -----
 
 
-version_info('$Id: euler.yap 8293 2015-07-15 13:11:19Z josd $').
+version_info('$Id: euler.yap 8296 2015-07-15 15:31:10Z josd $').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -168,10 +168,11 @@ eye
 	swipl -x eye.pvm --
 <options>
 	--nope			no proof explanation
-	--no-qnames		no qnames in output
-	--no-qvars		no qvars in output
-	--no-numerals		no numerals in output
-	--no-distinct		no distinct answers in output
+	--no-qnames		no qnames in the output
+	--no-qvars		no qvars in the output
+	--no-numerals		no numerals in the output
+	--no-distinct		no distinct answers in the output
+	--no-skolem		no Skolem IRIs in the output
 	--step <count>		set maximimum step count
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
@@ -2166,6 +2167,16 @@ wt0(X) :-
 	),
 	!,
 	write(Y).
+wt0(X) :-
+	flag('no-skolem'),
+	(	\+flag(traditional)
+	->	true
+	;	flag(nope)
+	),
+	sub_atom(X, _, 19, _, '/.well-known/genid/'),
+	!,
+	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, [X]),
+	wt0(Y).
 wt0(X) :-
 	(	wtcache(X, W)
 	->	true
