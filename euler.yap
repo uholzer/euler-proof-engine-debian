@@ -31,7 +31,6 @@
 % directives
 % ----------
 
-
 :- if(current_prolog_flag(dialect, swi)).
 :- if(current_prolog_flag(version_data, swi(6, _, _, _))).
 :- style_check(-atom).
@@ -150,8 +149,7 @@
 % infos
 % -----
 
-
-version_info('$Id: euler.yap 8298 2015-07-15 20:28:20Z josd $').
+version_info('EYE-Summer15 made 2015-07-19T22:58:03Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -211,14 +209,12 @@ eye
 % GRE (Generic Reasoning Engine)
 % ------------------------------
 
-
 main :-
 	Id is random(2^30)*random(2^30)*random(2^30)*random(2^30),
 	atom_number(Run, Id),
 	atomic_list_concat(['http://eulersharp.sourceforge.net/.well-known/genid/', Run, '#'], Vns),
 	nb_setval(var_ns, Vns),
-	version_info(V),
-	sub_atom(V, 1, _, 2, Version),
+	version_info(Version),
 	format(user_error, '~w~n', [Version]),
 	flush_output(user_error),
 	prolog_flag(version, PVersion),
@@ -247,10 +243,10 @@ main :-
 		)
 	;	true
 	),
-	catch(eye_computing(Argus), Exc,
+	catch(cross_computing(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** eye_computing ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** cross_computing ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -362,7 +358,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-eye_computing(Argus) :-
+cross_computing(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -490,8 +486,7 @@ eye_computing(Argus) :-
 	),
 	(	flag(strings)
 	->	true
-	;	version_info(V),
-		sub_atom(V, 1, _, 2, Version),
+	;	version_info(Version),
 		format('#Processed by ~w~n', [Version]),
 		(	flag(kgb)	% DEPRECATED
 		->	true
@@ -2812,7 +2807,6 @@ strelas(A) :-
 %  4/ If C = answer(A) and tactic single-answer stop, else backtrack to 2/ or 1/
 %  5/ If brake or tactic linear-select stop, else start again at 1/
 
-
 eam(Span) :-
 	(	cnt(tr),
 		(	flag(debug)
@@ -3099,7 +3093,6 @@ pstep(Rule) :-
 	cnt(RTC),
 	lookup(RTP, tp, RuleL),
 	cnt(RTP).
-
 
 
 % DEPRECATED
@@ -3830,7 +3823,6 @@ end(End, Env) :-
 % --------
 % builtins
 % --------
-
 
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#allAncestors>'(A, B) :-
@@ -5113,7 +5105,6 @@ end(End, Env) :-
 % ------------
 
 % according to RIF Datatypes and Built-Ins 1.0 -- http://www.w3.org/TR/rif-dtb/
-
 
 % 4.1.1.1 pred:literal-not-identical
 
@@ -7391,7 +7382,6 @@ end(End, Env) :-
 % support
 % -------
 
-
 def_pfx('math:', '<http://www.w3.org/2000/10/swap/math#>').
 def_pfx('e:', '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#>').
 def_pfx('list:', '<http://www.w3.org/2000/10/swap/list#>').
@@ -9668,7 +9658,6 @@ regexp_wildcard([A|B], [A|C]) :-
 
 % according to http://www.w3.org/2000/10/swap/grammar/n3-ietf.txt
 % inspired by http://code.google.com/p/km-rdf/wiki/Henry
-
 
 barename(BareName) -->
 	[name(BareName)].
