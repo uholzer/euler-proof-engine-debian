@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 made 2015-07-20T00:02:36Z josd').
+version_info('EYE-Summer15 made 2015-07-20T09:44:35Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -176,6 +176,7 @@ eye
 	--tactic single-answer	give only one answer
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
+	--ignore-inference-fuse	do not halt in case of inference fuse
 	--n3p			output all <data> as N3 P-code to stdout
 	--pvm <n3p-file>	output <n3p-file> as PVM code to <pvm-file>
 	--image <pvm-file>	output all <data> and all code to <pvm-file>
@@ -2846,7 +2847,11 @@ eam(Span) :-
 		),
 		call(Prem),
 		(	Conc = false
-		->	throw(inference_fuse(Prem))
+		->	(	flag('ignore-inference-fuse')
+			->	format(user_error, '** ERROR ** eam ** ~w~n', [inference_fuse(Prem)]),
+				fail
+			;	throw(inference_fuse(Prem))
+			)
 		;	true
 		),
 		(	flag('rule-histogram'),
