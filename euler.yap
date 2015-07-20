@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 made 2015-07-20T15:11:10Z josd').
+version_info('EYE-Summer15 edition 2015-07-20T19:39:43Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -244,10 +244,10 @@ main :-
 		)
 	;	true
 	),
-	catch(mixinfer(Argus), Exc,
+	catch(arc(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** mixinfer ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** arc (atomic reasoning cycle) ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -359,7 +359,9 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-mixinfer(Argus) :-
+% atom reasoning cycle
+
+arc(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -542,7 +544,7 @@ mixinfer(Argus) :-
 	nb_setval(lemma_cursor, 0),
 	nb_setval(output_statements, 0),
 	catch(eam(0), Exc,
-		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
+		(	format(user_error, '** ERROR ** eam (euler abstract machine) ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -1183,6 +1185,8 @@ args([Arg|Args]) :-
 	args(Args).
 
 
+% N3 to N3P compiler
+
 n3_n3p(Argument, Mode) :-
 	absolute_uri(Argument, Arg),
 	(	flag('tmp-file', Tmp)	% DEPRECATED
@@ -1610,6 +1614,8 @@ tr_split([A|B], C, D) :-
 tr_split([A|B], [A|C], D) :-
 	tr_split(B, C, D).
 
+
+% reasoning output
 
 wa([]) :-
 	!.
@@ -2682,6 +2688,8 @@ answer(A1, A2, A3, A4, A5, A6, A7, A8) :-
 	call(B).
 
 
+% stretch relax
+
 strela(answer(cn(A)), cn(B)) :-
 	!,
 	strela(A, B).
@@ -2848,7 +2856,7 @@ eam(Span) :-
 		call(Prem),
 		(	Conc = false
 		->	(	flag('ignore-inference-fuse')
-			->	format(user_error, '** ERROR ** eam ** ~w~n', [inference_fuse(Prem)]),
+			->	format(user_error, '** ERROR ** eam (euler abstract machine) ** ~w~n', [inference_fuse(Prem)]),
 				fail
 			;	throw(inference_fuse(Prem))
 			)
