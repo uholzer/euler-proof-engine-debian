@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-20T22:17:08Z josd').
+version_info('EYE-Summer15 edition 2015-07-21T22:01:47Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -247,7 +247,7 @@ main :-
 	catch(arc(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** arc (atomic reasoning cycle) ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** arc (automated reasoning cycle) ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -359,7 +359,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-% atomic reasoning cycle
+% automated reasoning cycle
 
 arc(Argus) :-
 	statistics(runtime, [T0, _]),
