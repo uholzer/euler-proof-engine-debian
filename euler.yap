@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-22T13:03:39Z josd').
+version_info('EYE-Summer15 edition 2015-07-22T13:21:25Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -359,7 +359,7 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-% atomic reasoning cycle
+% augmented reasoning cycle
 
 arc(Argus) :-
 	statistics(runtime, [T0, _]),
