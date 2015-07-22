@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-22T13:21:25Z josd').
+version_info('EYE-Summer15 edition 2015-07-22T15:16:19Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2856,7 +2856,7 @@ eam(Span) :-
 		call(Prem),
 		(	Conc = false
 		->	(	flag('ignore-inference-fuse')
-			->	format(user_error, '** ERROR ** eam (euler abstract machine) ** ~w~n', [inference_fuse(Prem)]),
+			->	format(user_error, '** ERROR ** eam ** ~w~n', [inference_fuse(Prem)]),
 				fail
 			;	throw(inference_fuse(Prem))
 			)
