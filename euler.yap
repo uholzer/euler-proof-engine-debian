@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-22T15:16:19Z josd').
+version_info('EYE-Summer15 edition 2015-07-26T13:10:34Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1117,7 +1117,12 @@ args(['--proof', Arg|Args]) :-
 	(	got_pi
 	->	true
 	;	assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Inference>'),
-				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]), G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
+				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G)]),
+				G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
+		assertz(implies(cn(['<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, '<http://www.w3.org/2000/10/swap/reason#Extraction>'),
+				'<http://www.w3.org/2000/10/swap/reason#gives>'(S, G),
+				'<http://www.w3.org/2000/10/swap/log#notEqualTo>'(G, '<http://www.w3.org/2000/10/swap/log#implies>'(_, _))]),
+				G, '<http://eulersharp.sourceforge.net/2003/03swap/proof-lemma>')),
 		assertz(got_pi)
 	),
 	args(Args).
