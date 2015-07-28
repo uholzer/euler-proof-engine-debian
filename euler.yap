@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-26T13:10:34Z josd').
+version_info('EYE-Summer15 edition 2015-07-28T11:41:31Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -631,7 +631,7 @@ arc(Argus) :-
 				wt(ST)
 			)
 		),
-		(	nb_getval(csv_header, Header),
+		(	catch(nb_getval(csv_header, Header), _, fail),
 			wct(Header),
 			query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
 			catch(call(Where), _, fail),
