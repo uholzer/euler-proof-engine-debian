@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-29T12:58:54Z josd').
+version_info('EYE-Summer15 edition 2015-07-29T17:53:51Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -170,7 +170,7 @@ eye
 	--no-qvars		no qvars in the output
 	--no-numerals		no numerals in the output
 	--no-distinct		no distinct answers in the output
-	--no-skolem		no Skolem IRIs in the output
+	--no-skolem <prefix>	no Skolem IRIs with prefix in the output
 	--step <count>		set maximimum step count
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
@@ -351,7 +351,7 @@ argv([], []) :-
 argv([Arg|Argvs], [U, V|Argus]) :-
 	sub_atom(Arg, B, 1, E, '='),
 	sub_atom(Arg, 0, B, _, U),
-	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--step', '--tactic']),
+	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--no-skolem', '--step', '--tactic']),
 	!,
 	sub_atom(Arg, _, E, 0, V),
 	argv(Argvs, Argus).
@@ -809,6 +809,10 @@ opts(['--image', File|Argus], Args) :-
 opts(['--yabc', File|Argus], Args) :-
 	!,
 	assertz(flag(image, File)),
+	opts(Argus, Args).
+opts(['--no-skolem', Prefix|Argus], Args) :-
+	!,
+	assertz(flag('no-skolem', Prefix)),
 	opts(Argus, Args).
 opts(['--step', Lim|Argus], Args) :-
 	!,
@@ -2175,12 +2179,12 @@ wt0(X) :-
 	!,
 	write(Y).
 wt0(X) :-
-	flag('no-skolem'),
+	flag('no-skolem', Prefix),
 	(	\+flag(traditional)
 	->	true
 	;	flag(nope)
 	),
-	sub_atom(X, _, 19, _, '/.well-known/genid/'),
+	sub_atom(X, 1, _, _, Prefix),
 	!,
 	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, [X]),
 	wt0(Y).
