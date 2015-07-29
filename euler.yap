@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-29T17:53:51Z josd').
+version_info('EYE-Summer15 edition 2015-07-29T18:01:28Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -170,7 +170,7 @@ eye
 	--no-qvars		no qvars in the output
 	--no-numerals		no numerals in the output
 	--no-distinct		no distinct answers in the output
-	--no-skolem <prefix>	no Skolem IRIs with prefix in the output
+	--no-skolem <prefix>	no uris with <prefix> in the output
 	--step <count>		set maximimum step count
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
