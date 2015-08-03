@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-07-29T18:01:28Z josd').
+version_info('EYE-Summer15 edition 2015-08-03T21:29:22Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2114,7 +2114,7 @@ wt0(X) :-
 		write(Y)
 	;	nb_getval(var_ns, Vns),
 		atomic_list_concat(['<', Vns, 'sk', Y, '>'], Z),
-		wt(Z)
+		wt0(Z)
 	).
 wt0(X) :-
 	atom(X),
@@ -2138,7 +2138,7 @@ wt0(X) :-
 		write(Y)
 	;	nb_getval(var_ns, Vns),
 		atomic_list_concat(['<', Vns, 'U', Y, '>'], Z),
-		wt(Z)
+		wt0(Z)
 	).
 wt0(X) :-
 	atom(X),
@@ -2146,7 +2146,7 @@ wt0(X) :-
 	!,
 	nb_getval(var_ns, Vns),
 	atomic_list_concat(['<', Vns, 'x', Y, '>'], Z),
-	wt(Z).
+	wt0(Z).
 wt0(X) :-
 	(	\+flag(traditional)
 	->	true
@@ -2172,8 +2172,11 @@ wt0(X) :-
 			)
 		)
 	->	write('?')
-	;	\+flag('no-qvars'),
-		\+flag('no-blank'),	% DEPRECATED
+	;	(	\+flag('no-qvars'),
+			\+flag('no-blank')	% DEPRECATED
+		->	true
+		;	flag('no-skolem', _)
+		),
 		write('_:')
 	),
 	!,
