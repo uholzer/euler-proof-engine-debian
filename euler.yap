@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-08-03T21:51:16Z josd').
+version_info('EYE-Summer15 edition 2015-08-04T10:32:43Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -646,15 +646,7 @@ arc(Argus) :-
 		),
 		nl
 	),
-	get_time(StampN),
-	datetime(StampN, StampC),
-	atom_codes(StampA, StampC),
-	(	sub_atom(StampA, I, 1, 0, 'Z'),
-		I > 23
-	->	sub_atom(StampA, 0, 23, _, StampB),
-		atomic_list_concat([StampB, 'Z'], Stamp)
-	;	Stamp = StampA
-	),
+	timestamp(Stamp),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
 	format(user_error, '[~w] in=~d out=~d inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Inf, Elaps, Speed]),
@@ -853,9 +845,7 @@ opts(['--probe'|_], _) :-
 	(	atomic_list_concat(['curl -s http://www.agfa.com/w3c/temp/graph-100000.n3p -o ', File], Cmd),
 		catch(exec(Cmd, _), _, fail)
 	->	statistics(walltime, [_, T1]),
-		S1 is 100000000/T1,
-		format(user_error, 'probing web ~0f [triples/sec]~n', [S1]),
-		flush_output(user_error)
+		S1 is 100000000/T1
 	;	open(File, write, Out),
 		tell(Out),
 		format(':- style_check(-discontiguous).~n', []),
@@ -870,14 +860,14 @@ opts(['--probe'|_], _) :-
 			S is random(10000),
 			P is random(100),
 			O is random(10000),
-			format('\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\'(\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\',\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\').~n', [P, S, O]),
+			format('\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\'(\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\',
+				\'<http://eulersharp.sourceforge.net/2007/07test/graph#i~d>\').~n', [P, S, O]),
 			fail
 		;	true
 		),
 		told,
 		statistics(walltime, [_, _]),
-		format(user_error, 'probing web is not possible~n', []),
-		flush_output(user_error)
+		S1 is 0
 	),
 	open(File, read, In, [encoding(utf8)]),
 	repeat,
@@ -895,8 +885,6 @@ opts(['--probe'|_], _) :-
 	),
 	statistics(walltime, [_, T2]),
 	S2 is 100000000/T2,
-	format(user_error, 'probing file ~0f [triples/sec]~n', [S2]),
-	flush_output(user_error),
 	statistics(runtime, [_, _]),
 	(	between(1, 100, _),
 		forall(
@@ -915,21 +903,11 @@ opts(['--probe'|_], _) :-
 	),
 	statistics(runtime, [_, T3]),
 	S3 is 10000000000/T3,
-	format(user_error, 'probing memory ~0f [triples/sec]~n', [S3]),
+	timestamp(Stamp),
+	format(user_error, '[~w] web-triples/sec=~0f file-triples/sec=~0f memory-triples/sec=~0f~n~n', [Stamp, S1, S2, S3]),
 	flush_output(user_error),
 	close(In),
 	delete_file(File),
-	get_time(StampN),
-	datetime(StampN, StampC),
-	atom_codes(StampA, StampC),
-	(	sub_atom(StampA, I, 1, 0, 'Z'),
-		I > 23
-	->	sub_atom(StampA, 0, 23, _, StampB),
-		atomic_list_concat([StampB, 'Z'], Stamp)
-	;	Stamp = StampA
-	),
-	format(user_error, '[~w]~n~n', [Stamp]),
-	flush_output(user_error),
 	throw(halt).
 opts([Arg|Argus], Args) :-
 	\+memberchk(Arg, ['--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--pass', '--pass-all', '--tquery']),
@@ -9453,6 +9431,18 @@ dynamic_verb(Verb) :-
 			)
 		)
 	;	true
+	).
+
+
+timestamp(Stamp) :-
+	get_time(StampN),
+	datetime(StampN, StampC),
+	atom_codes(StampA, StampC),
+	(	sub_atom(StampA, I, 1, 0, 'Z'),
+		I > 23
+	->	sub_atom(StampA, 0, 23, _, StampB),
+		atomic_list_concat([StampB, 'Z'], Stamp)
+	;	Stamp = StampA
 	).
 
 
