@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 edition 2015-08-04T10:32:43Z josd').
+version_info('EYE-Summer15 0804-1249 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
