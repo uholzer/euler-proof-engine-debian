@@ -12,6 +12,7 @@
 <h1><img src="http://eulersharp.sourceforge.net/2003/03swap/eye.png" alt="EYE" height="37" width="37"/> DONE</h1>
 <pre>
 <span id="EYE-Summer15">[<a href="https://sourceforge.net/projects/eulersharp/files/eulersharp/EYE-Summer15/">EYE-Summer15</a>]</span>
+- supporting inference fuses in queries (obs from Hong Sun)
 - adding --tactic=forced-break to brake after too many trunk runs
 - updating the output of --probe
 - making --no-skolem dominant over --no-qvars
