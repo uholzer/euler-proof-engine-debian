@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0804-1249 josd').
+version_info('EYE-Summer15 0805-2105 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -172,6 +172,7 @@ eye
 	--no-distinct		no distinct answers in the output
 	--no-skolem <prefix>	no uris with <prefix> in the output
 	--step <count>		set maximimum step count
+	--tactic forced-brake	brake after too many trunk runs
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
 	--wcache <uri> <file>	to tell that uri is cached as file
@@ -2802,7 +2803,7 @@ strelas(A) :-
 %
 %  1/ Select rule P => C
 %  2/ Prove P & NOT(C) (backward chaining)
-%  3/ If P & NOT(C) assert C (forward chaining)
+%  3/ If P & NOT(C) assert C (forward chaining) and remove brake
 %  4/ If C = answer(A) and tactic single-answer stop, else backtrack to 2/ or 1/
 %  5/ If brake or tactic linear-select stop, else start again at 1/
 
@@ -2938,8 +2939,13 @@ eam(Span) :-
 		;	retract(brake),
 			fail
 		)
-	;	(	flag(tactic, 'linear-select')
-		;	brake
+	;	(	brake
+		;	flag(tactic, 'forced-brake'),
+			nb_getval(tc, TC),
+			nb_getval(tr, TR),
+			Val is TC+25-TR*2,
+			Val < 0
+		;	flag(tactic, 'linear-select')
 		),
 		(	S is Span+1,
 			assertz(span(S)),
