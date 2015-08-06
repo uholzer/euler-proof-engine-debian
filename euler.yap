@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0806-0819 josd').
+version_info('EYE-Summer15 0806-2204 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -172,6 +172,7 @@ eye
 	--no-distinct		no distinct answers in the output
 	--no-skolem <prefix>	no uris with <prefix> in the output
 	--step <count>		set maximimum step count
+	--brake <count>		set maximimum brake count
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
 	--wcache <uri> <file>	to tell that uri is cached as file
@@ -351,7 +352,7 @@ argv([], []) :-
 argv([Arg|Argvs], [U, V|Argus]) :-
 	sub_atom(Arg, B, 1, E, '='),
 	sub_atom(Arg, 0, B, _, U),
-	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--no-skolem', '--step', '--tactic']),
+	memberchk(U, ['--tmp-file', '--wget-path', '--pvm', '--image', '--yabc', '--plugin', '--plugin-pvm', '--turtle', '--proof', '--trules', '--query', '--tquery', '--no-skolem', '--step', '--brake', '--tactic']),
 	!,
 	sub_atom(Arg, _, E, 0, V),
 	argv(Argvs, Argus).
@@ -818,6 +819,19 @@ opts(['--step', Lim|Argus], Args) :-
 		)
 	),
 	assertz(flag(step, Limit)),
+	opts(Argus, Args).
+opts(['--brake', Lim|Argus], Args) :-
+	!,
+	(	number(Lim)
+	->	Limit = Lim
+	;	catch(atom_number(Lim, Limit), Exc,
+			(	format(user_error, '** ERROR ** brake ** ~w~n', [Exc]),
+				flush_output(user_error),
+				halt(1)
+			)
+		)
+	),
+	assertz(flag(brake, Limit)),
 	opts(Argus, Args).
 opts(['--tactic', Tactic|Argus], Args) :-
 	!,
@@ -2808,6 +2822,16 @@ strelas(A) :-
 
 eam(Span) :-
 	(	cnt(tr),
+		(	flag(brake, BrakeLim),
+			nb_getval(tr, TR),
+			TR >= BrakeLim
+		->	(	flag(strings)
+			->	true
+			;	w3(trunk)
+			),
+			throw(maximimum_brake_count(TR))
+		;	true
+		),
 		(	flag(debug)
 		->	format(user_error, 'eam/1 enter trunk span ~w~n', [Span]),
 			flush_output(user_error)
