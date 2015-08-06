@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0805-2124 josd').
+version_info('EYE-Summer15 0806-0819 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -172,7 +172,6 @@ eye
 	--no-distinct		no distinct answers in the output
 	--no-skolem <prefix>	no uris with <prefix> in the output
 	--step <count>		set maximimum step count
-	--tactic forced-brake	brake after too many trunk runs
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
 	--wcache <uri> <file>	to tell that uri is cached as file
@@ -2942,11 +2941,6 @@ eam(Span) :-
 			fail
 		)
 	;	(	brake
-		;	flag(tactic, 'forced-brake'),
-			nb_getval(tc, TC),
-			nb_getval(tr, TR),
-			Val is TC+25-TR*2,
-			Val < 0
 		;	flag(tactic, 'linear-select')
 		),
 		(	S is Span+1,

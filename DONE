@@ -13,7 +13,6 @@
 <pre>
 <span id="EYE-Summer15">[<a href="https://sourceforge.net/projects/eulersharp/files/eulersharp/EYE-Summer15/">EYE-Summer15</a>]</span>
 - supporting inference fuses in queries (obs from Hong Sun)
-- adding --tactic=forced-break to brake after too many trunk runs
 - updating the output of --probe
 - making --no-skolem dominant over --no-qvars
 - changing from --no-skolem to --no-skolem &lt;prefix&gt; to have no uris with &lt;prefix&gt; in the output (obs from Dörthe Arndt)
