@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0807:1207 josd').
+version_info('EYE-Summer15 0807:1432 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -858,7 +858,7 @@ opts(['--help'|_], _) :-
 	throw(halt).
 opts(['--probe'|_], _) :-
 	tmp_file(File),
-	(	atomic_list_concat(['curl -s http://www.agfa.com/w3c/temp/graph-100000.n3p -o ', File], Cmd),
+	(	atomic_list_concat(['curl -s -L http://www.agfa.com/w3c/temp/graph-100000.n3p -o ', File], Cmd),
 		catch(exec(Cmd, _), _, fail)
 	->	statistics(walltime, [_, T1]),
 		S1 is 100000000/T1
@@ -956,7 +956,7 @@ args(['--plugin', Argument|Args]) :-
 			;	tmp_file(File),
 				assertz(tmpfile(File))
 			),
-			atomic_list_concat(['curl -s "', Arg, '" -o ', File], Cmd),
+			atomic_list_concat(['curl -s -L "', Arg, '" -o ', File], Cmd),
 			catch(exec(Cmd, _), Exc,
 				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
 					flush_output(user_error),
@@ -1055,7 +1055,7 @@ args(['--plugin-pvm', Argument|Args]) :-
 			;	tmp_file(File),
 				assertz(tmpfile(File))
 			),
-			atomic_list_concat(['curl -s "', Arg, '" -o ', File], Cmd),
+			atomic_list_concat(['curl -s -L "', Arg, '" -o ', File], Cmd),
 			catch(exec(Cmd, _), Exc,
 				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
 					flush_output(user_error),
@@ -1211,7 +1211,7 @@ n3_n3p(Argument, Mode) :-
 			->	true
 			;	assertz(tmpfile(File))
 			),
-			atomic_list_concat(['curl -s "', Arg, '" -o ', File], Cmd),
+			atomic_list_concat(['curl -s -L "', Arg, '" -o ', File], Cmd),
 			catch(exec(Cmd, _), Exc,
 				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
 					flush_output(user_error),
