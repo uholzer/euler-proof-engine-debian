@@ -149,7 +149,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0806-2204 josd').
+version_info('EYE-Summer15 0807:1207 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -610,6 +610,10 @@ arc(Argus) :-
 	flush_output(user_error),
 	nb_getval(input_statements, Inp),
 	nb_getval(output_statements, Outp),
+	Step is TP+BP,
+	nb_getval(tr, TR),
+	nb_getval(br, BR),
+	Brake is TR+BR,
 	(	statistics(inferences, Inf)
 	->	true
 	;	Inf = ''
@@ -650,7 +654,7 @@ arc(Argus) :-
 	timestamp(Stamp),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
-	format(user_error, '[~w] in=~d out=~d inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Inf, Elaps, Speed]),
+	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Step, Brake, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
@@ -682,8 +686,6 @@ arc(Argus) :-
 		),
 		sort(CntRl, CntRs),
 		reverse(CntRs, CntRr),
-		nb_getval(tr, TR),
-		nb_getval(br, BR),
 		format(user_error, '>>> rule histogram TR=~w BR=~w <<<~n', [TR, BR]),
 		forall(
 			(	member(RCnt, CntRr)
