@@ -68,6 +68,7 @@
 :- dynamic(base_uri/1).
 :- dynamic(bcnd/2).
 :- dynamic(bgot/3).
+:- dynamic(bolton/1).
 :- dynamic(brake/0).
 :- dynamic(branch/0).
 :- dynamic(branching/0).
@@ -149,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0807:1432 josd').
+version_info('EYE-Summer15 0808:2234 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -207,9 +208,9 @@ eye
 
 
 
-% ------------------------------
-% GRE (Generic Reasoning Engine)
-% ------------------------------
+% ---------
+% main goal
+% ---------
 
 main :-
 	Id is random(2^30)*random(2^30)*random(2^30)*random(2^30),
@@ -245,10 +246,10 @@ main :-
 		)
 	;	true
 	),
-	catch(arc(Argus), Exc,
+	catch(gre(Argus), Exc,
 		(	Exc = halt
 		->	true
-		;	format(user_error, '** ERROR ** arc ** ~w~n', [Exc]),
+		;	format(user_error, '** ERROR ** gre ** ~w~n', [Exc]),
 			flush_output(user_error),
 			nb_setval(exit_code, 1)
 		)
@@ -360,9 +361,13 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 	argv(Argvs, Argus).
 
 
-% augmented reasoning cycle
 
-arc(Argus) :-
+% ------------------------------
+% GRE (Generic Reasoning Engine)
+% ------------------------------
+
+
+gre(Argus) :-
 	statistics(runtime, [T0, _]),
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
@@ -1418,6 +1423,11 @@ n3_n3p(Argument, Mode) :-
 								(	flag(n3p)
 								->	portray_clause(':-'(Ci, Pj))
 								;	assertz(':-'(Ci, Pj))
+								),
+								(	Ci =.. [Cp, _, _],
+									\+bolton(Cp)
+								->	assertz(bolton(Cp))
+								;	true
 								)
 							)
 						;	strelas(Rt),
