@@ -150,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0808:2234 josd').
+version_info('EYE-Summer15 0810:2200 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2647,15 +2647,23 @@ wcf(rdiv(X, Y)) :-
 		)
 	),
 	format(F, [X]).
-wcf(literal(A, _)) :-
+wcf(literal(A, B)) :-
 	!,
-	write('"'),
-	atom_codes(A, B),
-	escape_string(C, B),
-	subst([[[0'"], [0'", 0'"]]], C, D),
-	atom_codes(E, D),
-	write(E),
-	write('"').
+	atom_codes(A, C),
+	escape_string(D, C),
+	subst([[[0'"], [0'", 0'"]]], D, E),
+	atom_codes(F, E),
+	(	B \= type('<http://www.w3.org/2001/XMLSchema#dateTime>'),
+		B \= type('<http://www.w3.org/2001/XMLSchema#date>'),
+		B \= type('<http://www.w3.org/2001/XMLSchema#time>'),
+		B \= type('<http://www.w3.org/2001/XMLSchema#duration>'),
+		B \= type('<http://www.w3.org/2001/XMLSchema#yearMonthDuration>'),
+		B \= type('<http://www.w3.org/2001/XMLSchema#dayTimeDuration>')
+	->	write('"'),
+		write(F),
+		write('"')
+	;	write(F)
+	).
 wcf(A) :-
 	atom(A),
 	nb_getval(var_ns, Vns),
@@ -2676,9 +2684,7 @@ wcf(A) :-
 	sub_atom(A, 0, 1, _, '_'),
 	!,
 	sub_atom(A, 1, _, 0, B),
-	write('"'),
-	write(B),
-	write('"').
+	write(B).
 wcf(A) :-
 	write(A).
 
@@ -9906,8 +9912,7 @@ formulacontent(Formula) -->
 
 langcode(Langcode) -->
 	[name(Name)],
-	{	downcase_atom(Name, Nm),
-		atomic_list_concat(['\'', Nm, '\''], Langcode)
+	{	atomic_list_concat(['\'', Name, '\''], Langcode)
 	}.
 
 
