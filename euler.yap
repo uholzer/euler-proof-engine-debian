@@ -150,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0810:2315 josd').
+version_info('EYE-Summer15 0811:1021 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -646,6 +646,7 @@ gre(Argus) :-
 			query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
 			catch(call(Where), _, fail),
 			wct(Select),
+			cnt(output_statements),
 			fail
 		;	true
 		)
@@ -659,7 +660,8 @@ gre(Argus) :-
 	timestamp(Stamp),
 	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
-	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Step, Brake, Inf, Elaps, Speed]),
+	nb_getval(output_statements, Outq),
+	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outq, Step, Brake, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
