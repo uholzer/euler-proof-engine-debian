@@ -12,7 +12,8 @@
 <h1><img src="http://eulersharp.sourceforge.net/2003/03swap/eye.png" alt="EYE" height="37" width="37"/> DONE</h1>
 <pre>
 <span id="EYE-Summer15">[<a href="https://sourceforge.net/projects/eulersharp/files/eulersharp/EYE-Summer15/">EYE-Summer15</a>]</span>
-- show the number of csv output records (obs from Hong Sun)
+- making implicit quantification according to <a href="http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues">http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues</a>
+- showing the number of csv output records (obs from Hong Sun)
 - making sure that --proof does not use facts from builtins as well as inferences from boltons (backward rules)
 - using less double quotes in csv output and simplifying language tags
 - implementing registry for boltons (backward rules)

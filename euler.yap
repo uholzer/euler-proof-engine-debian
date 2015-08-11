@@ -64,7 +64,6 @@
 
 
 :- dynamic(answer/8).
-:- dynamic(back/0).
 :- dynamic(base_uri/1).
 :- dynamic(bcnd/2).
 :- dynamic(bgot/3).
@@ -86,6 +85,7 @@
 :- dynamic(flag/1).
 :- dynamic(flag/2).
 :- dynamic(fm/1).
+:- dynamic(forward/0).
 :- dynamic(fs/1).
 :- dynamic(goal/0).
 :- dynamic(got_answer/9).
@@ -150,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0811:1021 josd').
+version_info('EYE-Summer15 0811 2026 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -380,7 +380,6 @@ gre(Argus) :-
 	nb_setval(fnet, not_done),
 	nb_setval(table, -1),
 	nb_setval(tuple, -1),
-	nb_setval(fdepth, 0),
 	nb_setval(defcl, true),
 	nb_setval(input_statements, 0),
 	nb_setval(fdepth, 0),
@@ -9907,7 +9906,7 @@ expression(Node, T) -->
 formulacontent(Formula) -->
 	statementlist(List),
 	{	(	nb_getval(fdepth, 1),
-			retract(back)
+			retract(forward)
 		->	L = List
 		;	distinct(List, L)
 		),
@@ -10422,16 +10421,16 @@ symbol(Name) -->
 			subst([[[0'-], [0'_, 0'M, 0'I, 0'N, 0'U, 0'S, 0'_]], [[0'.], [0'_, 0'D, 0'O, 0'T, 0'_]]], LabelCodes, LabelTidy),
 			atom_codes(N, LabelTidy)
 		),
-		(	(	D =:= 0
-			->	evar(N, S)
-			;	evar(N, S, D)
+		(	(	forward
+			->	evar(N, S, 1)
+			;	evar(N, S)
 			)
 		->	true
 		;	atom_concat(N, '_', M),
 			gensym(M, S),
-			(	D =:= 0
-			->	assertz(evar(N, S))
-			;	assertz(evar(N, S, D))
+			(	forward
+			->	assertz(evar(N, S, 1))
+			;	assertz(evar(N, S))
 			)
 		),
 		(	nb_getval(fdepth, 0)
@@ -10508,7 +10507,8 @@ verb(V, []) -->
 			throw(not_in_turtle('=>', after_line(Ln)))
 		;	true
 		),
-		V = '\'<http://www.w3.org/2000/10/swap/log#implies>\''
+		V = '\'<http://www.w3.org/2000/10/swap/log#implies>\'',
+		assertz(forward)
 	}.
 verb(V, []) -->
 	['='],
@@ -10527,8 +10527,7 @@ verb(':-', []) -->
 		->	nb_getval(line_number, Ln),
 			throw(not_in_turtle('<=', after_line(Ln)))
 		;	true
-		),
-		assertz(back)
+		)
 	}.
 % DEPRECATED
 verb(V, []) -->
