@@ -64,6 +64,7 @@
 
 
 :- dynamic(answer/8).
+:- dynamic(backward/0).
 :- dynamic(base_uri/1).
 :- dynamic(bcnd/2).
 :- dynamic(bgot/3).
@@ -150,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0811 2026 josd').
+version_info('EYE-Summer15 0812 1240 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -554,6 +555,35 @@ gre(Argus) :-
 			nb_setval(exit_code, 1)
 		)
 	),
+	(	flag(strings)
+	->	findall([Key, Str],
+			(	'<http://www.w3.org/2000/10/swap/log#outputString>'(Key, Str)
+			;	answer(A1, A2, A3, A4, A5, A6, A7, A8),
+				strela(answer('<http://www.w3.org/2000/10/swap/log#outputString>'(Key, Str)), answer(A1, A2, A3, A4, A5, A6, A7, A8))
+			),
+			KS
+		),
+		sort(KS, KT),
+		forall(
+			(	member([_, MT], KT),
+				getcodes(MT, LT)
+			),
+			(	escape_string(NT, LT),
+				atom_codes(ST, NT),
+				wt(ST)
+			)
+		),
+		(	catch(nb_getval(csv_header, Header), _, fail),
+			wct(Header),
+			query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
+			catch(call(Where), _, fail),
+			wct(Select),
+			cnt(output_statements),
+			fail
+		;	true
+		)
+	;	true
+	),
 	nb_getval(tc, TC),
 	nb_getval(tp, TP),
 	nb_getval(bc, BC),
@@ -612,8 +642,18 @@ gre(Argus) :-
 	statistics(walltime, [_, T5]),
 	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
 	flush_output(user_error),
+	Elaps is T1+T3+T5,
 	nb_getval(input_statements, Inp),
 	nb_getval(output_statements, Outp),
+	(	flag(strings)
+	->	true
+	;	(	Inp =\= 0
+		->	format('#ENDS ~3d [sec] IO=~d/~d TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [Elaps, Inp, Outp, TC, TP, BC, BP, PM, CM, FM, AM])
+		;	format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [Elaps, TC, TP, BC, BP, PM, CM, FM, AM])
+		),
+		nl
+	),
+	timestamp(Stamp),
 	Step is TP+BP,
 	nb_getval(tr, TR),
 	nb_getval(br, BR),
@@ -622,45 +662,8 @@ gre(Argus) :-
 	->	true
 	;	Inf = ''
 	),
-	(	flag(strings)
-	->	findall([Key, Str],
-			(	'<http://www.w3.org/2000/10/swap/log#outputString>'(Key, Str)
-			;	answer(A1, A2, A3, A4, A5, A6, A7, A8),
-				strela(answer('<http://www.w3.org/2000/10/swap/log#outputString>'(Key, Str)), answer(A1, A2, A3, A4, A5, A6, A7, A8))
-			),
-			KS
-		),
-		sort(KS, KT),
-		forall(
-			(	member([_, MT], KT),
-				getcodes(MT, LT)
-			),
-			(	escape_string(NT, LT),
-				atom_codes(ST, NT),
-				wt(ST)
-			)
-		),
-		(	catch(nb_getval(csv_header, Header), _, fail),
-			wct(Header),
-			query(Where, '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#csvTuple>'(_, Select)),
-			catch(call(Where), _, fail),
-			wct(Select),
-			cnt(output_statements),
-			fail
-		;	true
-		)
-	;	TE is T1+T3+T5,
-		(	Inp =\= 0
-		->	format('#ENDS ~3d [sec] IO=~d/~d TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, Inp, Outp, TC, TP, BC, BP, PM, CM, FM, AM])
-		;	format('#ENDS ~3d [sec] TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TE, TC, TP, BC, BP, PM, CM, FM, AM])
-		),
-		nl
-	),
-	timestamp(Stamp),
-	Elaps is T1+T3+T5,
 	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
-	nb_getval(output_statements, Outq),
-	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outq, Step, Brake, Inf, Elaps, Speed]),
+	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Step, Brake, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
 	->	findall([RTC, RTP, RBC, RBP, Rule],
@@ -9906,7 +9909,8 @@ expression(Node, T) -->
 formulacontent(Formula) -->
 	statementlist(List),
 	{	(	nb_getval(fdepth, 1),
-			retract(forward)
+			retract(forward),
+			retract(backward)
 		->	L = List
 		;	distinct(List, L)
 		),
@@ -10421,16 +10425,18 @@ symbol(Name) -->
 			subst([[[0'-], [0'_, 0'M, 0'I, 0'N, 0'U, 0'S, 0'_]], [[0'.], [0'_, 0'D, 0'O, 0'T, 0'_]]], LabelCodes, LabelTidy),
 			atom_codes(N, LabelTidy)
 		),
-		(	(	forward
-			->	evar(N, S, 1)
-			;	evar(N, S)
+		(	(	\+forward,
+				\+backward
+			->	evar(N, S)
+			;	evar(N, S, 1)
 			)
 		->	true
 		;	atom_concat(N, '_', M),
 			gensym(M, S),
-			(	forward
-			->	assertz(evar(N, S, 1))
-			;	assertz(evar(N, S))
+			(	\+forward,
+				\+backward
+			->	assertz(evar(N, S))
+			;	assertz(evar(N, S, 1))
 			)
 		),
 		(	nb_getval(fdepth, 0)
@@ -10527,7 +10533,8 @@ verb(':-', []) -->
 		->	nb_getval(line_number, Ln),
 			throw(not_in_turtle('<=', after_line(Ln)))
 		;	true
-		)
+		),
+		assertz(backward)
 	}.
 % DEPRECATED
 verb(V, []) -->
