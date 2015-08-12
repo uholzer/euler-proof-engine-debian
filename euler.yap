@@ -68,7 +68,6 @@
 :- dynamic(base_uri/1).
 :- dynamic(bcnd/2).
 :- dynamic(bgot/3).
-:- dynamic(bolton/1).
 :- dynamic(brake/0).
 :- dynamic(branch/0).
 :- dynamic(branching/0).
@@ -151,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0812 1240 josd').
+version_info('EYE-Summer15 0812 2216 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1430,11 +1429,6 @@ n3_n3p(Argument, Mode) :-
 								(	flag(n3p)
 								->	portray_clause(':-'(Ci, Pj))
 								;	assertz(':-'(Ci, Pj))
-								),
-								(	Ci =.. [Cp, _, _],
-									\+bolton(Cp)
-								->	assertz(bolton(Cp))
-								;	true
 								)
 							)
 						;	strelas(Rt),

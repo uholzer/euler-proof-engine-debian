@@ -15,9 +15,8 @@
 - correcting reasoning time measurement for csv output (obs from Hong Sun)
 - making implicit quantification according to <a href="http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues">http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues</a>
 - showing the number of csv output records (obs from Hong Sun)
-- making sure that --proof does not use facts from builtins as well as inferences from boltons (backward rules)
+- making sure that --proof does not use facts from builtins as well as inferences from backward rules
 - using less double quotes in csv output and simplifying language tags
-- implementing registry for boltons (backward rules)
 - using curl -L to follow redirects
 - adding --brake &lt;count&gt; command line switch to set maximimum brake count
 - supporting inference fuses in queries (obs from Hong Sun)
