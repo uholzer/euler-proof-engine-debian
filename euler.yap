@@ -150,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0814 0836 josd').
+version_info('EYE-Summer15 0814 1414 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -7516,8 +7516,8 @@ unify(A, B) :-
 	(	(	nonvar(B)
 		;	nonvar(Q)
 		)
-	->	atom(Q),
-		B =.. [Q, T, R]
+	->	B =.. [Q, T, R],
+		atom(Q)
 	),
 	!.
 unify(A, B) :-
@@ -7529,7 +7529,8 @@ unify(A, B) :-
 	(	(	nonvar(A)
 		;	nonvar(Q)
 		)
-	->	A =.. [Q, T, R]
+	->	A =.. [Q, T, R],
+		atom(Q)
 	),
 	!.
 unify(A, B) :-
