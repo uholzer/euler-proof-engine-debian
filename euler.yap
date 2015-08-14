@@ -150,7 +150,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0812 2216 josd').
+version_info('EYE-Summer15 0814 0836 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -3868,9 +3868,9 @@ end(End, Env) :-
 
 
 
-% --------
-% builtins
-% --------
+% ---------
+% built-ins
+% ---------
 
 % DEPRECATED
 '<http://eulersharp.sourceforge.net/2003/03swap/log-rules#allAncestors>'(A, B) :-
@@ -5148,9 +5148,9 @@ end(End, Env) :-
 
 
 
-% ------------
-% RIF builtins
-% ------------
+% -------------
+% RIF built-ins
+% -------------
 
 % according to RIF Datatypes and Built-Ins 1.0 -- http://www.w3.org/TR/rif-dtb/
 
