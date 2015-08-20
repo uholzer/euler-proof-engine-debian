@@ -101,6 +101,7 @@
 :- dynamic(keywords/1).
 :- dynamic(lemma/6).
 :- dynamic(mtime/2).
+:- dynamic(ncllit/0).
 :- dynamic(nodepth/0).
 :- dynamic(ns/2).
 :- dynamic(pfx/2).
@@ -150,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0814 1414 josd').
+version_info('EYE-Summer15 0820 2051 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1574,19 +1575,18 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	(	\+flag(tactic, 'linear-select'),
-		pvars(Y, U),
-		U = []
-	->	write(Y),
+	(	flag(tactic, 'linear-select')
+	->	write(implies(true, Y, Src)),
+		writeln('.')
+	;	rvars(Y, V), 
+		write(V),
 		writeln('.'),
 		(	flag(nope),
 			\+flag(ances)	% DEPRECATED
 		->	true
-		;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
+		;	write(prfstep(V, _, true, _, V, _, forward, Src)),
 			writeln('.')
 		)
-	;	write(implies(true, Y, Src)),
-		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
 
@@ -2103,15 +2103,13 @@ wt0(X) :-
 	(	\+flag('no-qvars'),
 		\+flag('no-blank')	% DEPRECATED
 	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, CD),
-				CD > 0
-			->	memberchk(Y, L)
-			;	(	memberchk(Y, L)
+			(	ncllit
+			->	(	memberchk(Y, L)
 				->	true
 				;	retract(rule_uvar(L)),
 					assertz(rule_uvar([Y|L]))
 				)
+			;	memberchk(Y, L)
 			)
 		->	write('?U')
 		;	write('_:sk')
@@ -2127,15 +2125,13 @@ wt0(X) :-
 	!,
 	(	\+flag('no-qvars')
 	->	(	rule_uvar(L),
-			(	nb_getval(pdepth, 0),
-				nb_getval(cdepth, CD),
-				CD > 0
-			->	memberchk(Y, L)
-			;	(	memberchk(Y, L)
+			(	ncllit
+			->	(	memberchk(Y, L)
 				->	true
 				;	retract(rule_uvar(L)),
 					assertz(rule_uvar([Y|L]))
 				)
+			;	memberchk(Y, L)
 			)
 		->	write('?U')
 		;	write('_:sk')
@@ -2163,18 +2159,13 @@ wt0(X) :-
 	sub_atom(X, J, _, 1, Y),
 	(	\+sub_atom(Y, 0, 2, _, 'qe'),
 		rule_uvar(L),
-		(	nb_getval(pdepth, PD),
-			nb_getval(cdepth, CD),
-			(	PD = 0,
-				CD > 0
-			;	PD > 1
-			)
-		->	memberchk(Y, L)
-		;	(	memberchk(Y, L)
+		(	ncllit
+		->	(	memberchk(Y, L)
 			->	true
 			;	retract(rule_uvar(L)),
 				assertz(rule_uvar([Y|L]))
 			)
+		;	memberchk(Y, L)
 		)
 	->	write('?')
 	;	(	\+flag('no-qvars'),
@@ -2327,10 +2318,22 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 	;	true
 	),
 	(	catch(clause(Y, Z), _, fail)
-	->	wg(Y),
+	->	(	nb_getval(fdepth, 0)
+		->	assertz(ncllit)
+		;	true
+		),
+		wg(Y),
 		write(' <= '),
-		wg(X)
-	;	(	\+atom(X)
+		wg(X),
+		(	nb_getval(fdepth, 0)
+		->	retract(ncllit)
+		;	true
+		)
+	;	(	nb_getval(fdepth, 0)
+		->	assertz(ncllit)
+		;	true
+		),
+		(	\+atom(X)
 		->	nb_getval(pdepth, PD),
 			PD1 is PD+1,
 			nb_setval(pdepth, PD1)
@@ -2339,6 +2342,10 @@ wt2('<http://www.w3.org/2000/10/swap/log#implies>'(X, Y)) :-
 		wg(X),
 		(	\+atom(X)
 		->	nb_setval(pdepth, PD)
+		;	true
+		),
+		(	nb_getval(fdepth, 0)
+		->	retract(ncllit)
 		;	true
 		),
 		write(' => '),
@@ -8418,6 +8425,34 @@ qvars(A, B) :-
 	qvars(C, B).
 
 
+rvars(A, B) :-
+	atomic(A),
+	!,
+	(	atom(A),
+		sub_atom(A, 0, 1, _, '_')
+	->	sub_atom(A, 1, _, 0, C),
+		(	evar(C, D)
+		->	true
+		;	atom_concat(C, '_', E),
+			gensym(E, D),
+			assertz(evar(C, D))
+		),
+		nb_getval(var_ns, Vns),
+		atomic_list_concat(['\'<', Vns, D, '>\''], B)
+	;	B = A
+	).
+rvars([], []) :-
+	!.
+rvars([A|B], [C|D]) :-
+	rvars(A, C),
+	rvars(B, D),
+	!.
+rvars(A, B) :-
+	A =.. C,
+	rvars(C, D),
+	B =.. D.
+
+
 raw_type(A, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#List>') :-
 	is_list(A),
 	!.
@@ -10509,7 +10544,10 @@ verb(V, []) -->
 		;	true
 		),
 		V = '\'<http://www.w3.org/2000/10/swap/log#implies>\'',
-		assertz(forward)
+		(	nb_getval(fdepth, 0)
+		->	assertz(forward)
+		;	true
+		)
 	}.
 verb(V, []) -->
 	['='],
@@ -10529,7 +10567,10 @@ verb(':-', []) -->
 			throw(not_in_turtle('<=', after_line(Ln)))
 		;	true
 		),
-		assertz(backward)
+		(	nb_getval(fdepth, 0)
+		->	assertz(backward)
+		;	true
+		)
 	}.
 % DEPRECATED
 verb(V, []) -->

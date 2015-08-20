@@ -12,11 +12,11 @@
 <h1><img src="http://eulersharp.sourceforge.net/2003/03swap/eye.png" alt="EYE" height="37" width="37"/> DONE</h1>
 <pre>
 <span id="EYE-Summer15">[<a href="https://sourceforge.net/projects/eulersharp/files/eulersharp/EYE-Summer15/">EYE-Summer15</a>]</span>
+- making implicit quantification according to <a href="http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues">http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues</a>
 - correcting bug in graph literal unifier (obs from Hong Sun)
 - correcting reasoning time measurement for csv output (obs from Hong Sun)
-- making implicit quantification according to <a href="http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues">http://eulersharp.sourceforge.net/2006/02swap/eye-note#designissues</a>
 - showing the number of csv output records (obs from Hong Sun)
-- making sure that --proof does not use facts from built-ins as well as inferences from add-ons
+- making sure that --proof does not use facts from built-ins as well as inferences from backward rules
 - using less double quotes in csv output and simplifying language tags
 - using curl -L to follow redirects
 - adding --brake &lt;count&gt; command line switch to set maximimum brake count
