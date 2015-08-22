@@ -151,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0820 2051 josd').
+version_info('EYE-Summer15 0822 2109 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -209,9 +209,9 @@ eye
 
 
 
-% ---------
-% main goal
-% ---------
+% ---------------------------------------------------
+% main goal = SEE (Subgoal Expansion and Elimination)
+% ---------------------------------------------------
 
 main :-
 	Id is random(2^30)*random(2^30)*random(2^30)*random(2^30),
@@ -366,7 +366,6 @@ argv([Arg|Argvs], [Arg|Argus]) :-
 % ------------------------------
 % GRE (Generic Reasoning Engine)
 % ------------------------------
-
 
 gre(Argus) :-
 	statistics(runtime, [T0, _]),
