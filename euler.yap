@@ -151,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0822 2109 josd').
+version_info('EYE-Summer15 0827 1135 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -177,6 +177,7 @@ eye
 	--brake <count>		set maximimum brake count
 	--tactic linear-select	select each rule only once
 	--tactic single-answer	give only one answer
+	--tactic existing-path	Euler path using homomorphism
 	--wcache <uri> <file>	to tell that uri is cached as file
 	--ignore-syntax-error	do not halt in case of syntax error
 	--ignore-inference-fuse	do not halt in case of inference fuse
@@ -209,9 +210,9 @@ eye
 
 
 
-% ---------------------------------------------------
-% main goal = SEE (Subgoal Expansion and Elimination)
-% ---------------------------------------------------
+% ---------
+% main goal
+% ---------
 
 main :-
 	Id is random(2^30)*random(2^30)*random(2^30)*random(2^30),
@@ -2928,12 +2929,20 @@ eam(Span) :-
 			partconc(Prem, Lv, Lw),
 			clist(Lw, Concd)
 		),
+		(	flag(tactic, 'existing-path')
+		->	evars(Concd, Conct),
+			distinct(Conct, Concu),
+			length(Concu, Concw),
+			length(Concv, Concw),
+			evars(Concd, Concdr, Concu, Concv)
+		;	Concdr = Concd
+		),
 		term_index(Prem, Pnd),
 		(	flag(think),	% DEPRECATED
 			\+flag(nope),
 			\+prfstep(_, _, Prem, Pnd, _, _, _, _)
 		->	true
-		;	(	\+call(Concd)
+		;	(	\+call(Concdr)
 			->	true
 			;	(	flag(debug),
 					flag(warn)
@@ -8382,24 +8391,53 @@ findvars(A, B) :-
 	findvars(C, B).
 
 
-pvars(A, B) :-
+evars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
-		sub_atom(A, 0, 1, _, '_')
+		(	sub_atom(A, 0, _, _, 'some')
+		;	nb_getval(var_ns, Vns),
+			sub_atom(A, 1, _, _, Vns)
+		)
 	->	B = [A]
 	;	B = []
 	).
-pvars([], []) :-
+evars(A, []) :-
+	var(A),
 	!.
-pvars([A|B], C) :-
-	pvars(A, D),
-	pvars(B, E),
+evars([], []) :-
+	!.
+evars([A|B], C) :-
+	evars(A, D),
+	evars(B, E),
 	append(D, E, C),
 	!.
-pvars(A, B) :-
+evars(A, B) :-
 	A =.. C,
-	pvars(C, B).
+	evars(C, B).
+
+
+evars(A, B, C, D) :-
+	atomic(A),
+	!,
+	(	atom(A),
+		nth0(E, C, A)
+	->	nth0(E, D, B)
+	;	B = A
+	).
+evars(A, A, _, _) :-
+	var(A),
+	!.
+evars([], [], _, _) :-
+	!.
+evars([A|B], [C|D], E, F) :-
+	evars(A, C, E, F),
+	evars(B, D, E, F),
+	!.
+evars(A, B, E, F) :-
+	A =.. C,
+	evars(C, D, E, F),
+	B =.. D.
 
 
 qvars(A, B) :-
