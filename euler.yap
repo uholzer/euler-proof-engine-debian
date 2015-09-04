@@ -151,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0827 1135 josd').
+version_info('EYE-Summer15 0904 1929 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4629,19 +4629,32 @@ end(End, Env) :-
 	).
 
 
-'<http://www.w3.org/2000/10/swap/log#uri>'(X, literal(Y, type('<http://www.w3.org/2001/XMLSchema#string>'))) :-
+'<http://www.w3.org/2000/10/swap/log#uri>'(X, Y) :-
 	when(
 		(	nonvar(X)
 		;	nonvar(Y)
 		),
 		(	atom(X),
-			nb_getval(var_ns, Vns),
-			\+sub_atom(X, 1, _, _, Vns),
-			sub_atom(X, 1, _, 1, Y),
-			atomic_list_concat(['<', Y, '>'], X),
+			(	(	nb_getval(var_ns, Vns),
+					sub_atom(X, 1, _, _, Vns)
+				;	atom_concat(some, _, X)
+				)
+			->	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, [X])
+			;	sub_atom(X, 1, _, 1, Z),
+				atomic_list_concat(['<', Z, '>'], X),
+				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>'))
+			),
 			!
 		;	nonvar(Y),
-			atomic_list_concat(['<', Y, '>'], X)
+			(	atom(Y),
+				(	nb_getval(var_ns, Vns),
+					sub_atom(Y, 1, _, _, Vns)
+				;	atom_concat(some, _, Y)
+				)
+			->	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, [Y])
+			;	Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
+				atomic_list_concat(['<', Z, '>'], X)
+			)
 		)
 	).
 
@@ -8395,9 +8408,9 @@ evars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
-		(	sub_atom(A, 0, _, _, 'some')
-		;	nb_getval(var_ns, Vns),
+		(	nb_getval(var_ns, Vns),
 			sub_atom(A, 1, _, _, Vns)
+		;	atom_concat(some, _, A)
 		)
 	->	B = [A]
 	;	B = []
