@@ -151,7 +151,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0904 1929 josd').
+version_info('EYE-Summer15 0904 2231 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9194,11 +9194,13 @@ resolve_uri(A, B, C) :-
 	atom_length(U, V),
 	sub_atom(B, 0, V, D, U),
 	sub_atom(B, V, D, _, E),
-	sub_atom(E, F, 1, G, '/'),
-	sub_atom(E, _, G, 0, H),
-	\+sub_atom(H, _, _, _, '/'),
-	K is V+F,
-	sub_atom(B, 0, K, _, S),
+	(	sub_atom(E, F, 1, G, '/'),
+		sub_atom(E, _, G, 0, H),
+		\+sub_atom(H, _, _, _, '/'),
+		K is V+F
+	->	sub_atom(B, 0, K, _, S)
+	;	S = B
+	),
 	resolve_uri(R, S, C).
 resolve_uri(A, B, C) :-
 	so_uri(U),
