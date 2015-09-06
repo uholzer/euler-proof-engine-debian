@@ -50,6 +50,8 @@
 :- if(current_prolog_flag(dialect, swi)).
 :- use_module(library(when), [when/2]).
 :- use_module(library(qsave)).
+:- catch(use_module(library(sha1)), _, true).
+:- catch(use_module(library(uri)), _, true).
 :- endif.
 :- if(\+current_predicate(date_time_stamp/2)).
 :- load_foreign_files(['pl-tai'], [], install).
@@ -151,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0904 2231 josd').
+version_info('EYE-Summer15 0906 1145 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9163,6 +9165,10 @@ absolute_uri(A, B) :-
 	).
 
 
+:- if(current_predicate(uri_resolve/3)).
+resolve_uri(A, B, C) :-
+	uri_resolve(A, B, C).
+:-else.
 resolve_uri(A, _, A) :-
 	sub_atom(A, _, 1, _, ':'),
 	!.
@@ -9230,6 +9236,7 @@ resolve_uri(A, B, C) :-
 resolve_uri(A, _, _) :-
 	nb_getval(line_number, Ln),
 	throw(unresolvable_relative_uri(A, after_line(Ln))).
+:- endif.
 
 
 so_uri('http://').
