@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0906 1145 josd').
+version_info('EYE-Summer15 0908 2110 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4555,24 +4555,25 @@ end(End, Env) :-
 	).
 
 
-:- if(current_prolog_flag(dialect, swi)).
-'<http://www.w3.org/2000/10/swap/log#dtlit>'(A, B) :-
-	nonvar(B),
-	!,
-	dtlit(A, B).
-:- endif.
-'<http://www.w3.org/2000/10/swap/log#dtlit>'(A, B) :-
+'<http://www.w3.org/2000/10/swap/log#dtlit>'([A, B], C) :-
 	when(
-		(	ground(A)
-		;	nonvar(B)
+		(	ground([A, B])
+		;	nonvar(C)
 		),
-		(	(	nonvar(B)
-			->	dtlit(A, B)
-			;	A = [E, D],
-				getcodes(E, F),
-				atom_codes(C, F),
-				B = literal(C, type(D))
+		(	\+exivar(A),
+			\+exivar(B),
+			\+exivar(C)
+		->	(	ground([A, B]),
+				getcodes(A, D),
+				atom_codes(E, D),
+				C = literal(E, type(B)),
+				!
+			;	nonvar(C),
+				dtlit([A, B], C)
 			)
+		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(A, ['<http://www.w3.org/2000/10/swap/log#dtlit>', '', B, C])),
+			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(B, ['<http://www.w3.org/2000/10/swap/log#dtlit>', A, '', C])),
+			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(C, ['<http://www.w3.org/2000/10/swap/log#dtlit>', A, B, '']))
 		)
 	).
 
@@ -4636,27 +4637,19 @@ end(End, Env) :-
 		(	nonvar(X)
 		;	nonvar(Y)
 		),
-		(	atom(X),
-			(	(	nb_getval(var_ns, Vns),
-					sub_atom(X, 1, _, _, Vns)
-				;	atom_concat(some, _, X)
-				)
-			->	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, [X])
-			;	sub_atom(X, 1, _, 1, Z),
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	nonvar(X),
+				sub_atom(X, 1, _, 1, Z),
 				atomic_list_concat(['<', Z, '>'], X),
-				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>'))
-			),
-			!
-		;	nonvar(Y),
-			(	atom(Y),
-				(	nb_getval(var_ns, Vns),
-					sub_atom(Y, 1, _, _, Vns)
-				;	atom_concat(some, _, Y)
-				)
-			->	'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, [Y])
-			;	Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
+				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
+				!
+			;	nonvar(Y),
+				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
 				atomic_list_concat(['<', Z, '>'], X)
 			)
+		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/log#uri>', '', Y])),
+			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/log#uri>', X, '']))
 		)
 	).
 
@@ -4767,9 +4760,13 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	getnumber(X, U),
-			getnumber(Y, V),
-			U > V
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	getnumber(X, U),
+				getnumber(Y, V),
+				U > V
+			)
+		;	true
 		)
 	).
 
@@ -4792,9 +4789,13 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	getnumber(X, U),
-			getnumber(Y, V),
-			U < V
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	getnumber(X, U),
+				getnumber(Y, V),
+				U < V
+			)
+		;	true
 		)
 	).
 
@@ -4830,9 +4831,13 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	getnumber(X, U),
-			getnumber(Y, V),
-			U =\= V
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	getnumber(X, U),
+				getnumber(Y, V),
+				U =\= V
+			)
+		;	true
 		)
 	).
 
@@ -4841,9 +4846,13 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	getnumber(X, U),
-			getnumber(Y, V),
-			U =< V
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	getnumber(X, U),
+				getnumber(Y, V),
+				U =< V
+			)
+		;	true
 		)
 	).
 
@@ -4852,9 +4861,13 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	getnumber(X, U),
-			getnumber(Y, V),
-			U >= V
+		(	\+exivar(X),
+			\+exivar(Y)
+		->	(	getnumber(X, U),
+				getnumber(Y, V),
+				U >= V
+			)
+		;	true
 		)
 	).
 
@@ -8380,6 +8393,16 @@ commonvars(A, B, C) :-
 	).
 
 
+exivar(A) :-
+	atom(A),
+	nb_getval(var_ns, Vns),
+	sub_atom(A, 1, _, _, Vns),
+	!.
+exivar(A) :-
+	atom(A),
+	atom_concat(some, _, A).
+
+
 getvars(A, B) :-
 	findvars(A, C),
 	distinct(C, B).
@@ -8409,11 +8432,7 @@ findvars(A, B) :-
 evars(A, B) :-
 	atomic(A),
 	!,
-	(	atom(A),
-		(	nb_getval(var_ns, Vns),
-			sub_atom(A, 1, _, _, Vns)
-		;	atom_concat(some, _, A)
-		)
+	(	exivar(A)
 	->	B = [A]
 	;	B = []
 	).
