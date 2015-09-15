@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0914 2244 josd').
+version_info('EYE-Summer15 0915 1425 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4560,20 +4560,13 @@ end(End, Env) :-
 		(	ground([A, B])
 		;	nonvar(C)
 		),
-		(	\+exivar(A),
-			\+exivar(B),
-			\+exivar(C)
-		->	(	ground([A, B]),
-				getcodes(A, D),
-				atom_codes(E, D),
-				C = literal(E, type(B)),
-				!
-			;	nonvar(C),
-				dtlit([A, B], C)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(A, ['<http://www.w3.org/2000/10/swap/log#dtlit>', '', B, C])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(B, ['<http://www.w3.org/2000/10/swap/log#dtlit>', A, '', C])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(C, ['<http://www.w3.org/2000/10/swap/log#dtlit>', A, B, '']))
+		(	ground([A, B]),
+			getcodes(A, D),
+			atom_codes(E, D),
+			C = literal(E, type(B)),
+			!
+		;	nonvar(C),
+			dtlit([A, B], C)
 		)
 	).
 
@@ -4637,19 +4630,19 @@ end(End, Env) :-
 		(	nonvar(X)
 		;	nonvar(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	nonvar(X),
-				sub_atom(X, 1, _, 1, Z),
-				atomic_list_concat(['<', Z, '>'], X),
-				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
-				!
-			;	nonvar(Y),
-				Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
-				atomic_list_concat(['<', Z, '>'], X)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/log#uri>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/log#uri>', X, '']))
+		(	nonvar(X),
+			(	atom_concat(some, V, X)
+			->	nb_getval(var_ns, Vns),
+				atomic_list_concat(['<', Vns, 'sk', V, '>'], U)
+			;	U = X
+			),
+			sub_atom(U, 1, _, 1, Z),
+			atomic_list_concat(['<', Z, '>'], U),
+			Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
+			!
+		;	nonvar(Y),
+			Y = literal(Z, type('<http://www.w3.org/2001/XMLSchema#string>')),
+			atomic_list_concat(['<', Z, '>'], X)
 		)
 	).
 
@@ -4658,12 +4651,8 @@ end(End, Env) :-
 	when(
 		(	ground(X)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is abs(U)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#absoluteValue>', X, '']))
+		(	getnumber(X, U),
+			Y is abs(U)
 		)
 	).
 
@@ -4672,14 +4661,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				Z is atan(U/V)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#atan2>', X, Y, '']))
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			Z is atan(U/V)
 		)
 	).
 
@@ -4689,16 +4673,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is cos(U),
-				!
-			;	getnumber(Y, W),
-				X is acos(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#cos>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#cos>', X, '']))
+		(	getnumber(X, U),
+			Y is cos(U),
+			!
+		;	getnumber(Y, W),
+			X is acos(W)
 		)
 	).
 
@@ -4708,16 +4687,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is cosh(U),
-				!
-			;	getnumber(Y, W),
-				X is acosh(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#cosh>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#cosh>', X, '']))
+		(	getnumber(X, U),
+			Y is cosh(U),
+			!
+		;	getnumber(Y, W),
+			X is acosh(W)
 		)
 	).
 
@@ -4727,16 +4701,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is U*180/pi,
-				!
-			;	getnumber(Y, W),
-				X is W*pi/180
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#degrees>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#degrees>', X, '']))
+		(	getnumber(X, U),
+			Y is U*180/pi,
+			!
+		;	getnumber(Y, W),
+			X is W*pi/180
 		)
 	).
 
@@ -4745,14 +4714,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				Z is U-V
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#difference>', X, Y, '']))
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			Z is U-V
 		)
 	).
 
@@ -4761,13 +4725,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U =:= V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U =:= V
 		)
 	).
 
@@ -4777,21 +4737,15 @@ end(End, Env) :-
 		(	ground([X, Y])
 		;	ground([X, Z])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				(	getnumber(Y, V),
-					Z is U**V,
-					!
-				;	getnumber(Z, W),
-					W =\= 0,
-					U =\= 0,
-					Y is log(W)/log(U)
-				)
+		(	getnumber(X, U),
+			(	getnumber(Y, V),
+				Z is U**V,
+				!
+			;	getnumber(Z, W),
+				W =\= 0,
+				U =\= 0,
+				Y is log(W)/log(U)
 			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#exponentiation>', X, Y, ''])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#exponentiation>', X, '', Z]))
 		)
 	).
 
@@ -4800,13 +4754,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U > V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U > V
 		)
 	).
 
@@ -4815,17 +4765,12 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				(	V =\= 0
-				->	Z is round(floor(U/V))
-				;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#integerQuotient>'([X, Y], Z)))
-				)
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			(	V =\= 0
+			->	Z is round(floor(U/V))
+			;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#integerQuotient>'([X, Y], Z)))
 			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#integerQuotient>', X, Y, '']))
 		)
 	).
 
@@ -4834,13 +4779,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U < V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U < V
 		)
 	).
 
@@ -4849,15 +4790,11 @@ end(End, Env) :-
 	when(
 		(	nonvar(X)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	(	getlist(X, Z)
-				->	true
-				;	clistflat(Z, X)
-				),
-				length(Z, Y)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#memberCount>', X, '']))
+		(	(	getlist(X, Z)
+			->	true
+			;	clistflat(Z, X)
+			),
+			length(Z, Y)
 		)
 	).
 
@@ -4867,16 +4804,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is -U,
-				!
-			;	getnumber(Y, W),
-				X is -W
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#negation>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#negation>', X, '']))
+		(	getnumber(X, U),
+			Y is -U,
+			!
+		;	getnumber(Y, W),
+			X is -W
 		)
 	).
 
@@ -4885,13 +4817,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U =\= V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U =\= V
 		)
 	).
 
@@ -4900,13 +4828,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U =< V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U =< V
 		)
 	).
 
@@ -4915,13 +4839,9 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				U >= V
-			)
-		;	true
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			U >= V
 		)
 	).
 
@@ -4930,11 +4850,7 @@ end(End, Env) :-
 	when(
 		(	ground(X)
 		),
-		(	\+exivarchk(X),
-			\+exivar(Y)
-		->	(	product(X, Y)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#product>', X, '']))
+		(	product(X, Y)
 		)
 	).
 
@@ -4943,17 +4859,12 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				(	V =\= 0
-				->	Z is U/V
-				;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#quotient>'([X, Y], Z)))
-				)
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			(	V =\= 0
+			->	Z is U/V
+			;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#quotient>'([X, Y], Z)))
 			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#quotient>', X, Y, '']))
 		)
 	).
 
@@ -4962,17 +4873,12 @@ end(End, Env) :-
 	when(
 		(	ground([X, Y])
 		),
-		(	\+exivar(X),
-			\+exivar(Y),
-			\+exivar(Z)
-		->	(	getnumber(X, U),
-				getnumber(Y, V),
-				(	V =\= 0
-				->	Z is U-V*round(floor(U/V))
-				;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#remainder>'([X, Y], Z)))
-				)
+		(	getnumber(X, U),
+			getnumber(Y, V),
+			(	V =\= 0
+			->	Z is U-V*round(floor(U/V))
+			;	throw(zero_division('<http://www.w3.org/2000/10/swap/math#remainder>'([X, Y], Z)))
 			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Z, ['<http://www.w3.org/2000/10/swap/math#remainder>', X, Y, '']))
 		)
 	).
 
@@ -4981,12 +4887,8 @@ end(End, Env) :-
 	when(
 		(	ground(X)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is round(round(U))
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#rounded>', X, '']))
+		(	getnumber(X, U),
+			Y is round(round(U))
 		)
 	).
 
@@ -4996,16 +4898,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is sin(U),
-				!
-			;	getnumber(Y, W),
-				X is asin(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#sin>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#sin>', X, '']))
+		(	getnumber(X, U),
+			Y is sin(U),
+			!
+		;	getnumber(Y, W),
+			X is asin(W)
 		)
 	).
 
@@ -5015,16 +4912,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is sinh(U),
-				!
-			;	getnumber(Y, W),
-				X is asinh(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#sinh>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#sinh>', X, '']))
+		(	getnumber(X, U),
+			Y is sinh(U),
+			!
+		;	getnumber(Y, W),
+			X is asinh(W)
 		)
 	).
 
@@ -5033,11 +4925,7 @@ end(End, Env) :-
 	when(
 		(	ground(X)
 		),
-		(	\+exivarchk(X),
-			\+exivar(Y)
-		->	(	sum(X, Y)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#sum>', X, '']))
+		(	sum(X, Y)
 		)
 	).
 
@@ -5047,16 +4935,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is tan(U),
-				!
-			;	getnumber(Y, W),
-				X is atan(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#tan>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#tan>', X, '']))
+		(	getnumber(X, U),
+			Y is tan(U),
+			!
+		;	getnumber(Y, W),
+			X is atan(W)
 		)
 	).
 
@@ -5066,16 +4949,11 @@ end(End, Env) :-
 		(	ground(X)
 		;	ground(Y)
 		),
-		(	\+exivar(X),
-			\+exivar(Y)
-		->	(	getnumber(X, U),
-				Y is tanh(U),
-				!
-			;	getnumber(Y, W),
-				X is atanh(W)
-			)
-		;	ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(X, ['<http://www.w3.org/2000/10/swap/math#tanh>', '', Y])),
-			ignore('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tuple>'(Y, ['<http://www.w3.org/2000/10/swap/math#tanh>', X, '']))
+		(	getnumber(X, U),
+			Y is tanh(U),
+			!
+		;	getnumber(Y, W),
+			X is atanh(W)
 		)
 	).
 
@@ -8797,22 +8675,6 @@ commonvars(A, B, C) :-
 	).
 
 
-exivar(A) :-
-	atom(A),
-	(	atom_concat(some, _, A)
-	;	nb_getval(var_ns, Vns),
-		sub_atom(A, 1, _, _, Vns)
-	),
-	!.
-
-
-exivarchk([A|_]) :-
-	exivar(A),
-	!.
-exivarchk([_|B]) :-
-	exivarchk(B).
-
-
 getvars(A, B) :-
 	findvars(A, C),
 	distinct(C, B).
@@ -8842,7 +8704,11 @@ findvars(A, B) :-
 evars(A, B) :-
 	atomic(A),
 	!,
-	(	exivar(A)
+	(	atom(A),
+		(	atom_concat(some, _, A)
+		;	nb_getval(var_ns, Vns),
+			sub_atom(A, 1, _, _, Vns)
+		)
 	->	B = [A]
 	;	B = []
 	).
