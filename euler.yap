@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0915 1425 josd').
+version_info('EYE-Summer15 0915 1517 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -4561,8 +4561,7 @@ end(End, Env) :-
 		;	nonvar(C)
 		),
 		(	ground([A, B]),
-			getcodes(A, D),
-			atom_codes(E, D),
+			A = literal(E, _),
 			C = literal(E, type(B)),
 			!
 		;	nonvar(C),
