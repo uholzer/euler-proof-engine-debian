@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 0915 1517 josd').
+version_info('EYE-Summer15 0918 1525 josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2374,11 +2374,19 @@ wt2(':-'(X, Y)) :-
 	->	true
 	;	R = []
 	),
+	(	nb_getval(fdepth, 0)
+	->	assertz(ncllit)
+	;	true
+	),
 	assertz(rule_uvar(R)),
 	wg(X),
 	write(' <= '),
 	wg(Y),
 	retract(rule_uvar(_)),
+	(	nb_getval(fdepth, 0)
+	->	retract(ncllit)
+	;	true
+	),
 	!.
 wt2(is(O, T)) :-
 	!,
