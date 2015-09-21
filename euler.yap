@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 09211249Z josd').
+version_info('EYE-Summer15 09211535Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -644,6 +644,7 @@ gre(Argus) :-
 	statistics(walltime, [_, T5]),
 	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
 	flush_output(user_error),
+	Cpu is T0+T2+T4,
 	Elaps is T1+T3+T5,
 	nb_getval(input_statements, Inp),
 	nb_getval(output_statements, Outp),
@@ -664,7 +665,7 @@ gre(Argus) :-
 	->	true
 	;	Inf = ''
 	),
-	catch(Speed is round(Inf/Elaps*1000), _, Speed = ''),
+	catch(Speed is round(Inf/Cpu*1000), _, Speed = ''),
 	format(user_error, '[~w] in=~d out=~d step=~w brake=~w inf=~w sec=~3d inf/sec=~w~n~n', [Stamp, Inp, Outp, Step, Brake, Inf, Elaps, Speed]),
 	flush_output(user_error),
 	(	flag('rule-histogram')
