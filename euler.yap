@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 09210941Z josd').
+version_info('EYE-Summer15 09211249Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2471,6 +2471,7 @@ wg(X) :-
 			F \= true,
 			F \= false,
 			F \= '-',
+			F \= /,
 			!
 		;	A >= 2,
 			F \= '.',
