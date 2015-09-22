@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 09211535Z josd').
+version_info('EYE-Summer15 09221413Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -208,7 +208,8 @@ eye
 <query>
 	--query <n3-query>	output filtered with filter rules
 	--pass			output deductive closure
-	--pass-all		output deductive closure plus rules').
+	--pass-all		output deductive closure plus rules
+	--multi-query		query answer loop').
 
 
 
@@ -393,7 +394,8 @@ gre(Argus) :-
 		\+memberchk('--tquery', Args),
 		\+memberchk('--pass', Args),
 		\+memberchk('--pass-all', Args),
-		\+memberchk('--pass-only-new', Args),
+		\+memberchk('--pass-only-new', Args),	% DEPRECATED
+		\+memberchk('--multi-query', Argus),
 		\+memberchk('--n3p', Argus)
 	->	assertz(flag(nope))
 	;	true
@@ -486,6 +488,7 @@ gre(Argus) :-
 	(	\+implies(answer(_, _, _, _, _, _, _, _), goal, '<>'),
 		\+query(_, _),
 		\+flag('pass-only-new'),	% DEPRECATED
+		\+flag('multi-query'),
 		\+flag(strings)
 	->	throw(halt)
 	;	true
@@ -551,6 +554,34 @@ gre(Argus) :-
 	nb_setval(lemma_count, 0),
 	nb_setval(lemma_cursor, 0),
 	nb_setval(output_statements, 0),
+	(	flag('multi-query')
+	->	repeat,
+		read_line_to_codes(user_input, Fc),
+		atom_codes(Fa, Fc),
+		catch(args(['--query', Fa]), Exc,
+			(	format(user_error, '** ERROR ** args ** ~w~n', [Exc]),
+				flush_output(user_error),
+				nb_setval(exit_code, 1)
+			)
+		),
+		catch(eam(0), Exc,
+			(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
+				flush_output(user_error),
+				nb_setval(exit_code, 1)
+			)
+		),
+		retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
+		retractall(answer(_, _, _, _, _, _, _, _)),
+		retractall(got_answer(_, _, _, _, _, _, _, _, _)),
+		retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
+		retractall(lemma(_, _, _, _, _, _)),
+		retractall(got_wi(_, _, _, _, _)),
+		retractall(wpfx(_)),
+		nb_setval(lemma_count, 0),
+		nb_setval(lemma_cursor, 0),
+		Fa = 'halt.'
+	;	true
+	),
 	catch(eam(0), Exc,
 		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
 			flush_output(user_error),
@@ -2805,6 +2836,7 @@ strelar(A, A).
 
 strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
 	atomic(A1),
+	\+flag('multi-query'),
 	!,
 	(	\+pred(A1)
 	->	assertz(pred(A1))
