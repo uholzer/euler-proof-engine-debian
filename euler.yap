@@ -153,7 +153,7 @@
 % infos
 % -----
 
-version_info('EYE-Summer15 09221413Z josd').
+version_info('EYE-Summer15 09230902Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -556,36 +556,36 @@ gre(Argus) :-
 	nb_setval(output_statements, 0),
 	(	flag('multi-query')
 	->	repeat,
-		read_line_to_codes(user_input, Fc),
-		atom_codes(Fa, Fc),
-		catch(args(['--query', Fa]), Exc,
-			(	format(user_error, '** ERROR ** args ** ~w~n', [Exc]),
-				flush_output(user_error),
-				nb_setval(exit_code, 1)
-			)
-		),
-		catch(eam(0), Exc,
+		catch((read_line_to_codes(user_input, Fc), atom_codes(Fs, Fc)), _, Fs = end_of_file),
+		(	Fs = end_of_file
+		->	true
+		;	catch(args(['--query', Fs]), Exc,
+				(	format(user_error, '** ERROR ** args ** ~w~n', [Exc]),
+					flush_output(user_error),
+					nb_setval(exit_code, 1)
+				)
+			),
+			catch(eam(0), Exc,
+				(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
+					flush_output(user_error),
+					nb_setval(exit_code, 1)
+				)
+			),
+			format('#DONE~n'),
+			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
+			retractall(answer(_, _, _, _, _, _, _, _)),
+			retractall(got_answer(_, _, _, _, _, _, _, _, _)),
+			retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
+			retractall(lemma(_, _, _, _, _, _)),
+			retractall(got_wi(_, _, _, _, _)),
+			retractall(wpfx(_)),
+			fail
+		)
+	;	catch(eam(0), Exc,
 			(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
 				flush_output(user_error),
 				nb_setval(exit_code, 1)
 			)
-		),
-		retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
-		retractall(answer(_, _, _, _, _, _, _, _)),
-		retractall(got_answer(_, _, _, _, _, _, _, _, _)),
-		retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
-		retractall(lemma(_, _, _, _, _, _)),
-		retractall(got_wi(_, _, _, _, _)),
-		retractall(wpfx(_)),
-		nb_setval(lemma_count, 0),
-		nb_setval(lemma_cursor, 0),
-		Fa = 'halt.'
-	;	true
-	),
-	catch(eam(0), Exc,
-		(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
-			flush_output(user_error),
-			nb_setval(exit_code, 1)
 		)
 	),
 	(	flag(strings)
