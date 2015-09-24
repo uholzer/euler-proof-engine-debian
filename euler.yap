@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09241432Z josd').
+version_info('EYE-Autumn15 09241920Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -561,14 +561,14 @@ gre(Argus) :-
 		catch((read_line_to_codes(user_input, Fc), atom_codes(Fs, Fc)), _, Fs = end_of_file),
 		(	Fs = end_of_file
 		->	true
-		;	catch(args(['--query', Fs]), Exc,
-				(	format(user_error, '** ERROR ** args ** ~w~n', [Exc]),
+		;	catch(args(['--query', Fs]), Exc1,
+				(	format(user_error, '** ERROR ** args ** ~w~n', [Exc1]),
 					flush_output(user_error),
 					nb_setval(exit_code, 1)
 				)
 			),
-			catch(eam(0), Exc,
-				(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
+			catch(eam(0), Exc2,
+				(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc2]),
 					flush_output(user_error),
 					nb_setval(exit_code, 1)
 				)
@@ -590,14 +590,15 @@ gre(Argus) :-
 			),
 			retractall(got_answer(_, _, _, _, _, _, _, _, _)),
 			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
+			retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 			retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
 			retractall(lemma(_, _, _, _, _, _)),
 			retractall(got_wi(_, _, _, _, _)),
 			retractall(wpfx(_)),
 			fail
 		)
-	;	catch(eam(0), Exc,
-			(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc]),
+	;	catch(eam(0), Exc3,
+			(	format(user_error, '** ERROR ** eam ** ~w~n', [Exc3]),
 				flush_output(user_error),
 				nb_setval(exit_code, 1)
 			)
@@ -1274,8 +1275,8 @@ n3_n3p(Argument, Mode) :-
 			;	assertz(tmpfile(File))
 			),
 			atomic_list_concat(['curl -s -L "', Arg, '" -o ', File], Cmd),
-			catch(exec(Cmd, _), Exc,
-				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc]),
+			catch(exec(Cmd, _), Exc1,
+				(	format(user_error, '** ERROR ** ~w ** ~w~n', [Arg, Exc1]),
 					flush_output(user_error),
 					(	retract(tmpfile(File))
 					->	delete_file(File)
@@ -1348,10 +1349,10 @@ n3_n3p(Argument, Mode) :-
 			),
 			Tokens = []
 		),
-		Exc,
+		Exc2,
 		(	(	wcache(Arg, File)
-			->	format(user_error, '** ~w ** ~w FROM ~w ** ~w~n', [Ise, Arg, File, Exc])
-			;	format(user_error, '** ~w ** ~w ** ~w~n', [Ise, Arg, Exc])
+			->	format(user_error, '** ~w ** ~w FROM ~w ** ~w~n', [Ise, Arg, File, Exc2])
+			;	format(user_error, '** ~w ** ~w ** ~w~n', [Ise, Arg, Exc2])
 			),
 			flush_output(user_error),
 			ignore(Parsed = fail)
