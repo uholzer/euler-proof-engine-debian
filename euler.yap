@@ -110,6 +110,7 @@
 :- dynamic(pi/3).
 :- dynamic(possible/8).
 :- dynamic(pred/1).
+:- dynamic(preda/1).
 :- dynamic(prfstep/8).
 :- dynamic(qevar/3).
 :- dynamic(query/2).
@@ -153,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09232118Z josd').
+version_info('EYE-Autumn15 09241432Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -395,12 +396,13 @@ gre(Argus) :-
 		\+memberchk('--pass', Args),
 		\+memberchk('--pass-all', Args),
 		\+memberchk('--pass-only-new', Args),	% DEPRECATED
-		\+memberchk('--multi-query', Argus),
-		\+memberchk('--n3p', Argus)
+		\+flag('multi-query'),
+		\+flag(n3p)
 	->	assertz(flag(nope))
 	;	true
 	),
-	(	Args = []
+	(	\+flag('multi-query'),
+		Args = []
 	->	opts(['--help'], _)
 	;	true
 	),
@@ -572,9 +574,22 @@ gre(Argus) :-
 				)
 			),
 			format('#DONE~n'),
-			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
-			retractall(answer(_, _, _, _, _, _, _, _)),
+			forall(
+				(	retract(preda(Pa))
+				),
+				(	Ans =.. [Pa, _, _, _, _, _, _, _],
+					retractall(Ans)
+				)
+			),
+			forall(
+				(	answer(A1, A2, A3, A4, A5, A6, A7, A8),
+					nonvar(A1)
+				),
+				(	retract(answer(A1, A2, A3, A4, A5, A6, A7, A8))
+				)
+			),
 			retractall(got_answer(_, _, _, _, _, _, _, _, _)),
+			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
 			retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
 			retractall(lemma(_, _, _, _, _, _)),
 			retractall(got_wi(_, _, _, _, _)),
@@ -1066,6 +1081,7 @@ args(['--plugin', Argument|Args]) :-
 		),
 		fail
 	),
+	!,
 	(	File = '-'
 	->	true
 	;	close(In)
@@ -2836,10 +2852,13 @@ strelar(A, A).
 
 strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
 	atomic(A1),
-	\+flag('multi-query'),
 	!,
 	(	\+pred(A1)
 	->	assertz(pred(A1))
+	;	true
+	),
+	(	\+preda(A1)
+	->	assertz(preda(A1))
 	;	true
 	),
 	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
@@ -3051,7 +3070,10 @@ eam(Span) :-
 		;	flag(tactic, 'linear-select')
 		),
 		(	S is Span+1,
-			assertz(span(S)),
+			(	\+span(S)
+			->	assertz(span(S))
+			;	true
+			),
 			nb_getval(limit, Limit),
 			Span < Limit,
 			eam(S)
