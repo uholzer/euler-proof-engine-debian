@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09241920Z josd').
+version_info('EYE-Autumn15 09251345Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -590,6 +590,7 @@ gre(Argus) :-
 			),
 			retractall(got_answer(_, _, _, _, _, _, _, _, _)),
 			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
+			retractall(implies(_, cn([answer(_, _, _, _, _, _, _, _)|_]), _)),
 			retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 			retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
 			retractall(lemma(_, _, _, _, _, _)),
@@ -1513,10 +1514,11 @@ n3_n3p(Argument, Mode) :-
 		->	catch(delete_file(Tmp_p), _, true)
 		;	true
 		),
-		(	flag('ignore-syntax-error')
-		->	true
-		;	nl,
+		(	\+flag('ignore-syntax-error'),
+			\+flag('multi-query')
+		->	nl,
 			halt(1)
+		;	true
 		)
 	),
 	!.
