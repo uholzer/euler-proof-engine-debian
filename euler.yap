@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09251345Z josd').
+version_info('EYE-Autumn15 09251504Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -573,7 +573,8 @@ gre(Argus) :-
 					nb_setval(exit_code, 1)
 				)
 			),
-			format('#DONE~n'),
+			statistics(walltime, [_, Ti]),
+			format('#DONE ~3d [sec]~n', [Ti]),
 			forall(
 				(	retract(preda(Pa))
 				),
@@ -688,12 +689,13 @@ gre(Argus) :-
 	),
 	format(user_error, 'TC=~w TP=~w BC=~w BP=~w PM=~w CM=~w FM=~w AM=~w~n', [TC, TP, BC, BP, PM, CM, FM, AM]),
 	flush_output(user_error),
-	statistics(runtime, [_, T4]),
-	statistics(walltime, [_, T5]),
-	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
-	flush_output(user_error),
-	Cpu is T0+T2+T4,
-	Elaps is T1+T3+T5,
+	statistics(runtime, [Cpu, T4]),
+	statistics(walltime, [Elaps, T5]),
+	(	\+flag('multi-query')
+	->	format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [T4, T5]),
+		flush_output(user_error)
+	;	true
+	),
 	nb_getval(input_statements, Inp),
 	nb_getval(output_statements, Outp),
 	(	flag(strings)
