@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09251504Z josd').
+version_info('EYE-Autumn15 09261046Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -557,7 +557,9 @@ gre(Argus) :-
 	nb_setval(lemma_cursor, 0),
 	nb_setval(output_statements, 0),
 	(	flag('multi-query')
-	->	repeat,
+	->	tmp_file(Tmp),
+		assertz(flag('tmp-file', Tmp)),
+		repeat,
 		catch((read_line_to_codes(user_input, Fc), atom_codes(Fs, Fc)), _, Fs = end_of_file),
 		(	Fs = end_of_file
 		->	true
@@ -573,8 +575,6 @@ gre(Argus) :-
 					nb_setval(exit_code, 1)
 				)
 			),
-			statistics(walltime, [_, Ti]),
-			format('#DONE ~3d [sec]~n', [Ti]),
 			forall(
 				(	retract(preda(Pa))
 				),
@@ -597,6 +597,14 @@ gre(Argus) :-
 			retractall(lemma(_, _, _, _, _, _)),
 			retractall(got_wi(_, _, _, _, _)),
 			retractall(wpfx(_)),
+			cnt(mq),
+			nb_getval(mq, Cnt),
+			(	Cnt mod 10000 =:= 0
+			->	garbage_collect_atoms
+			;	true
+			),
+			statistics(walltime, [_, Ti]),
+			format('#DONE ~3d [sec] mq=~w~n', [Ti, Cnt]),
 			fail
 		)
 	;	catch(eam(0), Exc3,
