@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09280926Z josd').
+version_info('EYE-Autumn15 09281944Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -595,6 +595,7 @@ gre(Argus) :-
 			retractall(implies(_, answer(_, _, _, _, _, _, _, _), _)),
 			retractall(implies(_, cn([answer(_, _, _, _, _, _, _, _)|_]), _)),
 			retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
+			retractall(query(_, _)),
 			retractall(prfstep(answer(_, _, _, _, _, _, _, _), _, _, _, _, _, _, _)),
 			retractall(lemma(_, _, _, _, _, _)),
 			retractall(got_wi(_, _, _, _, _)),
