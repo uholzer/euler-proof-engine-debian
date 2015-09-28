@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09261046Z josd').
+version_info('EYE-Autumn15 09280926Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -170,47 +170,47 @@ help_info('Usage: eye <options>* <data>* <query>*
 eye
 	swipl -x eye.pvm --
 <options>
-	--nope			no proof explanation
-	--no-qnames		no qnames in the output
-	--no-qvars		no qvars in the output
-	--no-numerals		no numerals in the output
-	--no-distinct		no distinct answers in the output
-	--no-skolem <prefix>	no uris with <prefix> in the output
-	--step <count>		set maximimum step count
-	--brake <count>		set maximimum brake count
-	--tactic linear-select	select each rule only once
-	--tactic single-answer	give only one answer
-	--tactic existing-path	Euler path using homomorphism
-	--wcache <uri> <file>	to tell that uri is cached as file
-	--ignore-syntax-error	do not halt in case of syntax error
-	--ignore-inference-fuse	do not halt in case of inference fuse
-	--n3p			output all <data> as N3 P-code to stdout
-	--pvm <n3p-file>	output <n3p-file> as PVM code to <pvm-file>
-	--image <pvm-file>	output all <data> and all code to <pvm-file>
-	--strings		output log:outputString objects to stdout
-	--warn			output warning info to stderr
-	--debug			output debug info to stderr
-	--debug-cnt		output debug info about counters to stderr
-	--debug-pvm		output debug info about PVM code to stderr
-	--rule-histogram	output rule histogram info to stderr
-	--profile		output profile info to stderr
-	--statistics		output statistics info to stderr
-	--probe			output speedtest info to stderr
-	--traditional		traditional mode
-	--version		show version info
-	--license		show license info
-	--help			show help info
+	--nope				no proof explanation
+	--no-qnames			no qnames in the output
+	--no-qvars			no qvars in the output
+	--no-numerals			no numerals in the output
+	--no-distinct			no distinct answers in the output
+	--no-skolem <prefix>		no uris with <prefix> in the output
+	--step <count>			set maximimum step <count>
+	--brake <count>			set maximimum brake <count>
+	--tactic linear-select		select each rule only once
+	--tactic single-answer		give only one answer
+	--tactic existing-path		Euler path using homomorphism
+	--wcache <uri> <file>		to tell that <uri> is cached as <file>
+	--ignore-syntax-error		do not halt in case of syntax error
+	--ignore-inference-fuse		do not halt in case of inference fuse
+	--n3p				output all <data> as N3 P-code on stdout
+	--pvm <n3p-file>		output <n3p-file> as PVM code to <pvm-file>
+	--image <pvm-file>		output all <data> and all code to <pvm-file>
+	--strings			output log:outputString objects on stdout
+	--warn				output warning info on stderr
+	--debug				output debug info on stderr
+	--debug-cnt			output debug info about counters on stderr
+	--debug-pvm			output debug info about PVM code on stderr
+	--rule-histogram		output rule histogram info on stderr
+	--profile			output profile info on stderr
+	--statistics			output statistics info on stderr
+	--probe				output speedtest info on stderr
+	--traditional			traditional mode
+	--version			show version info
+	--license			show license info
+	--help				show help info
 <data>
-	<n3-data>		N3 triples and rules
-	--turtle <ttl-data>	Turtle data
-	--proof <n3-proof>	N3 proof
-	--plugin <n3p-data>	plugin N3 P-code
-	--plugin-pvm <pvm-data>	plugin PVM code
+	<n3-data>			N3 triples and rules
+	--turtle <ttl-data>		Turtle data
+	--proof <n3-proof>		N3 proof
+	--plugin <n3p-data>		plugin N3 P-code
+	--plugin-pvm <pvm-data>		plugin PVM code
 <query>
-	--query <n3-query>	output filtered with filter rules
-	--pass			output deductive closure
-	--pass-all		output deductive closure plus rules
-	--multi-query		query answer loop').
+	--query <n3-query>		output filtered with filter rules
+	--pass				output deductive closure
+	--pass-all			output deductive closure plus rules
+	--multi-query			query answer loop').
 
 
 
@@ -563,7 +563,9 @@ gre(Argus) :-
 		catch((read_line_to_codes(user_input, Fc), atom_codes(Fs, Fc)), _, Fs = end_of_file),
 		(	Fs = end_of_file
 		->	true
-		;	catch(args(['--query', Fs]), Exc1,
+		;	statistics(walltime, [_, _]),
+			nb_getval(output_statements, Outb),
+			catch(args(['--query', Fs]), Exc1,
 				(	format(user_error, '** ERROR ** args ** ~w~n', [Exc1]),
 					flush_output(user_error),
 					nb_setval(exit_code, 1)
@@ -604,7 +606,10 @@ gre(Argus) :-
 			;	true
 			),
 			statistics(walltime, [_, Ti]),
-			format('#DONE ~3d [sec] mq=~w~n', [Ti, Cnt]),
+			nb_getval(output_statements, Oute),
+			Outd is Oute-Outb,
+			catch(Outs is round(Outd/Ti*1000), _, Outs = ''),
+			format('#DONE ~3d [sec] mq=~w out=~d triples/sec=~w~n~n', [Ti, Cnt, Outd, Outs]),
 			fail
 		)
 	;	catch(eam(0), Exc3,
