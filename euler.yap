@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09302147Z josd').
+version_info('EYE-Autumn15 09302308Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -360,7 +360,8 @@ gre(Argus) :-
 		\+memberchk('--pass-all', Args),
 		\+memberchk('--pass-only-new', Args),	% DEPRECATED
 		\+flag('multi-query'),
-		\+flag(n3p)
+		\+flag(n3p),
+		\+flag(image, _)
 	->	assertz(flag(nope))
 	;	true
 	),
