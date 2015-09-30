@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09302021Z josd').
+version_info('EYE-Autumn15 09302147Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1017,7 +1017,6 @@ args(['--plugin', Argument|Args]) :-
 	->	In = user_input
 	;	open(File, read, In, [encoding(utf8)])
 	),
-	nb_setval(sc, 0),
 	repeat,
 	read_term(In, Rt, []),
 	(	Rt = end_of_file
@@ -1054,8 +1053,7 @@ args(['--plugin', Argument|Args]) :-
 					;	nb_getval(current_scope, Src),
 						term_index(Rt, Rnd),
 						assertz(prfstep(Rt, Rnd, true, _, Rt, _, forward, Src))
-					),
-					cnt(sc)
+					)
 				;	true
 				)
 			)
@@ -1071,7 +1069,10 @@ args(['--plugin', Argument|Args]) :-
 	->	delete_file(File)
 	;	true
 	),
-	nb_getval(sc, SC),
+	(	retract(scount(SC))
+	->	true
+	;	SC = 0
+	),
 	nb_getval(input_statements, IN),
 	Inp is SC+IN,
 	nb_setval(input_statements, Inp),
