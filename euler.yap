@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09301259Z josd').
+version_info('EYE-Autumn15 09301531Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -240,7 +240,7 @@ main :-
 	),
 	(	Argvp = ['-']
 	->	read_line_to_codes(user_input, Fc),
-		open_codes_stream(Fc, In),
+		open_chars_stream(Fc, In),
 		argp(In, Argvs)
 	;	Argvs = Argvp
 	),
