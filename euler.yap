@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09301531Z josd').
+version_info('EYE-Autumn15 09302021Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -239,9 +239,11 @@ main :-
 	;	Argvp = Argv
 	),
 	(	Argvp = ['-']
-	->	read_line_to_codes(user_input, Fc),
-		open_chars_stream(Fc, In),
-		argp(In, Argvs)
+	->	catch((read_line_to_codes(user_input, Ac), atom_codes(As, Ac)), _, As = ''),
+		(	As = ''
+		->	Argvs = []
+		;	atomic_list_concat(Argvs, ' ', As)
+		)
 	;	Argvs = Argvp
 	),
 	argv(Argvs, Argus),
@@ -313,47 +315,6 @@ main :-
 	),
 	nb_getval(exit_code, EC),
 	halt(EC).
-
-
-argp(In, List) :-
-	get_code(In, C0),
-	argt(C0, In, C1, Tok1),
-	(	Tok1 == end_of_file
-	->	List = []
-	;	List = [Tok1|Tokens],
-		argp(C1, In, Tokens)
-	).
-
-
-argp(C0, In, List) :-
-	argt(C0, In, C1, H),
-	(	H == end_of_file
-	->	List = []
-	;	List = [H|T],
-		argp(C1, In, T)
-	).
-
-
-argt(-1, _, -1, end_of_file) :-
-	!.
-argt(C0, In, C, Token) :-
-	white_space(C0),
-	!,
-	get_code(In, C1),
-	argt(C1, In, C, Token).
-argt(C0, In, C, Token) :-
-	get_code(In, C1),
-	argn(C1, In, C, T),
-	atom_codes(Token, [C0|T]).
-
-
-argn(C0, In, C, [C0|T]) :-
-	\+white_space(C0),
-	C0 \= -1,
-	!,
-	get_code(In, C1),
-	argn(C1, In, C, T).
-argn(C, _, C, []).
 
 
 argv([], []) :-
@@ -1649,7 +1610,7 @@ tr_n3p([X|Z], Src, Mode) :-
 	(	flag(tactic, 'linear-select')
 	->	write(implies(true, Y, Src)),
 		writeln('.')
-	;	rvars(Y, V), 
+	;	rvars(Y, V),
 		write(V),
 		writeln('.'),
 		(	flag(nope),
