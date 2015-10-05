@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 09302308Z josd').
+version_info('EYE-Autumn15 10052241Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1021,7 +1021,7 @@ args(['--plugin', Argument|Args]) :-
 	repeat,
 	read_term(In, Rt, []),
 	(	Rt = end_of_file
-	->	true
+	->	catch(read_line_to_codes(user_input, _), _, true)
 	;	(	Rt = ':-'(Rg)
 		->	call(Rg)
 		;	(	predicate_property(Rt, dynamic)
@@ -1041,6 +1041,7 @@ args(['--plugin', Argument|Args]) :-
 			;	true
 			),
 			(	Rt \= implies(_, _, _),
+				Rt \= scount(_),
 				call(Rt)
 			->	true
 			;	strelas(Rt),
@@ -1070,10 +1071,12 @@ args(['--plugin', Argument|Args]) :-
 	->	delete_file(File)
 	;	true
 	),
-	(	retract(scount(SC))
-	->	true
-	;	SC = 0
+	findall(SCnt,
+		(	retract(scount(SCnt))
+		),
+		SCnts
 	),
+	sum(SCnts, SC),
 	nb_getval(input_statements, IN),
 	Inp is SC+IN,
 	nb_setval(input_statements, Inp),
@@ -9513,6 +9516,29 @@ absolute_uri(A, B) :-
 
 
 :- if(current_predicate(uri_resolve/3)).
+resolve_uri(A, _, A) :-
+	uri_is_global(A),
+	!.
+resolve_uri('', A, A) :-
+	!.
+resolve_uri(A, B, C) :-
+	sub_atom(A, 0, 1, _, '?'),
+	(	sub_atom(B, I, 1, _, '?')
+	->	true
+	;	atom_length(B, I)
+	),
+	sub_atom(B, 0, I, _, D),
+	atomic_list_concat([D, A], C),
+	!.
+resolve_uri(A, B, C) :-
+	sub_atom(A, 0, 1, _, '#'),
+	(	sub_atom(B, I, 1, _, '#')
+	->	true
+	;	atom_length(B, I)
+	),
+	sub_atom(B, 0, I, _, D),
+	atomic_list_concat([D, A], C),
+	!.
 resolve_uri(A, B, C) :-
 	uri_resolve(A, B, C).
 :-else.
