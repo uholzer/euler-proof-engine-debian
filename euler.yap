@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10052241Z josd').
+version_info('EYE-Autumn15 10061532Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -448,6 +448,7 @@ gre(Argus) :-
 	->	nb_getval(input_statements, SC),
 		write(scount(SC)),
 		writeln('.'),
+		writeln('end_of_file.'),
 		throw(halt)
 	;	true
 	),
@@ -1021,7 +1022,7 @@ args(['--plugin', Argument|Args]) :-
 	repeat,
 	read_term(In, Rt, []),
 	(	Rt = end_of_file
-	->	catch(read_line_to_codes(user_input, _), _, true)
+	->	catch(read_line_to_codes(In, _), _, true)
 	;	(	Rt = ':-'(Rg)
 		->	call(Rg)
 		;	(	predicate_property(Rt, dynamic)
