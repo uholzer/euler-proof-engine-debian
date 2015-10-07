@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10061532Z josd').
+version_info('EYE-Autumn15 10071348Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1045,7 +1045,10 @@ args(['--plugin', Argument|Args]) :-
 				Rt \= scount(_),
 				call(Rt)
 			->	true
-			;	strelas(Rt),
+			;	(	Rt \= pred('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>')
+				->	strelas(Rt)
+				;	true
+				),
 				(	Rt \= scope(_),
 					Rt \= pfx(_, _),
 					Rt \= pred(_),
