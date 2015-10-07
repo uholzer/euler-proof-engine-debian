@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10071348Z josd').
+version_info('EYE-Autumn15 10072112Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -340,6 +340,7 @@ gre(Argus) :-
 	statistics(walltime, [T1, _]),
 	format(user_error, 'starting ~w [msec cputime] ~w [msec walltime]~n', [T0, T1]),
 	flush_output(user_error),
+	nb_getval(var_ns, Vns),
 	nb_setval(exit_code, 0),
 	nb_setval(indentation, 0),
 	nb_setval(possible, not_started),
@@ -371,8 +372,7 @@ gre(Argus) :-
 	;	true
 	),
 	(	flag('no-qvars')
-	->	nb_getval(var_ns, Vns),
-		atomic_list_concat(['<', Vns, '>'], Vpfx),
+	->	atomic_list_concat(['<', Vns, '>'], Vpfx),
 		assertz(pfx('var:', Vpfx))
 	;	true
 	),
@@ -400,7 +400,8 @@ gre(Argus) :-
 		format(':- multifile(\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2000/10/swap/log#implies>\'/2).~n', []),
 		format(':- multifile(\'<http://www.w3.org/2000/10/swap/log#outputString>\'/2).~n', []),
-		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', [])
+		format(':- multifile(\'<http://www.w3.org/2002/07/owl#sameAs>\'/2).~n', []),
+		format('flag(\'no-skolem\', \'~w\').~n', [Vns])
 	;	true
 	),
 	args(Args),
@@ -494,8 +495,7 @@ gre(Argus) :-
 		->	true
 		;	(	pfx('var:', _)
 			->	true
-			;	nb_getval(var_ns, Vns),
-				atomic_list_concat(['<', Vns, '>'], Vpfx),
+			;	atomic_list_concat(['<', Vns, '>'], Vpfx),
 				assertz(pfx('var:', Vpfx))
 			),
 			(	pfx('n3:', _)
