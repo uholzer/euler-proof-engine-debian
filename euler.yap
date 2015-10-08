@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10072112Z josd').
+version_info('EYE-Autumn15 10081815Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -185,7 +185,6 @@ eye
 	--ignore-syntax-error		do not halt in case of syntax error
 	--ignore-inference-fuse		do not halt in case of inference fuse
 	--n3p				output all <data> as N3 P-code on stdout
-	--pvm <n3p-file>		output <n3p-file> as PVM code to <pvm-file>
 	--image <pvm-file>		output all <data> and all code to <pvm-file>
 	--strings			output log:outputString objects on stdout
 	--warn				output warning info on stderr
@@ -205,7 +204,6 @@ eye
 	--turtle <ttl-data>		Turtle data
 	--proof <n3-proof>		N3 proof
 	--plugin <n3p-data>		plugin N3 P-code
-	--plugin-pvm <pvm-data>		plugin PVM code
 <query>
 	--query <n3-query>		output filtered with filter rules
 	--pass				output deductive closure
@@ -281,31 +279,7 @@ main :-
 	;	true
 	),
 	(	flag(statistics)
-	->	statistics,
-		(	current_prolog_flag(pid, B)
-		->	true
-		;	pid(B)
-		),
-		(	\+current_prolog_flag(windows, true)
-		->	atomic_list_concat(['pmap ', B, ' 1>&2'], Cmd),
-			catch(exec(Cmd, _), _, true)
-		;	tmp_file(Tmp),
-			atomic_list_concat([Tmp, '.txt'], File),
-			atomic_list_concat(['vmmap -p ', B, ' ', File], Cmd),
-			(	catch(exec(Cmd, _), _, fail)
-			->	open(File, read, In),
-				(	between(1, 15, _),
-					readln(In, Line),
-					format(user_error, '~w~n', [Line]),
-					flush_output(user_error),
-					fail
-				;	true
-				),
-				close(In),
-				delete_file(File)
-			;	true
-			)
-		)
+	->	statistics
 	;	true
 	),
 	(	flag('debug-pvm')
@@ -781,8 +755,11 @@ opts(['--pcl'|Argus], Args) :-
 	!,
 	assertz(flag(n3p)),
 	opts(Argus, Args).
+% DEPRECATED
 opts(['--pvm', File|Argus], _) :-
 	!,
+	format(user_error, '** WARNING ** command line switch --pvm is DEPRECATED~n', []),
+	flush_output(user_error),
 	(	memberchk('--nope', Argus)
 	->	assertz(flag(nope))
 	;	true
@@ -1090,8 +1067,11 @@ args(['--plugin', Argument|Args]) :-
 	),
 	flush_output(user_error),
 	args(Args).
+% DEPRECATED
 args(['--plugin-pvm', Argument|Args]) :-
 	!,
+	format(user_error, '** WARNING ** command line switch --plugin-pvm is DEPRECATED~n', []),
+	flush_output(user_error),
 	absolute_uri(Argument, Arg),
 	(	wcache(Arg, File)
 	->	true
