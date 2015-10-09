@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10081815Z josd').
+version_info('EYE-Autumn15 10091121Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -191,6 +191,7 @@ eye
 	--debug				output debug info on stderr
 	--debug-cnt			output debug info about counters on stderr
 	--debug-pvm			output debug info about PVM code on stderr
+	--debug-jiti			output debug info about JITI on stderr
 	--rule-histogram		output rule histogram info on stderr
 	--profile			output profile info on stderr
 	--statistics			output statistics info on stderr
@@ -285,6 +286,60 @@ main :-
 	(	flag('debug-pvm')
 	->	tell(user_error),
 		ignore(vm_list(_))
+	;	true
+	),
+	(	flag('debug-jiti')
+	->	forall(
+			(	pred(Pred)
+			),
+			(	(	P =.. [Pred, _, _],
+					predicate_property(P, indexed(Ind2))
+				->	format(user_error, 'JITI ~w/2 indexed ~w~n', [Pred, Ind2])
+				;	true
+				),
+				(	P =.. [Pred, _, _, _],
+					predicate_property(P, indexed(Ind3))
+				->	format(user_error, 'JITI ~w/3 indexed ~w~n', [Pred, Ind3])
+				;	true
+				),
+				(	P =.. [Pred, _, _, _, _],
+					predicate_property(P, indexed(Ind4))
+				->	format(user_error, 'JITI ~w/4 indexed ~w~n', [Pred, Ind4])
+				;	true
+				),
+				(	P =.. [Pred, _, _, _, _, _, _, _],
+					predicate_property(P, indexed(Ind7))
+				->	format(user_error, 'JITI ~w/7 indexed ~w~n', [Pred, Ind7])
+				;	true
+				)
+			)
+		),
+		(	predicate_property(exopred(_, _, _), indexed(Inde3))
+		->	format(user_error, 'JITI exopred/3 indexed ~w~n', [Inde3])
+		;	true
+		),
+		(	predicate_property(implies(_, _, _), indexed(Indi3))
+		->	format(user_error, 'JITI implies/3 indexed ~w~n', [Indi3])
+		;	true
+		),
+		(	predicate_property(prfstep(_, _, _, _, _, _, _, _), indexed(Indp8))
+		->	format(user_error, 'JITI prfstep/8 indexed ~w~n', [Indp8])
+		;	true
+		),
+		(	predicate_property(lemma(_, _, _, _, _, _), indexed(Indl6))
+		->	format(user_error, 'JITI lemma/6 indexed ~w~n', [Indl6])
+		;	true
+		),
+		(	predicate_property(answer(_, _, _, _, _, _, _, _), indexed(Inda8))
+		->	format(user_error, 'JITI answer/8 indexed ~w~n', [Inda8])
+		;	true
+		),
+		(	predicate_property(got_answer(_, _, _, _, _, _, _, _, _), indexed(Indg9))
+		->	format(user_error, 'JITI got_answer/9 indexed ~w~n', [Indg9])
+		;	true
+		),
+		format(user_error, '~n', []),
+		flush_output(user_error)
 	;	true
 	),
 	nb_getval(exit_code, EC),
