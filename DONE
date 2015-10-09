@@ -13,7 +13,6 @@
 <pre>
 <span id="EYE-Autumn15">[<a href="https://sourceforge.net/projects/eulersharp/files/eulersharp/EYE-Autumn15/">EYE-Autumn15</a>]</span>
 - adding --debug-jiti command line switch to output debug info about JITI on stderr
-- deprecating --pvm and --plugin-pvm and use --image instead
 - adding flag no-skolem to n3p
 - fixing issue with <a href="http://eulersharp.sourceforge.net/2003/03swap/log-rules.html#relabel">e:relabel</a> while using --plugin together with --pass (obs from Hong Sun)
 - improving relative IRI resolution and <a href="https://gist.github.com/RubenVerborgh/39f0e8d63e33e435371a">Turtle IRI resolution compliance test</a> gives 306 tests, 306 passed, 0 failed, 0 errored

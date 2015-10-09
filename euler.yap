@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10091121Z josd').
+version_info('EYE-Autumn15 10091151Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -185,6 +185,7 @@ eye
 	--ignore-syntax-error		do not halt in case of syntax error
 	--ignore-inference-fuse		do not halt in case of inference fuse
 	--n3p				output all <data> as N3 P-code on stdout
+	--pvm <n3p-file>		output <n3p-file> as PVM code to <pvm-file>
 	--image <pvm-file>		output all <data> and all code to <pvm-file>
 	--strings			output log:outputString objects on stdout
 	--warn				output warning info on stderr
@@ -205,6 +206,7 @@ eye
 	--turtle <ttl-data>		Turtle data
 	--proof <n3-proof>		N3 proof
 	--plugin <n3p-data>		plugin N3 P-code
+	--plugin-pvm <pvm-data>		plugin PVM code
 <query>
 	--query <n3-query>		output filtered with filter rules
 	--pass				output deductive closure
@@ -810,10 +812,8 @@ opts(['--pcl'|Argus], Args) :-
 	!,
 	assertz(flag(n3p)),
 	opts(Argus, Args).
-% DEPRECATED
 opts(['--pvm', File|Argus], _) :-
 	!,
-	format(user_error, '** WARNING ** command line switch --pvm is DEPRECATED~n', []),
 	flush_output(user_error),
 	(	memberchk('--nope', Argus)
 	->	assertz(flag(nope))
@@ -1122,10 +1122,8 @@ args(['--plugin', Argument|Args]) :-
 	),
 	flush_output(user_error),
 	args(Args).
-% DEPRECATED
 args(['--plugin-pvm', Argument|Args]) :-
 	!,
-	format(user_error, '** WARNING ** command line switch --plugin-pvm is DEPRECATED~n', []),
 	flush_output(user_error),
 	absolute_uri(Argument, Arg),
 	(	wcache(Arg, File)
