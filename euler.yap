@@ -154,7 +154,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10091151Z josd').
+version_info('EYE-Autumn15 10091405Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1336,7 +1336,10 @@ n3_n3p(Argument, Mode) :-
 		assertz(base_uri(Arg))
 	),
 	retractall(ns(_, _)),
-	atomic_list_concat([Arg, '#'], D),
+	(	Arg = '-'
+	->	D = '#'
+	;	atomic_list_concat([Arg, '#'], D)
+	),
 	(	flag(turtle)
 	->	true
 	;	assertz(ns('', D))
