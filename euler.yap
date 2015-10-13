@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10131009Z josd').
+version_info('EYE-Autumn15 10131333Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -600,11 +600,14 @@ gre(Argus) :-
 			->	garbage_collect_atoms
 			;	true
 			),
-			statistics(walltime, [_, Ti]),
+			statistics(runtime, [_, Ti4]),
+			statistics(walltime, [_, Ti5]),
+			format(user_error, 'reasoning ~w [msec cputime] ~w [msec walltime]~n', [Ti4, Ti5]),
+			flush_output(user_error),
 			nb_getval(output_statements, Oute),
 			Outd is Oute-Outb,
-			catch(Outs is round(Outd/Ti*1000), _, Outs = ''),
-			format('#DONE ~3d [sec] mq=~w out=~d triples/sec=~w~n~n', [Ti, Cnt, Outd, Outs]),
+			catch(Outs is round(Outd/Ti5*1000), _, Outs = ''),
+			format('#DONE ~3d [sec] mq=~w out=~d triples/sec=~w~n~n', [Ti5, Cnt, Outd, Outs]),
 			fail
 		)
 	;	catch(eam(0), Exc3,
