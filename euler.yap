@@ -99,6 +99,7 @@
 :- dynamic(graph/2).
 :- dynamic(hash_value/2).
 :- dynamic(implies/3).
+:- dynamic(input_statements/1).
 :- dynamic(intern/1).
 :- dynamic(keywords/1).
 :- dynamic(lemma/6).
@@ -154,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10091405Z josd').
+version_info('EYE-Autumn15 10130946Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -316,10 +317,6 @@ main :-
 				)
 			)
 		),
-		(	predicate_property(exopred(_, _, _), indexed(Inde3))
-		->	format(user_error, 'JITI exopred/3 indexed ~w~n', [Inde3])
-		;	true
-		),
 		(	predicate_property(implies(_, _, _), indexed(Indi3))
 		->	format(user_error, 'JITI implies/3 indexed ~w~n', [Indi3])
 		;	true
@@ -330,10 +327,6 @@ main :-
 		),
 		(	predicate_property(lemma(_, _, _, _, _, _), indexed(Indl6))
 		->	format(user_error, 'JITI lemma/6 indexed ~w~n', [Indl6])
-		;	true
-		),
-		(	predicate_property(answer(_, _, _, _, _, _, _, _), indexed(Inda8))
-		->	format(user_error, 'JITI answer/8 indexed ~w~n', [Inda8])
 		;	true
 		),
 		(	predicate_property(got_answer(_, _, _, _, _, _, _, _, _), indexed(Indg9))
@@ -381,10 +374,13 @@ gre(Argus) :-
 	nb_setval(table, -1),
 	nb_setval(tuple, -1),
 	nb_setval(defcl, true),
-	nb_setval(input_statements, 0),
 	nb_setval(fdepth, 0),
 	nb_setval(pdepth, 0),
 	nb_setval(cdepth, 0),
+	(	input_statements(Ist)
+	->	nb_setval(input_statements, Ist)
+	;	nb_setval(input_statements, 0)
+	),
 	opts(Argus, Args),
 	(	\+memberchk('--query', Args),
 		\+memberchk('--tquery', Args),
@@ -463,11 +459,14 @@ gre(Argus) :-
 	statistics(runtime, [_, T2]),
 	statistics(walltime, [_, T3]),
 	format(user_error, 'networking ~w [msec cputime] ~w [msec walltime]~n', [T2, T3]),
+	nb_getval(input_statements, SC),
 	flush_output(user_error),
 	(	flag(image, File)
 	->	retractall(flag(_)),
 		retractall(flag(_, _)),
 		retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
+		retractall(input_statements(_)),
+		assertz(input_statements(SC)),
 		reset_gensym,
 		(	current_predicate(qsave:qsave_program/1)
 		->	qsave_program(File)
@@ -477,8 +476,7 @@ gre(Argus) :-
 	;	true
 	),
 	(	flag(n3p)
-	->	nb_getval(input_statements, SC),
-		write(scount(SC)),
+	->	write(scount(SC)),
 		writeln('.'),
 		writeln('end_of_file.'),
 		throw(halt)
@@ -9947,14 +9945,14 @@ barename_csl_tail([]) -->
 
 % DEPRECATED
 boolean(true) -->
-	['@', name('true')],
+	[atname('true')],
 	!.
 boolean(true) -->
 	[name('true')],
 	!.
 % DEPRECATED
 boolean(false) -->
-	['@', name('false')],
+	[atname('false')],
 	!.
 boolean(false) -->
 	[name('false')],
@@ -9968,7 +9966,7 @@ boolean(Boolean) -->
 
 % DEPRECATED
 declaration -->
-	['@', name(base)],
+	[at(base)],
 	!,
 	explicituri(U),
 	{	base_uri(V),
@@ -9998,7 +9996,7 @@ declaration -->
 	withoutdot.
 % DEPRECATED
 declaration -->
-	['@', name(keywords)],
+	[atname(keywords)],
 	!,
 	barename_csl(List),
 	{	(	flag(turtle)
@@ -10011,7 +10009,7 @@ declaration -->
 	}.
 % DEPRECATED
 declaration -->
-	['@', name(prefix)],
+	[atname(prefix)],
 	!,
 	prefix(Prefix),
 	explicituri(U),
@@ -10040,12 +10038,13 @@ document(Triples) -->
 	statements_optional(Triples).
 
 
-dtlang(lang(Lang)) -->
-	['@'],
+dtlang(lang(Langcode)) -->
+	[atname(Name)],
 	!,
-	langcode(Lang).
+	{	atomic_list_concat(['\'', Name, '\''], Langcode)
+	}.
 dtlang(type(Datatype)) -->
-	['^', '^'],
+	[caretcaret],
 	!,
 	uri(Datatype).
 dtlang(type(T)) -->
@@ -10056,7 +10055,7 @@ dtlang(type(T)) -->
 
 % DEPRECATED
 existential -->
-	['@', name(forSome)],
+	[atname(forSome)],
 	!,
 	symbol_csl(Symbols),
 	{	(	flag(turtle)
@@ -10114,12 +10113,6 @@ formulacontent(Formula) -->
 		;	distinct(List, L)
 		),
 		clist(L, Formula)
-	}.
-
-
-langcode(Langcode) -->
-	[name(Name)],
-	{	atomic_list_concat(['\'', Name, '\''], Langcode)
 	}.
 
 
@@ -10666,7 +10659,7 @@ symbol_csl_tail([]) -->
 
 % DEPRECATED
 universal -->
-	['@', name(forAll)],
+	[atname(forAll)],
 	!,
 	symbol_csl(Symbols),
 	{	(	flag(turtle)
@@ -10743,7 +10736,7 @@ verb(':-', []) -->
 	}.
 % DEPRECATED
 verb(V, []) -->
-	['@', name(a)],
+	[atname(a)],
 	!,
 	{	V = '\'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>\''
 	}.
@@ -10754,7 +10747,7 @@ verb(V, []) -->
 	}.
 % DEPRECATED
 verb(Node, Triples) -->
-	['@', name(has)],
+	[atname(has)],
 	!,
 	expression(Node, Triples).
 verb(Node, Triples) -->
@@ -10763,10 +10756,10 @@ verb(Node, Triples) -->
 	expression(Node, Triples).
 % DEPRECATED
 verb(isof(Node), Triples) -->
-	['@', name(is)],
+	[atname(is)],
 	!,
 	expression(Node, Triples),
-	['@', name(of)],
+	[atname(of)],
 	{	(	flag(turtle)
 		->	nb_getval(line_number, Ln),
 			throw(not_in_turtle('no_is_of', after_line(Ln)))
@@ -10966,6 +10959,15 @@ token(0':, In, C, Token) :-
 	;	Token = '':'',
 		C = C0
 	).
+token(0'@, In, C, atname(Name)) :-
+	get_code(In, C0),
+	name(C0, In, C, Name),
+	!.
+token(0'^, In, C, caretcaret) :-
+	peek_code(In, 0'^),
+	!,
+	get_code(In, _),
+	get_code(In, C).
 token(C0, In, C, Token) :-
 	name(C0, In, C1, Name),
 	!,
@@ -11566,7 +11568,6 @@ punctuation(0'), ')').
 punctuation(0'[, '[').
 punctuation(0'], ']').
 punctuation(0',, ',').
-punctuation(0'@, '@').
 punctuation(0':, ':').
 punctuation(0';, ';').
 punctuation(0'{, '{').
