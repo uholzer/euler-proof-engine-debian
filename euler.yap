@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10130946Z josd').
+version_info('EYE-Autumn15 10131009Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -9966,7 +9966,7 @@ boolean(Boolean) -->
 
 % DEPRECATED
 declaration -->
-	[at(base)],
+	[atname(base)],
 	!,
 	explicituri(U),
 	{	base_uri(V),
