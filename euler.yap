@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10131333Z josd').
+version_info('EYE-Autumn15 10141448Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -310,6 +310,11 @@ main :-
 				->	format(user_error, 'JITI ~w/4 indexed ~w~n', [Pred, Ind4])
 				;	true
 				),
+				(	P =.. [Pred, _, _, _, _, _],
+					predicate_property(P, indexed(Ind5))
+				->	format(user_error, 'JITI ~w/5 indexed ~w~n', [Pred, Ind5])
+				;	true
+				),
 				(	P =.. [Pred, _, _, _, _, _, _, _],
 					predicate_property(P, indexed(Ind7))
 				->	format(user_error, 'JITI ~w/7 indexed ~w~n', [Pred, Ind7])
@@ -321,12 +326,12 @@ main :-
 		->	format(user_error, 'JITI implies/3 indexed ~w~n', [Indi3])
 		;	true
 		),
-		(	predicate_property(prfstep(_, _, _, _, _, _, _, _), indexed(Indp8))
-		->	format(user_error, 'JITI prfstep/8 indexed ~w~n', [Indp8])
-		;	true
-		),
 		(	predicate_property(lemma(_, _, _, _, _, _), indexed(Indl6))
 		->	format(user_error, 'JITI lemma/6 indexed ~w~n', [Indl6])
+		;	true
+		),
+		(	predicate_property(prfstep(_, _, _, _, _, _, _, _), indexed(Indp8))
+		->	format(user_error, 'JITI prfstep/8 indexed ~w~n', [Indp8])
 		;	true
 		),
 		(	predicate_property(got_answer(_, _, _, _, _, _, _, _, _), indexed(Indg9))
@@ -2891,6 +2896,20 @@ strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
 	),
 	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
 	assertz(B).
+strelas('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B)) :-
+	!,
+	(	current_predicate('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/5)
+	->	true
+	;	dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/5),
+		assertz(':-'('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y),
+				(	term_index(X-Y, Z),
+					'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y, Z, eta, eta)
+				)
+			)
+		)
+	),
+	term_index(A-B, C),
+	assertz('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B, C, eta, eta)).
 strelas(A) :-
 	ground(A),
 	A =.. [P, [S1, S2|S3], O],
