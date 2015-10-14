@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10141448Z josd').
+version_info('EYE-Autumn15 10141554Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -468,7 +468,12 @@ gre(Argus) :-
 	flush_output(user_error),
 	(	flag(image, File)
 	->	retractall(flag(_)),
-		retractall(flag(_, _)),
+		(	flag(Flag, _),
+			Flag \= 'no-skolem',
+			retractall(flag(Flag, _)),
+			fail
+		;	true
+		),
 		retractall(implies(answer(_, _, _, _, _, _, _, _), goal, '<>')),
 		retractall(input_statements(_)),
 		assertz(input_statements(SC)),
@@ -1087,7 +1092,8 @@ args(['--plugin', Argument|Args]) :-
 				->	strelas(Rt)
 				;	true
 				),
-				(	Rt \= scope(_),
+				(	Rt \= flag(_, _),
+					Rt \= scope(_),
 					Rt \= pfx(_, _),
 					Rt \= pred(_),
 					Rt \= scount(_)
