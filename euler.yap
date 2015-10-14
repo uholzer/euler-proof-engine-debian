@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10141554Z josd').
+version_info('EYE-Autumn15 10141946Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -308,11 +308,6 @@ main :-
 				(	P =.. [Pred, _, _, _, _],
 					predicate_property(P, indexed(Ind4))
 				->	format(user_error, 'JITI ~w/4 indexed ~w~n', [Pred, Ind4])
-				;	true
-				),
-				(	P =.. [Pred, _, _, _, _, _],
-					predicate_property(P, indexed(Ind5))
-				->	format(user_error, 'JITI ~w/5 indexed ~w~n', [Pred, Ind5])
 				;	true
 				),
 				(	P =.. [Pred, _, _, _, _, _, _, _],
@@ -2902,20 +2897,6 @@ strelas(answer(A1, A2, A3, A4, A5, A6, A7, A8)) :-
 	),
 	B =.. [A1, A2, A3, A4, A5, A6, A7, A8],
 	assertz(B).
-strelas('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B)) :-
-	!,
-	(	current_predicate('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/5)
-	->	true
-	;	dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/5),
-		assertz(':-'('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y),
-				(	term_index(X-Y, Z),
-					'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y, Z, eta, eta)
-				)
-			)
-		)
-	),
-	term_index(A-B, C),
-	assertz('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B, C, eta, eta)).
 strelas(A) :-
 	ground(A),
 	A =.. [P, [S1, S2|S3], O],
@@ -2933,6 +2914,20 @@ strelas(A) :-
 	),
 	B =.. [P, S1, S2, S3, O],
 	assertz(B).
+strelas('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B)) :-
+	!,
+	(	current_predicate('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/3)
+	->	true
+	;	dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/3),
+		assertz(':-'('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y),
+				(	term_index(X-Y, Z),
+					'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(X, Y, Z)
+				)
+			)
+		)
+	),
+	term_index(A-B, C),
+	assertz('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(A, B, C)).
 strelas(A) :-
 	ground(A),
 	A =.. [P, S, literal(O1, O2)],
