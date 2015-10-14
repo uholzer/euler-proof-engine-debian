@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10141946Z josd').
+version_info('EYE-Autumn15 10142031Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -10984,7 +10984,7 @@ token(0':, In, C, Token) :-
 	).
 token(0'@, In, C, atname(Name)) :-
 	get_code(In, C0),
-	name(C0, In, C, Name),
+	token(C0, In, C, name(Name)),
 	!.
 token(0'^, In, C, caretcaret) :-
 	peek_code(In, 0'^),
