@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10142031Z josd').
+version_info('EYE-Autumn15 10151146Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -832,8 +832,34 @@ opts(['--pvm', File|Argus], _) :-
 					T4 =.. [P, _, _, _, _],
 					(	\+ catch(call(T4), _, fail)
 					->	X =.. [P, [U1, U2|U3], V],
-						T2 = [':-'(dynamic(P/4)), ':-'(multifile(P/4)), ':-'(X, (Y =.. [P, U1, U2, U3, V], call(Y))), T3]
+						T2 = [	':-'(dynamic(P/4)),
+							':-'(multifile(P/4)),
+							':-'(X,
+								(	Y =.. [P, U1, U2, U3, V],
+									call(Y)
+								)
+							),
+							T3
+						]
 					;	T2 = T3
+					)
+				)
+			)
+		),
+		assertz(':-'(term_expansion('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, O), T2),
+				(	!,
+					term_index(S-O, SO),
+					(	\+ catch(call('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(_, _, _)), _, fail)
+					->	T2 = [	':-'(dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/3)),
+							':-'(multifile('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/3)),
+							':-'('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(U, V),
+								(	term_index(U-V, UV),
+									'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(U, V, UV)
+								)
+							),
+							'<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, O, SO)
+						]
+					;	T2 = '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'(S, O, SO)
 					)
 				)
 			)
@@ -845,7 +871,15 @@ opts(['--pvm', File|Argus], _) :-
 					T4 =.. [P, _, _, _],
 					(	\+ catch(call(T4), _, fail)
 					->	X =.. [P, U, literal(V1, V2)],
-						T2 = [':-'(dynamic(P/3)), ':-'(multifile(P/3)), ':-'(X, (Y =.. [P, U, V1, V2], call(Y))), T3]
+						T2 = [	':-'(dynamic(P/3)),
+							':-'(multifile(P/3)),
+							':-'(X,
+								(	Y =.. [P, U, V1, V2],
+									call(Y)
+								)
+							),
+							T3
+						]
 					;	T2 = T3
 					)
 				)
