@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10151146Z josd').
+version_info('EYE-Autumn15 10160754Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -1503,7 +1503,8 @@ n3_n3p(Argument, Mode) :-
 							),
 							throw(builtin_redefinition(Rt))
 						),
-						(	call(Rt)
+						(	Rt \= implies(_, _, _),
+							call(Rt)
 						->	true
 						;	strelas(Rt),
 							cnt(sc),
@@ -1693,18 +1694,18 @@ tr_n3p(['\'<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>\''(X
 	tr_n3p(Z, Src, Mode).
 tr_n3p([X|Z], Src, Mode) :-
 	tr_tr(X, Y),
-	(	flag(tactic, 'linear-select')
-	->	write(implies(true, Y, Src)),
-		writeln('.')
-	;	rvars(Y, V),
-		write(V),
+	(	uvars(Y, U),
+		U = []
+	->	write(Y),
 		writeln('.'),
 		(	flag(nope),
 			\+flag(ances)	% DEPRECATED
 		->	true
-		;	write(prfstep(V, _, true, _, V, _, forward, Src)),
+		;	write(prfstep(Y, _, true, _, Y, _, forward, Src)),
 			writeln('.')
 		)
+	;	write(':-'(Y, pass)),
+		writeln('.')
 	),
 	tr_n3p(Z, Src, Mode).
 
@@ -2219,6 +2220,9 @@ wt0(fail) :-
 	write('() '),
 	wp(fail),
 	write(' true').
+wt0(pass) :-
+	!,
+	write('true').
 wt0(X) :-
 	atom(X),
 	atom_concat(some, Y, X),
@@ -8076,6 +8080,8 @@ cn([A|B]) :-
 
 clist([], true) :-
 	!.
+clist([], pass) :-
+	!.
 clist([A], A) :-
 	A \= cn(_),
 	!.
@@ -8139,6 +8145,8 @@ c_d([A|B], [A|C]) :-
 
 
 c_list([], true) :-
+	!.
+c_list([], pass) :-
 	!.
 c_list([A], A) :-
 	!.
@@ -8922,32 +8930,24 @@ qvars(A, B) :-
 	qvars(C, B).
 
 
-rvars(A, B) :-
+uvars(A, B) :-
 	atomic(A),
 	!,
 	(	atom(A),
 		sub_atom(A, 0, 1, _, '_')
-	->	sub_atom(A, 1, _, 0, C),
-		(	evar(C, D)
-		->	true
-		;	atom_concat(C, '_', E),
-			gensym(E, D),
-			assertz(evar(C, D))
-		),
-		nb_getval(var_ns, Vns),
-		atomic_list_concat(['\'<', Vns, D, '>\''], B)
-	;	B = A
+	->	B = [A]
+	;	B = []
 	).
-rvars([], []) :-
+uvars([], []) :-
 	!.
-rvars([A|B], [C|D]) :-
-	rvars(A, C),
-	rvars(B, D),
+uvars([A|B], C) :-
+	uvars(A, D),
+	uvars(B, E),
+	append(D, E, C),
 	!.
-rvars(A, B) :-
+uvars(A, B) :-
 	A =.. C,
-	rvars(C, D),
-	B =.. D.
+	uvars(C, B).
 
 
 raw_type(A, '<http://www.w3.org/1999/02/22-rdf-syntax-ns#List>') :-
