@@ -155,7 +155,7 @@
 % infos
 % -----
 
-version_info('EYE-Autumn15 10160754Z josd').
+version_info('EYE-Autumn15 10161557Z josd').
 
 
 license_info('EulerSharp: http://eulersharp.sourceforge.net/
@@ -2105,6 +2105,11 @@ wr(Y) :-
 	write(']').
 
 
+wt(X) :-
+	var(X),
+	!,
+	write('?'),
+	write(X).
 wt(rdiv(X, Y)) :-
 	number_codes(Y, [0'1|Z]),
 	lzero(Z, Z),
@@ -2582,6 +2587,11 @@ wtn(X) :-
 
 
 wg(X) :-
+	var(X),
+	!,
+	write('?'),
+	write(X).
+wg(X) :-
 	functor(X, F, A),
 	(	(	F = exopred,
 			!
@@ -3051,10 +3061,11 @@ eam(Span) :-
 		(	(	Conc = false
 			;	Conc = answer(false, zeta, zeta, zeta, zeta, zeta, zeta, zeta)
 			)
-		->	(	flag('ignore-inference-fuse')
-			->	format(user_error, '** ERROR ** eam ** ~w~n', [inference_fuse(Prem)]),
+		->	with_output_to(atom(PN3), wt('<http://www.w3.org/2000/10/swap/log#implies>'(Prem, false))),
+			(	flag('ignore-inference-fuse')
+			->	format(user_error, '** ERROR ** eam ** ~w~n', [inference_fuse(PN3)]),
 				fail
-			;	throw(inference_fuse(Prem))
+			;	throw(inference_fuse(PN3))
 			)
 		;	true
 		),
