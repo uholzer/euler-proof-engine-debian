@@ -1,3 +1,11 @@
+euler-proof-engine (10161557Z-1) unstable; urgency=medium
+
+  * New upstream version 10161557Z
+  * No longer conflict with swi-prolog 7
+  * Update standards version to 3.9.6
+
+ -- Urs Holzer <urs@andonyar.com>  Sun, 18 Oct 2015 17:18:42 +0200
+
 euler-proof-engine (7852-1) unstable; urgency=medium
 
   * the latest tactic is called linear-select
