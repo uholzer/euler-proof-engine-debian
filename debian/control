@@ -11,7 +11,6 @@ Vcs-Browser: https://github.com/uholzer/euler-proof-engine-debian
 Package: euler-proof-engine
 Architecture: all
 Depends: ${misc:Depends}, swi-prolog (>= 6)
-Conflicts: swi-prolog (>= 7)
 Description: Euler yet antoher Proof Engine for N3
  EYE is a reasoning engine supporting the RGB Semantic Web layers.
  It is a semibackward reasoner enhanced with Euler path detection.
